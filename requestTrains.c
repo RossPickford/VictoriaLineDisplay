@@ -40,25 +40,13 @@ void parseData(char *filename)
     return;
   }
 
-  char buffer[1000];
+  char c;
+  char quoteSkipCount = 0;
+  while (quoteSkipCount < 10)
+    fgetc(file);
 
-  while (fgets(buffer, 1000, file))
-  {
-    for (size_t i = 0; i < 1000; i++)
-    {
-      switch (buffer[i])
-      {
-      case '[':
-      case '{':
-      case '(':
-      case '"':
-      case ']':
-      case '}':
-      case ')':
-        break;
-      }
-    }
-  }
+  
+  
 }
 
 int main(void)
@@ -77,7 +65,16 @@ int main(void)
 
   printf("Southbound: \n");
 
-  char buffer[1000];
+  char c;
+  while (fgetc(southbound) == '[')
+    ;
+
+  char *key, *value;
+  // fscanf(southbound, "%s", key);
+
+  printf("%c\n", fgetc(southbound));
+
+  /* char buffer[1000];
 
   // for (size_t i = 0; i < 100; i++)
   // buffer[i] = '\0';
@@ -85,7 +82,7 @@ int main(void)
   // fgets(buffer, sizeof(buffer), southbound);
 
   while (fgets(buffer, sizeof(buffer), southbound))
-    printf("%s\n", buffer);
+    printf("%s\n", buffer); */
 
   // printf("%s\n", buffer);
 

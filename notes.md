@@ -24,3 +24,9 @@ Raspberry Pi 2B - I have, hopefully it is powerful enough to handle this project
 ~~The aim is to embed Python to call the HTTP request for all the data from the Line.~~
 
 It seems much more simplier to just use python. The matrix API also has a python wrapper. 
+
+### Basic Request Logic
+
+Using the requests module.
+
+The aim is to get all station requests and then sort them into a dictionary. It should store the train ID, the next stop, current position and time until reaching the next station

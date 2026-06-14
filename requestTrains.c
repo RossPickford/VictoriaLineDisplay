@@ -24,8 +24,8 @@ typedef enum Station
 
 typedef struct Train
 {
-  Station stops;
   uint16_t id;
+  Station stops;
   uint16_t time;
 
 } Train;

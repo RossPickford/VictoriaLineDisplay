@@ -4,7 +4,7 @@
             "name": "windows-gcc-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:\\Users\\Ross Pickford\\AppData\\Local\\Python\\pythoncore-3.14-64\\include"
+                "C:\\Users\\pickford ross\\AppData\\Local\\Python\\pythoncore-3.14-64\\include"
             ],
             "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
             "cStandard": "${default}",

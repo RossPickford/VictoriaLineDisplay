@@ -1,1 +1,2 @@
-gcc requestTrains.c -o trains.exe
+gcc -c embedPyTest.c -o embedPy.o -I "C:\Users\pickford ross\AppData\Local\Python\pythoncore-3.14-64\include"
+gcc embedPy.o -o embedPyTest.exe -L "C:\Users\pickford ross\AppData\Local\Python\pythoncore-3.14-64\libs" -lpython314

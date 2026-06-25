@@ -44,15 +44,13 @@ void parseData(char *filename)
   char quoteSkipCount = 0;
   while (quoteSkipCount < 10)
     fgetc(file);
-
-  
-  
 }
 
 int main(void)
 {
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN -o southbound.json");
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUWWL -o northbound.json");
+  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
+  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN -o southbound.json");
+  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUWWL -o northbound.json");
 
   FILE *northbound = fopen("northbound.json", "r");
   FILE *southbound = fopen("southbound.json", "r");
@@ -62,29 +60,6 @@ int main(void)
     printf("failed to open files");
     return -1;
   }
-
-  printf("Southbound: \n");
-
-  char c;
-  while (fgetc(southbound) == '[')
-    ;
-
-  char *key, *value;
-  // fscanf(southbound, "%s", key);
-
-  printf("%c\n", fgetc(southbound));
-
-  /* char buffer[1000];
-
-  // for (size_t i = 0; i < 100; i++)
-  // buffer[i] = '\0';
-
-  // fgets(buffer, sizeof(buffer), southbound);
-
-  while (fgets(buffer, sizeof(buffer), southbound))
-    printf("%s\n", buffer); */
-
-  // printf("%s\n", buffer);
 
   fclose(northbound);
   fclose(southbound);

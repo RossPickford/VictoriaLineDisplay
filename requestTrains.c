@@ -48,7 +48,10 @@ void parseData(char *filename)
 
 int main(void)
 {
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
+  // 940GZZLUBXN
+  // curl https://api.tfl.gov.uk/Journey/JourneyResults/940GZZLUSKW/to/940GZZLUBXN -o journeyTme.json
+  system("curl https://api.tfl.gov.uk/Journey/JourneyResults/940GZZLUBXN/to/940GZZLUSKW -o journeyTme.json");
+  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
   // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN -o southbound.json");
   // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUWWL -o northbound.json");
 

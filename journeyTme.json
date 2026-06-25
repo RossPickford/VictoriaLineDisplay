@@ -1,0 +1,726 @@
+{
+    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.ItineraryResult, Tfl.Api.Presentation.Entities",
+    "journeys": [
+        {
+            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Journey, Tfl.Api.Presentation.Entities",
+            "startDateTime": "2026-06-25T23:12:00",
+            "duration": 2,
+            "arrivalDateTime": "2026-06-25T23:14:00",
+            "alternativeRoute": false,
+            "legs": [
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Leg, Tfl.Api.Presentation.Entities",
+                    "duration": 2,
+                    "instruction": {
+                        "$type": "Tfl.Api.Presentation.Entities.Instruction, Tfl.Api.Presentation.Entities",
+                        "summary": "Victoria line to Brixton",
+                        "detailed": "Victoria line towards Brixton",
+                        "steps": []
+                    },
+                    "obstacles": [],
+                    "departureTime": "2026-06-25T23:12:00",
+                    "arrivalTime": "2026-06-25T23:14:00",
+                    "departurePoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "naptanId": "940GZZLUSKW",
+                        "platformName": "",
+                        "icsCode": "1000223",
+                        "individualStopId": "9400ZZLUSKW4",
+                        "commonName": "Stockwell Underground Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.471805122478,
+                        "lon": -0.122644846588
+                    },
+                    "arrivalPoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "naptanId": "940GZZLUBXN",
+                        "platformName": "",
+                        "icsCode": "1000031",
+                        "individualStopId": "9400ZZLUBXN1",
+                        "commonName": "Brixton Underground Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.4624849545,
+                        "lon": -0.11400102215499999
+                    },
+                    "path": {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Path, Tfl.Api.Presentation.Entities",
+                        "lineString": "[[51.47178939413, -0.12260098461],[51.47127295009, -0.12316777237],[51.47109492488, -0.12336615020],[51.47071859978, -0.12381096052],[51.47038836095, -0.12409001772],[51.46957969111, -0.12462611976],[51.46895475401, -0.12478089614],[51.46828831855, -0.12484306322],[51.46787976550, -0.12483620095],[51.46760990994, -0.12479759258],[51.46691782237, -0.12455471885],[51.46674495458, -0.12447412679],[51.46646658682, -0.12430816622],[51.46579030493, -0.12378305001],[51.46534597583, -0.12332200065],[51.46514267364, -0.12306486288],[51.46484508751, -0.12259737218],[51.46457969497, -0.12215246440],[51.46440181067, -0.12178127858],[51.46420919575, -0.12133828564],[51.46390982716, -0.12058051100],[51.46376438241, -0.12009038438],[51.46362023107, -0.11951843598],[51.46310099235, -0.11670011781],[51.46272012057, -0.11546117367],[51.46258440812, -0.11477791076],[51.46243102980, -0.11402722185]]",
+                        "stopPoints": [
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                                "id": "940GZZLUBXN",
+                                "name": "Brixton Underground Station",
+                                "uri": "/StopPoint/940GZZLUBXN",
+                                "type": "StopPoint",
+                                "routeType": "Unknown",
+                                "status": "Unknown"
+                            }
+                        ],
+                        "elevation": []
+                    },
+                    "routeOptions": [
+                        {
+                            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.RouteOption, Tfl.Api.Presentation.Entities",
+                            "name": "Victoria",
+                            "directions": [
+                                "Brixton Underground Station"
+                            ],
+                            "lineIdentifier": {
+                                "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                                "id": "victoria",
+                                "name": "Victoria",
+                                "uri": "/Line/victoria",
+                                "type": "Line",
+                                "crowding": {
+                                    "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+                                },
+                                "routeType": "Unknown",
+                                "status": "Unknown"
+                            },
+                            "direction": "Inbound"
+                        }
+                    ],
+                    "mode": {
+                        "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                        "id": "tube",
+                        "name": "tube",
+                        "type": "Mode",
+                        "routeType": "Unknown",
+                        "status": "Unknown",
+                        "motType": "1",
+                        "network": "tfl"
+                    },
+                    "disruptions": [],
+                    "plannedWorks": [],
+                    "distance": 54.0,
+                    "isDisrupted": false,
+                    "hasFixedLocations": true,
+                    "scheduledDepartureTime": "2026-06-25T23:12:00",
+                    "scheduledArrivalTime": "2026-06-25T23:14:00"
+                }
+            ],
+            "fare": {
+                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.JourneyFare, Tfl.Api.Presentation.Entities",
+                "totalCost": 220,
+                "fares": [
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Fare, Tfl.Api.Presentation.Entities",
+                        "lowZone": 2,
+                        "highZone": 2,
+                        "cost": 220,
+                        "chargeProfileName": "Normal",
+                        "isHopperFare": false,
+                        "chargeLevel": "Off Peak",
+                        "peak": 230,
+                        "offPeak": 220,
+                        "taps": [
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTap, Tfl.Api.Presentation.Entities",
+                                "atcoCode": "940GZZLUSKW",
+                                "tapDetails": {
+                                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTapDetails, Tfl.Api.Presentation.Entities",
+                                    "modeType": "Rail",
+                                    "validationType": "None",
+                                    "hostDeviceType": "Gate",
+                                    "nationalLocationCode": 716,
+                                    "tapTimestamp": "2026-06-26T00:12:00+01:00"
+                                }
+                            },
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTap, Tfl.Api.Presentation.Entities",
+                                "atcoCode": "940GZZLUBXN",
+                                "tapDetails": {
+                                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTapDetails, Tfl.Api.Presentation.Entities",
+                                    "modeType": "Rail",
+                                    "validationType": "None",
+                                    "hostDeviceType": "Gate",
+                                    "nationalLocationCode": 778,
+                                    "tapTimestamp": "2026-06-26T00:14:00+01:00"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "caveats": [
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareCaveat, Tfl.Api.Presentation.Entities",
+                        "text": "<p>Fares between two stations may vary depending on the direction of travel, time of day and day of the week.</p><p>We charge higher fares at the busiest times of the day (usually between 06:30 and 09:30, and between 16:00 and 19:00, Monday to Friday).</p><p>When you pay as you go, you must touch your contactless or Oyster card on a yellow reader at the start and end of your journey.</p><p>Some journeys are charged via Zone 1 regardless of the route taken.</p><p>If your journey avoids Zone 1 and you see a pink card reader when changing trains, touch your contactless or Oyster card on it to pay the right fare.</p>",
+                        "type": "allRailModes"
+                    },
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareCaveat, Tfl.Api.Presentation.Entities",
+                        "text": "The price shown is a single adult pay as you go fare.",
+                        "type": "generic"
+                    }
+                ]
+            }
+        },
+        {
+            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Journey, Tfl.Api.Presentation.Entities",
+            "startDateTime": "2026-06-25T23:15:00",
+            "duration": 2,
+            "arrivalDateTime": "2026-06-25T23:17:00",
+            "alternativeRoute": false,
+            "legs": [
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Leg, Tfl.Api.Presentation.Entities",
+                    "duration": 2,
+                    "instruction": {
+                        "$type": "Tfl.Api.Presentation.Entities.Instruction, Tfl.Api.Presentation.Entities",
+                        "summary": "Victoria line to Brixton",
+                        "detailed": "Victoria line towards Brixton",
+                        "steps": []
+                    },
+                    "obstacles": [],
+                    "departureTime": "2026-06-25T23:15:00",
+                    "arrivalTime": "2026-06-25T23:17:00",
+                    "departurePoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "naptanId": "940GZZLUSKW",
+                        "platformName": "",
+                        "icsCode": "1000223",
+                        "individualStopId": "9400ZZLUSKW4",
+                        "commonName": "Stockwell Underground Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.471805122478,
+                        "lon": -0.122644846588
+                    },
+                    "arrivalPoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "naptanId": "940GZZLUBXN",
+                        "platformName": "",
+                        "icsCode": "1000031",
+                        "individualStopId": "9400ZZLUBXN1",
+                        "commonName": "Brixton Underground Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.4624849545,
+                        "lon": -0.11400102215499999
+                    },
+                    "path": {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Path, Tfl.Api.Presentation.Entities",
+                        "lineString": "[[51.47178939413, -0.12260098461],[51.47127295009, -0.12316777237],[51.47109492488, -0.12336615020],[51.47071859978, -0.12381096052],[51.47038836095, -0.12409001772],[51.46957969111, -0.12462611976],[51.46895475401, -0.12478089614],[51.46828831855, -0.12484306322],[51.46787976550, -0.12483620095],[51.46760990994, -0.12479759258],[51.46691782237, -0.12455471885],[51.46674495458, -0.12447412679],[51.46646658682, -0.12430816622],[51.46579030493, -0.12378305001],[51.46534597583, -0.12332200065],[51.46514267364, -0.12306486288],[51.46484508751, -0.12259737218],[51.46457969497, -0.12215246440],[51.46440181067, -0.12178127858],[51.46420919575, -0.12133828564],[51.46390982716, -0.12058051100],[51.46376438241, -0.12009038438],[51.46362023107, -0.11951843598],[51.46310099235, -0.11670011781],[51.46272012057, -0.11546117367],[51.46258440812, -0.11477791076],[51.46243102980, -0.11402722185]]",
+                        "stopPoints": [
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                                "id": "940GZZLUBXN",
+                                "name": "Brixton Underground Station",
+                                "uri": "/StopPoint/940GZZLUBXN",
+                                "type": "StopPoint",
+                                "routeType": "Unknown",
+                                "status": "Unknown"
+                            }
+                        ],
+                        "elevation": []
+                    },
+                    "routeOptions": [
+                        {
+                            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.RouteOption, Tfl.Api.Presentation.Entities",
+                            "name": "Victoria",
+                            "directions": [
+                                "Brixton Underground Station"
+                            ],
+                            "lineIdentifier": {
+                                "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                                "id": "victoria",
+                                "name": "Victoria",
+                                "uri": "/Line/victoria",
+                                "type": "Line",
+                                "crowding": {
+                                    "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+                                },
+                                "routeType": "Unknown",
+                                "status": "Unknown"
+                            },
+                            "direction": "Inbound"
+                        }
+                    ],
+                    "mode": {
+                        "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                        "id": "tube",
+                        "name": "tube",
+                        "type": "Mode",
+                        "routeType": "Unknown",
+                        "status": "Unknown",
+                        "motType": "1",
+                        "network": "tfl"
+                    },
+                    "disruptions": [],
+                    "plannedWorks": [],
+                    "distance": 54.0,
+                    "isDisrupted": false,
+                    "hasFixedLocations": true,
+                    "scheduledDepartureTime": "2026-06-25T23:15:00",
+                    "scheduledArrivalTime": "2026-06-25T23:17:00"
+                }
+            ],
+            "fare": {
+                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.JourneyFare, Tfl.Api.Presentation.Entities",
+                "totalCost": 220,
+                "fares": [
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Fare, Tfl.Api.Presentation.Entities",
+                        "lowZone": 2,
+                        "highZone": 2,
+                        "cost": 220,
+                        "chargeProfileName": "Normal",
+                        "isHopperFare": false,
+                        "chargeLevel": "Off Peak",
+                        "peak": 230,
+                        "offPeak": 220,
+                        "taps": [
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTap, Tfl.Api.Presentation.Entities",
+                                "atcoCode": "940GZZLUSKW",
+                                "tapDetails": {
+                                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTapDetails, Tfl.Api.Presentation.Entities",
+                                    "modeType": "Rail",
+                                    "validationType": "None",
+                                    "hostDeviceType": "Gate",
+                                    "nationalLocationCode": 716,
+                                    "tapTimestamp": "2026-06-26T00:15:00+01:00"
+                                }
+                            },
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTap, Tfl.Api.Presentation.Entities",
+                                "atcoCode": "940GZZLUBXN",
+                                "tapDetails": {
+                                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTapDetails, Tfl.Api.Presentation.Entities",
+                                    "modeType": "Rail",
+                                    "validationType": "None",
+                                    "hostDeviceType": "Gate",
+                                    "nationalLocationCode": 778,
+                                    "tapTimestamp": "2026-06-26T00:17:00+01:00"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "caveats": [
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareCaveat, Tfl.Api.Presentation.Entities",
+                        "text": "<p>Fares between two stations may vary depending on the direction of travel, time of day and day of the week.</p><p>We charge higher fares at the busiest times of the day (usually between 06:30 and 09:30, and between 16:00 and 19:00, Monday to Friday).</p><p>When you pay as you go, you must touch your contactless or Oyster card on a yellow reader at the start and end of your journey.</p><p>Some journeys are charged via Zone 1 regardless of the route taken.</p><p>If your journey avoids Zone 1 and you see a pink card reader when changing trains, touch your contactless or Oyster card on it to pay the right fare.</p>",
+                        "type": "allRailModes"
+                    },
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareCaveat, Tfl.Api.Presentation.Entities",
+                        "text": "The price shown is a single adult pay as you go fare.",
+                        "type": "generic"
+                    }
+                ]
+            }
+        },
+        {
+            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Journey, Tfl.Api.Presentation.Entities",
+            "startDateTime": "2026-06-25T23:18:00",
+            "duration": 1,
+            "arrivalDateTime": "2026-06-25T23:19:00",
+            "alternativeRoute": false,
+            "legs": [
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Leg, Tfl.Api.Presentation.Entities",
+                    "duration": 1,
+                    "instruction": {
+                        "$type": "Tfl.Api.Presentation.Entities.Instruction, Tfl.Api.Presentation.Entities",
+                        "summary": "Victoria line to Brixton",
+                        "detailed": "Victoria line towards Brixton",
+                        "steps": []
+                    },
+                    "obstacles": [],
+                    "departureTime": "2026-06-25T23:18:00",
+                    "arrivalTime": "2026-06-25T23:19:00",
+                    "departurePoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "naptanId": "940GZZLUSKW",
+                        "platformName": "",
+                        "icsCode": "1000223",
+                        "individualStopId": "9400ZZLUSKW4",
+                        "commonName": "Stockwell Underground Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.471805122478,
+                        "lon": -0.122644846588
+                    },
+                    "arrivalPoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "naptanId": "940GZZLUBXN",
+                        "platformName": "",
+                        "icsCode": "1000031",
+                        "individualStopId": "9400ZZLUBXN1",
+                        "commonName": "Brixton Underground Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.4624849545,
+                        "lon": -0.11400102215499999
+                    },
+                    "path": {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Path, Tfl.Api.Presentation.Entities",
+                        "lineString": "[[51.47178939413, -0.12260098461],[51.47127295009, -0.12316777237],[51.47109492488, -0.12336615020],[51.47071859978, -0.12381096052],[51.47038836095, -0.12409001772],[51.46957969111, -0.12462611976],[51.46895475401, -0.12478089614],[51.46828831855, -0.12484306322],[51.46787976550, -0.12483620095],[51.46760990994, -0.12479759258],[51.46691782237, -0.12455471885],[51.46674495458, -0.12447412679],[51.46646658682, -0.12430816622],[51.46579030493, -0.12378305001],[51.46534597583, -0.12332200065],[51.46514267364, -0.12306486288],[51.46484508751, -0.12259737218],[51.46457969497, -0.12215246440],[51.46440181067, -0.12178127858],[51.46420919575, -0.12133828564],[51.46390982716, -0.12058051100],[51.46376438241, -0.12009038438],[51.46362023107, -0.11951843598],[51.46310099235, -0.11670011781],[51.46272012057, -0.11546117367],[51.46258440812, -0.11477791076],[51.46243102980, -0.11402722185]]",
+                        "stopPoints": [
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                                "id": "940GZZLUBXN",
+                                "name": "Brixton Underground Station",
+                                "uri": "/StopPoint/940GZZLUBXN",
+                                "type": "StopPoint",
+                                "routeType": "Unknown",
+                                "status": "Unknown"
+                            }
+                        ],
+                        "elevation": []
+                    },
+                    "routeOptions": [
+                        {
+                            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.RouteOption, Tfl.Api.Presentation.Entities",
+                            "name": "Victoria",
+                            "directions": [
+                                "Brixton Underground Station"
+                            ],
+                            "lineIdentifier": {
+                                "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                                "id": "victoria",
+                                "name": "Victoria",
+                                "uri": "/Line/victoria",
+                                "type": "Line",
+                                "crowding": {
+                                    "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+                                },
+                                "routeType": "Unknown",
+                                "status": "Unknown"
+                            },
+                            "direction": "Inbound"
+                        }
+                    ],
+                    "mode": {
+                        "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                        "id": "tube",
+                        "name": "tube",
+                        "type": "Mode",
+                        "routeType": "Unknown",
+                        "status": "Unknown",
+                        "motType": "1",
+                        "network": "tfl"
+                    },
+                    "disruptions": [],
+                    "plannedWorks": [],
+                    "distance": 54.0,
+                    "isDisrupted": false,
+                    "hasFixedLocations": true,
+                    "scheduledDepartureTime": "2026-06-25T23:18:00",
+                    "scheduledArrivalTime": "2026-06-25T23:19:00"
+                }
+            ],
+            "fare": {
+                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.JourneyFare, Tfl.Api.Presentation.Entities",
+                "totalCost": 220,
+                "fares": [
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Fare, Tfl.Api.Presentation.Entities",
+                        "lowZone": 2,
+                        "highZone": 2,
+                        "cost": 220,
+                        "chargeProfileName": "Normal",
+                        "isHopperFare": false,
+                        "chargeLevel": "Off Peak",
+                        "peak": 230,
+                        "offPeak": 220,
+                        "taps": [
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTap, Tfl.Api.Presentation.Entities",
+                                "atcoCode": "940GZZLUSKW",
+                                "tapDetails": {
+                                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTapDetails, Tfl.Api.Presentation.Entities",
+                                    "modeType": "Rail",
+                                    "validationType": "None",
+                                    "hostDeviceType": "Gate",
+                                    "nationalLocationCode": 716,
+                                    "tapTimestamp": "2026-06-26T00:18:00+01:00"
+                                }
+                            },
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTap, Tfl.Api.Presentation.Entities",
+                                "atcoCode": "940GZZLUBXN",
+                                "tapDetails": {
+                                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareTapDetails, Tfl.Api.Presentation.Entities",
+                                    "modeType": "Rail",
+                                    "validationType": "None",
+                                    "hostDeviceType": "Gate",
+                                    "nationalLocationCode": 778,
+                                    "tapTimestamp": "2026-06-26T00:19:00+01:00"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "caveats": [
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareCaveat, Tfl.Api.Presentation.Entities",
+                        "text": "<p>Fares between two stations may vary depending on the direction of travel, time of day and day of the week.</p><p>We charge higher fares at the busiest times of the day (usually between 06:30 and 09:30, and between 16:00 and 19:00, Monday to Friday).</p><p>When you pay as you go, you must touch your contactless or Oyster card on a yellow reader at the start and end of your journey.</p><p>Some journeys are charged via Zone 1 regardless of the route taken.</p><p>If your journey avoids Zone 1 and you see a pink card reader when changing trains, touch your contactless or Oyster card on it to pay the right fare.</p>",
+                        "type": "allRailModes"
+                    },
+                    {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.FareCaveat, Tfl.Api.Presentation.Entities",
+                        "text": "The price shown is a single adult pay as you go fare.",
+                        "type": "generic"
+                    }
+                ]
+            }
+        },
+        {
+            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Journey, Tfl.Api.Presentation.Entities",
+            "startDateTime": "2026-06-25T23:12:00",
+            "duration": 18,
+            "arrivalDateTime": "2026-06-25T23:30:00",
+            "alternativeRoute": false,
+            "legs": [
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Leg, Tfl.Api.Presentation.Entities",
+                    "duration": 18,
+                    "instruction": {
+                        "$type": "Tfl.Api.Presentation.Entities.Instruction, Tfl.Api.Presentation.Entities",
+                        "summary": "Walk to Brixton Station",
+                        "detailed": "Walk to Brixton Station",
+                        "steps": [
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.InstructionStep, Tfl.Api.Presentation.Entities",
+                                "description": " for 16 metres",
+                                "turnDirection": "STRAIGHT",
+                                "streetName": "",
+                                "distance": 16,
+                                "cumulativeDistance": 16,
+                                "skyDirection": 303,
+                                "skyDirectionDescription": "NorthWest",
+                                "cumulativeTravelTime": 53,
+                                "latitude": 51.472245700044994,
+                                "longitude": -0.12264115879200001,
+                                "pathAttribute": {
+                                    "$type": "Tfl.Api.Presentation.Entities.PathAttribute, Tfl.Api.Presentation.Entities"
+                                },
+                                "descriptionHeading": "Continue along ",
+                                "trackType": "None",
+                                "travelTime": 53
+                            },
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.InstructionStep, Tfl.Api.Presentation.Entities",
+                                "description": "for 442 metres",
+                                "turnDirection": "LEFT",
+                                "streetName": "",
+                                "distance": 442,
+                                "cumulativeDistance": 459,
+                                "skyDirection": 236,
+                                "skyDirectionDescription": "SouthWest",
+                                "cumulativeTravelTime": 414,
+                                "latitude": 51.472161594123,
+                                "longitude": -0.122443024049,
+                                "pathAttribute": {
+                                    "$type": "Tfl.Api.Presentation.Entities.PathAttribute, Tfl.Api.Presentation.Entities"
+                                },
+                                "descriptionHeading": "Turn left",
+                                "trackType": "None",
+                                "travelTime": 361
+                            },
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.InstructionStep, Tfl.Api.Presentation.Entities",
+                                "description": "on to Stockwell Road/Stockwell Avenue, continue for 648 metres",
+                                "turnDirection": "STRAIGHT",
+                                "streetName": "Stockwell Road/Stockwell Avenue",
+                                "distance": 648,
+                                "cumulativeDistance": 1108,
+                                "skyDirection": 299,
+                                "skyDirectionDescription": "NorthWest",
+                                "cumulativeTravelTime": 983,
+                                "latitude": 51.468814829031,
+                                "longitude": -0.119542429333,
+                                "pathAttribute": {
+                                    "$type": "Tfl.Api.Presentation.Entities.PathAttribute, Tfl.Api.Presentation.Entities"
+                                },
+                                "descriptionHeading": "Continue along ",
+                                "trackType": "None",
+                                "travelTime": 569
+                            },
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.InstructionStep, Tfl.Api.Presentation.Entities",
+                                "description": "on to Ferndale Road, continue for 11 metres",
+                                "turnDirection": "SLIGHT_LEFT",
+                                "streetName": "Ferndale Road",
+                                "distance": 11,
+                                "cumulativeDistance": 1119,
+                                "skyDirection": 282,
+                                "skyDirectionDescription": "West",
+                                "cumulativeTravelTime": 993,
+                                "latitude": 51.463891999484005,
+                                "longitude": -0.114821198377,
+                                "pathAttribute": {
+                                    "$type": "Tfl.Api.Presentation.Entities.PathAttribute, Tfl.Api.Presentation.Entities"
+                                },
+                                "descriptionHeading": "Take a slight left",
+                                "trackType": "None",
+                                "travelTime": 9
+                            },
+                            {
+                                "$type": "Tfl.Api.Presentation.Entities.InstructionStep, Tfl.Api.Presentation.Entities",
+                                "description": "on to Brixton Road, continue for 165 metres",
+                                "turnDirection": "SLIGHT_RIGHT",
+                                "streetName": "Brixton Road",
+                                "distance": 165,
+                                "cumulativeDistance": 1285,
+                                "skyDirection": 13,
+                                "skyDirectionDescription": "North",
+                                "cumulativeTravelTime": 1128,
+                                "latitude": 51.463844984129,
+                                "longitude": -0.11469356742199999,
+                                "pathAttribute": {
+                                    "$type": "Tfl.Api.Presentation.Entities.PathAttribute, Tfl.Api.Presentation.Entities"
+                                },
+                                "descriptionHeading": "Take a slight right",
+                                "trackType": "None",
+                                "travelTime": 135
+                            }
+                        ]
+                    },
+                    "obstacles": [],
+                    "departureTime": "2026-06-25T23:12:00",
+                    "arrivalTime": "2026-06-25T23:30:00",
+                    "departurePoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "platformName": "",
+                        "icsCode": "1000223",
+                        "commonName": "Stockwell Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.472245930449,
+                        "lon": -0.122655548469
+                    },
+                    "arrivalPoint": {
+                        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+                        "platformName": "",
+                        "icsCode": "1000031",
+                        "commonName": "Brixton Station",
+                        "placeType": "StopPoint",
+                        "additionalProperties": [],
+                        "lat": 51.462416603707,
+                        "lon": -0.115342673164
+                    },
+                    "path": {
+                        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.Path, Tfl.Api.Presentation.Entities",
+                        "lineString": "[[51.47224593045, -0.12265554847],[51.47224286273, -0.12264697326],[51.47223726718, -0.12262900695],[51.47222048052, -0.12259307434],[51.47222048052, -0.12258409119],[51.47220928942, -0.12254815857],[51.47215892941, -0.12244934389],[51.47215333385, -0.12244036074],[51.47219809831, -0.12236849552],[51.47220928942, -0.12235052921],[51.47220928942, -0.12232357975],[51.47218690720, -0.12228764714],[51.47217012053, -0.12226968084],[51.47193510647, -0.12206306832],[51.47190712853, -0.12203611886],[51.47167211312, -0.12183848950],[51.47122446138, -0.12146119708],[51.47119088732, -0.12143424762],[51.47116850461, -0.12141628132],[51.47076001806, -0.12103898890],[51.47036271941, -0.12066169648],[51.46983671307, -0.12020355568],[51.46981992553, -0.12020355568],[51.46980313799, -0.12020355568],[51.46978635044, -0.12020355568],[51.46975837118, -0.12018558938],[51.46973598776, -0.12015863992],[51.46973598776, -0.12014067361],[51.46968002915, -0.12009575785],[51.46956251587, -0.11997897686],[51.46945059817, -0.11986219588],[51.46938904332, -0.11981728011],[51.46932748838, -0.11976338119],[51.46913163122, -0.11961066760],[51.46908686375, -0.11958371814],[51.46894136917, -0.11948490346],[51.46891898535, -0.11949388661],[51.46882385398, -0.11956575183],[51.46881266204, -0.11953880237],[51.46880147010, -0.11951185292],[51.46879587413, -0.11948490346],[51.46878468218, -0.11945795400],[51.46879587413, -0.11943998769],[51.46879587413, -0.11940405508],[51.46878468218, -0.11938608878],[51.46876789426, -0.11936812247],[51.46819150514, -0.11888303222],[51.46810196831, -0.11880218384],[51.46791729805, -0.11861353763],[51.46772143483, -0.11845184088],[51.46769905041, -0.11844285773],[51.46766547376, -0.11840692512],[51.46762630097, -0.11837099250],[51.46751437852, -0.11823624521],[51.46749199400, -0.11820929575],[51.46745841719, -0.11816437999],[51.46743603264, -0.11812844738],[51.46734649433, -0.11799370009],[51.46698833934, -0.11759844136],[51.46690999256, -0.11751759298],[51.46689320394, -0.11750860983],[51.46680366457, -0.11742776146],[51.46673091370, -0.11735589623],[51.46654064164, -0.11718521633],[51.46636156133, -0.11703250273],[51.46635036879, -0.11703250273],[51.46632798369, -0.11704148588],[51.46630000231, -0.11701453643],[51.46627761719, -0.11699657012],[51.46627202091, -0.11696962066],[51.46588027951, -0.11664622716],[51.46585229786, -0.11662826085],[51.46582991252, -0.11661927770],[51.46580193083, -0.11660131140],[51.46577394913, -0.11657436194],[51.46574596740, -0.11655639563],[51.46573477471, -0.11650249671],[51.46571798566, -0.11650249671],[51.46570679296, -0.11649351356],[51.46566202213, -0.11648453041],[51.46565082942, -0.11647554726],[51.46564523306, -0.11646656410],[51.46562844398, -0.11643961464],[51.46559486581, -0.11642164834],[51.46557248034, -0.11641266519],[51.46554449850, -0.11639469888],[51.46542697456, -0.11634079996],[51.46531504671, -0.11628690105],[51.46523669706, -0.11624198528],[51.46521990783, -0.11623300213],[51.46506320806, -0.11616113691],[51.46496806866, -0.11611622114],[51.46489531486, -0.11608028853],[51.46485054323, -0.11604435592],[51.46482256094, -0.11601740646],[51.46481696448, -0.11601740646],[51.46478338571, -0.11598147385],[51.46472182456, -0.11590062547],[51.46471063162, -0.11588265917],[51.46464347389, -0.11581977710],[51.46463228093, -0.11581079395],[51.46461549148, -0.11576587818],[51.46456512309, -0.11569401296],[51.46449796514, -0.11559519828],[51.46435805245, -0.11538858576],[51.46420694626, -0.11519993955],[51.46418456011, -0.11515502379],[51.46392152208, -0.11486756290],[51.46390473237, -0.11484959659],[51.46389353923, -0.11482264713],[51.46389353923, -0.11477773137],[51.46388234608, -0.11475078191],[51.46387674950, -0.11471484930],[51.46387674950, -0.11470586615],[51.46384317004, -0.11468789984],[51.46382638030, -0.11469688299],[51.46380959055, -0.11470586615],[51.46350177741, -0.11484061344],[51.46337305494, -0.11489451236],[51.46322194548, -0.11495739443],[51.46305404550, -0.11502925965],[51.46294770853, -0.11507417541],[51.46284137131, -0.11511909118],[51.46266227648, -0.11520892271],[51.46241042319, -0.11531672054],[51.46241660371, -0.11534267316]]",
+                        "stopPoints": [],
+                        "elevation": []
+                    },
+                    "routeOptions": [
+                        {
+                            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.RouteOption, Tfl.Api.Presentation.Entities",
+                            "name": "",
+                            "directions": [
+                                ""
+                            ],
+                            "direction": ""
+                        }
+                    ],
+                    "mode": {
+                        "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                        "id": "walking",
+                        "name": "walking",
+                        "type": "Mode",
+                        "routeType": "Unknown",
+                        "status": "Unknown",
+                        "motType": "100",
+                        "network": ""
+                    },
+                    "disruptions": [],
+                    "plannedWorks": [],
+                    "distance": 1285.0,
+                    "isDisrupted": false,
+                    "hasFixedLocations": true,
+                    "scheduledDepartureTime": "2026-06-25T23:12:00",
+                    "scheduledArrivalTime": "2026-06-25T23:30:00"
+                }
+            ]
+        }
+    ],
+    "lines": [
+        {
+            "$type": "Tfl.Api.Presentation.Entities.Line, Tfl.Api.Presentation.Entities",
+            "id": "victoria",
+            "name": "Victoria",
+            "modeName": "tube",
+            "disruptions": [],
+            "created": "2026-05-26T12:41:07.333Z",
+            "modified": "2026-05-26T12:41:07.333Z",
+            "lineStatuses": [
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.LineStatus, Tfl.Api.Presentation.Entities",
+                    "id": 0,
+                    "statusSeverity": 10,
+                    "statusSeverityDescription": "Good Service",
+                    "created": "0001-01-01T00:00:00",
+                    "validityPeriods": []
+                }
+            ],
+            "routeSections": [],
+            "serviceTypes": [
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.LineServiceTypeInfo, Tfl.Api.Presentation.Entities",
+                    "name": "Regular",
+                    "uri": "/Line/Route?ids=Victoria&serviceTypes=Regular"
+                },
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.LineServiceTypeInfo, Tfl.Api.Presentation.Entities",
+                    "name": "Night",
+                    "uri": "/Line/Route?ids=Victoria&serviceTypes=Night"
+                }
+            ],
+            "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+            }
+        }
+    ],
+    "stopMessages": [],
+    "recommendedMaxAgeMinutes": 2,
+    "searchCriteria": {
+        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.SearchCriteria, Tfl.Api.Presentation.Entities",
+        "dateTime": "2026-06-25T23:12:00",
+        "dateTimeType": "Departing",
+        "timeAdjustments": {
+            "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.TimeAdjustments, Tfl.Api.Presentation.Entities",
+            "earliest": {
+                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.TimeAdjustment, Tfl.Api.Presentation.Entities",
+                "date": "20260625",
+                "time": "0300",
+                "timeIs": "departing",
+                "uri": "/journey/journeyresults/940gzzluskw/to/940gzzlubxn?time=0300&date=20260625&timeIs=departing"
+            },
+            "earlier": {
+                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.TimeAdjustment, Tfl.Api.Presentation.Entities",
+                "date": "20260625",
+                "time": "2257",
+                "timeIs": "departing",
+                "uri": "/journey/journeyresults/940gzzluskw/to/940gzzlubxn?time=2257&date=20260625&timeIs=departing"
+            },
+            "later": {
+                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.TimeAdjustment, Tfl.Api.Presentation.Entities",
+                "date": "20260625",
+                "time": "2319",
+                "timeIs": "departing",
+                "uri": "/journey/journeyresults/940gzzluskw/to/940gzzlubxn?time=2319&date=20260625&timeIs=departing"
+            },
+            "latest": {
+                "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.TimeAdjustment, Tfl.Api.Presentation.Entities",
+                "date": "20260626",
+                "time": "0300",
+                "timeIs": "departing",
+                "uri": "/journey/journeyresults/940gzzluskw/to/940gzzlubxn?time=0300&date=20260626&timeIs=departing"
+            }
+        }
+    },
+    "journeyVector": {
+        "$type": "Tfl.Api.Presentation.Entities.JourneyPlanner.JourneyVector, Tfl.Api.Presentation.Entities",
+        "from": "1000223",
+        "to": "1000031",
+        "via": "",
+        "uri": "/journey/journeyresults/940gzzluskw/to/940gzzlubxn"
+    }
+}

@@ -1,30 +1,38 @@
-import sys
-import json
-sys.path.append('C:\\Users\\pickford ross\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages');
+from sys import path
+path.append('C:\\Users\\Ross Pickford\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages')
 
-import requests
+from requests import get
 
-print("we are here")
 
 API_KEY = "580efc09100e43b6976feaefb4e33f12"
 url = "https://api.tfl.gov.uk/Line/victoria/Arrivals"
 params = {"app_key": API_KEY}
 
-response = requests.get(url, params=params)
+response = get(url, params=params)
 data = response.json()
 
-trainData = []
+trainData = {}
 
 print("Southbound Trains: ")
 for train in data:
     vehicle_id = train.get("vehicleId", "Unknown")
     stationName = train.get("stationName", "No Station Available")
-    stationName.replace(" Underground Station", "")
-    print(stationName)
+    stationName = stationName.replace(" Underground Station", "")
     location = train.get("currentLocation", "No location available")
+    direction = train.get("towards", "No Direction Available")
+    if direction == "Brixton":
+        direction = "southbound"
+    else:
+        direction = "northbound"
     time = train.get("timeToStation", "Unknown")
     if stationName in location:
-        trainData.append([vehicle_id, stationName, time])
+        if vehicle_id in trainData:
+            if trainData[vehicle_id][2] > time:
+                 trainData[vehicle_id][2] = time
+        else:
+            trainData.update({vehicle_id : [stationName, direction, time]})
 
-for train in trainData:
-    print(f"Train {train[0]} → {train[1]} | time to station: {train[2]}")
+import trainTimes
+
+for train_id, data in trainData.items():
+    print(f"Train {train_id} → {data[0]} | direction: {data[1]} | time to station: {data[2]} / {trainTimes.getStationTime(data[1], data[0])}")

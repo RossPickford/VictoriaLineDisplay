@@ -23,10 +23,16 @@ Raspberry Pi 2B - I have, hopefully it is powerful enough to handle this project
 
 ~~The aim is to embed Python to call the HTTP request for all the data from the Line.~~
 
-It seems much more simplier to just use python. The matrix API also has a python wrapper. 
+~~It seems much more simplier to just use python. The matrix API also has a python wrapper.~~ 
+
+It seems I have now embedded Python into C++. Since the matrix API is built in C++, I might as well use it. The next aim will be to retrieve data from Python into C.
+
+[Hre is the timetable for stations on victoria](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://content.tfl.gov.uk/vic-wtt-42.pdf)
 
 ### Basic Request Logic
 
 Using the requests module.
 
-The aim is to get all station requests and then sort them into a dictionary. It should store the train ID, the next stop, current position and time until reaching the next station
+Currently The dictionary stores the Key as the vehicle ID, and then the value is a list where the first value is the next station, the second is the direction, and the third is the time till the next station
+
+**One issue that I have already thought of is that my form of sorting trains into the dictionary it doesn't look at the other words in location. If it says "Leaving {station}" - it will always assume you are arriving to a station.**

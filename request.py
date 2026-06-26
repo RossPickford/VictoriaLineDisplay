@@ -1,5 +1,6 @@
 from sys import path
-path.append('C:\\Users\\Ross Pickford\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages')
+import link
+path.append()
 
 from requests import get
 

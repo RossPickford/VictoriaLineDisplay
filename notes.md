@@ -25,9 +25,15 @@ Raspberry Pi 2B - I have, hopefully it is powerful enough to handle this project
 
 ~~It seems much more simplier to just use python. The matrix API also has a python wrapper.~~ 
 
-It seems I have now embedded Python into C++. Since the matrix API is built in C++, I might as well use it. The next aim will be to retrieve data from Python into C.
+It seems I have now embedded Python into C++. Since the matrix API is built in C++, I might as well use it. The next aim will be to retrieve data from Python into C++.
 
-[Hre is the timetable for stations on victoria](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://content.tfl.gov.uk/vic-wtt-42.pdf)
+A quick note but here is some information that could potentially allow this project to be purely C++:
+
+- (HTTP Request C++ API)[https://www.youtube.com/watch?v=RzdM54i7buY]
+- (JSON Parser API)[https://rapidjson.org/md_doc_dom.html#Parsing]
+- (Potentially using 2 Raspberry Pis vis Serial Ports)[https://www.waveshare.com/wiki/Raspberry_Pi_Tutorial_Series:_Serial?srsltid=AfmBOorZFqnuxsJR4YX9LPxRoMZamXQ3WljWk7ybPLJ6dZkj5PeAE_zk]
+
+[Hre is the timetable for stations on victoria](https://tfl.gov.uk/corporate/publications-and-reports/working-timetables)
 
 ### Basic Request Logic
 

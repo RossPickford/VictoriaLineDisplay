@@ -4,7 +4,9 @@ northbound = {"Walthamstow Central" : 105,
                "Seven Sisters" :  205, #need to potentiall extend due to increase time on platform 4
                "Finsbury Park" : 145,
                "Highbury & Islington" : 165,
-               "King's Cross St. Pancras" : 90,
+               "Highbury & Isl" : 165,
+               "Kings Cross St. Pancras" : 90,
+               "Kings Cross St. P" : 90,
                "Euston" : 90,
                "Warren Street" : 100,
                "Oxford Circus" : 120,
@@ -24,8 +26,10 @@ southbound = {"Brixton" : 105,
               "Oxford Circus" : 95,
               "Warren Street" : 90,
               "Euston" : 90,
-              "King's Cross St. Pancras" : 175,
+              "Kings Cross St. Pancras" : 175,
+              "Kings Cross St. P" : 175,
               "Highbury & Islington" : 140,
+              "Highbury & Isl" : 140,
               "Finsbury Park" : 200,
               "Seven Sisters" : 110,
               "Tottenham Hale" : 115,
@@ -33,6 +37,8 @@ southbound = {"Brixton" : 105,
               "Walthamstow Central" : 0}
 
 def getStationTime(direction, station):
+    if station not in northbound.keys() or station not in southbound.keys():
+        return "station not referenced"
     if direction == "northbound":
         return northbound[station]
     else:

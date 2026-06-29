@@ -99,7 +99,6 @@ def getStationFromLocation(location):
         else:
             and_count = 0
     remove = "".join(buf)
-    # print(remove)
     return location.replace(remove, "")
 
 API_KEY = "580efc09100e43b6976feaefb4e33f12"
@@ -123,12 +122,14 @@ for data in all_data:
         id = train.get("vehicleId", "No vehicle Id")
         if not id.isdigit():
             continue
+
         location = train.get("currentLocation", "Location unknown")
         station = location            
         if "Between" in location:
             station = getStationFromLocation(location)
+
         station_url = base_url
-        time = 1000
+        time = 1000000
         if station in station_id_lookup.keys():
             station_url += (station_id_lookup[station])
             station_request = get(station_url, params=params)
@@ -138,10 +139,16 @@ for data in all_data:
                     t = s.get("timeToStation", "No Time Given")
                     if t < time:
                         time = t
+        elif station == "Walthamstow Central" or station == "Brixton":
+            time = train.get("timeToStation", "No Time Given")
+            
         if id not in data[1]:
             data[1].update({id : TrainData(station, time)})
         elif data[1][id].nextStation != station:
             print(f"Error 01: Different Location for train {id}")
+        elif time < data[1][id].timeToStation: 
+                data[1][id].timeToStation = time
+
 
 import trainTimes
 

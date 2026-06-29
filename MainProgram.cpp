@@ -6,14 +6,14 @@ int main(int argc, char *argv[])
 {
     Py_Initialize();
 
-    FILE *pyFile = fopen("testFile.py", "rb");
+    FILE *pyFile = fopen("request.py", "rb");
     if (pyFile == NULL)
     {
         printf("failed to load file");
         return -1;
     }
 
-    PyRun_SimpleFile(pyFile, "testFile.py");
+    PyRun_SimpleFile(pyFile, "request.py");
 
     if (Py_FinalizeEx() < 0)
         exit(120);

@@ -4,6 +4,8 @@
 
 int main(int argc, char *argv[])
 {
+    //curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUOXC -o OxfordCircus.json
+
     Py_Initialize();
 
     FILE *pyFile = fopen("request.py", "rb");

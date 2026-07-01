@@ -1,4 +1,7 @@
-station_id_lookup = {"Stockwell" : "940GZZLUSKW",
+import time
+start = time.time()
+
+station_id_lookup = { "Stockwell" : "940GZZLUSKW",
                      "Vauxhall" : "940GZZLUVXL",
                      "Pimlico" : "940GZZLUPCO",
                      "Victoria" : "940GZZLUVIC",
@@ -16,9 +19,10 @@ station_id_lookup = {"Stockwell" : "940GZZLUSKW",
                      "Blackhorse Road" : "940GZZLUBLR"}
 
 class TrainData:
-    def __init__(self, nextStation, timeToStation):
+    def __init__(self, nextStation, timeToStation, state):
         self.nextStation = nextStation
         self.timeToStation = timeToStation
+        self.state = state
 
 import subprocess
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
@@ -117,6 +121,7 @@ north_trains = {}
 south_trains = {}
 all_data = [[northbound_data, north_trains], [southbound_data, south_trains]]
 
+
 for data in all_data:
     for train in data[0]:
         id = train.get("vehicleId", "No vehicle Id")
@@ -125,40 +130,58 @@ for data in all_data:
 
         location = train.get("currentLocation", "Location unknown")
         station = location            
+        timeToStation = 0
+        state = "None"
         if "Between" in location:
             station = getStationFromLocation(location)
+            state = "moving"
+        elif "Approaching" in location:
+            station = location.replace("Approaching ", "")
+            state = "moving"
+        elif "At Platform" in location:
+            station = (train.get("stationName", "no station available")).replace(" Underground Station", "")
+            state = "idle"
+        elif "At" in location:
+            station = location.replace("At ", "")
+            state = "idle"
 
         station_url = base_url
-        time = 1000000
-        if station in station_id_lookup.keys():
-            station_url += (station_id_lookup[station])
+        if state == "moving" and station in station_id_lookup.keys():
+            timeToStation = 100000
+            station_url += station_id_lookup[station]
+            station_url += "?direction="
+            station_url += "outbound" if data[0] == northbound_data else "inbound"
             station_request = get(station_url, params=params)
             station_data = station_request.json()
             for s in station_data:
                 if id == s.get("vehicleId", "no id"):
                     t = s.get("timeToStation", "No Time Given")
-                    if t < time:
-                        time = t
-        elif station == "Walthamstow Central" or station == "Brixton":
-            time = train.get("timeToStation", "No Time Given")
+                    if t < timeToStation:
+                        timeToStation = t
+        elif state == "moving" and (station == "Walthamstow Central" or station == "Brixton"):
+            timeToStation = train.get("timeToStation", "No Time Given")
             
         if id not in data[1]:
-            data[1].update({id : TrainData(station, time)})
+            data[1].update({id : TrainData(station, timeToStation, state)})
         elif data[1][id].nextStation != station:
             print(f"Error 01: Different Location for train {id}")
-        elif time < data[1][id].timeToStation: 
-                data[1][id].timeToStation = time
+        elif timeToStation < data[1][id].timeToStation: 
+                data[1][id].timeToStation = timeToStation
 
 
 import trainTimes
 
 print("Northbound Trains")
 for id, loc in north_trains.items():
-        print(f"ID: {id} | next Stop: {loc.nextStation} | time to: {loc.timeToStation} / {trainTimes.getStationTime("northbound", loc.nextStation)}")
+        print(f"ID: {id} | {"next" if loc.state == "moving" else "current"} Stop: {loc.nextStation} | time to: {loc.timeToStation} / {trainTimes.getStationTime("northbound", loc.nextStation)}")
 
 print("Southbound Trains")
 for id, loc in south_trains.items():
-     print(f"ID: {id} | next Stop: {loc.nextStation} | time to: {loc.timeToStation} / {trainTimes.getStationTime("southbound", loc.nextStation)}")
+     print(f"ID: {id} | {"next" if loc.state == "moving" else "current"} Stop: {loc.nextStation} | time to: {loc.timeToStation} / {trainTimes.getStationTime("southbound", loc.nextStation)}")
+
+end = time.time()
+
+print(f"Program took {end - start} seconds to run")
 
 
 

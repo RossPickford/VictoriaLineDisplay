@@ -9,6 +9,7 @@ import time
 API_KEY = "580efc09100e43b6976feaefb4e33f12"
 base_url = "https://api.tfl.gov.uk/Line/victoria/Arrivals/"
 base_url += "940GZZLUOXC"
+base_url += "?direction=inbound"
 params = {"app_key": API_KEY}
 
 stationTime = {}

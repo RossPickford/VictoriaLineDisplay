@@ -28,7 +28,7 @@ class TrainData:
         self.state = state
 
 import subprocess
-# subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
+subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN", "-o", "southbound.json"])
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUWWL", "-o", "northbound.json"])
 
@@ -80,6 +80,7 @@ for station_name, stop_id in station_ids.items():
             continue
 
         location = train.get("currentLocation", "Location unknown")
+        # print(location)
         station = location            
         timeToStation = 0
         state = "None"
@@ -97,10 +98,16 @@ for station_name, stop_id in station_ids.items():
         elif "At" in location:
             station = location.replace("At ", "")
             state = "idle"
-        elif "Departing" in location or "Departed" in location or "Left" in location:    
-            station = list(station_ids.keys())[count - 1] if station_name == "Walthamstow Central" else list(station_ids.keys())[count + 1]
-            state = "moving"
-            # print(f"{id} : {location} : {station}")
+        elif "Departing" in location or "Departed" in location or "Left" in location: 
+            destination = train.get("towards", "no destination")
+            a = 1 if destination == "Brixton" else -1
+            previousStation = list(station_ids.keys())[count + a]
+            print(f"{id} | {destination} : {location} : {previousStation}")
+            if previousStation in location:
+                station = station_name
+                state = "moving"
+            else:
+                continue
         elif "Area" in location and "Brixton" in location:
             station = "Brixton"
             state = "moving"

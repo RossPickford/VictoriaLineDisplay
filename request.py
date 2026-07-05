@@ -102,7 +102,7 @@ for station_name, stop_id in station_ids.items():
             destination = train.get("towards", "no destination")
             a = 1 if destination == "Brixton" else -1
             previousStation = list(station_ids.keys())[count + a]
-            print(f"{id} | {destination} : {location} : {previousStation}")
+            print(f"{id} | {destination} : {location} : {previousStation} : {station_name}")
             if previousStation in location:
                 station = station_name
                 state = "moving"

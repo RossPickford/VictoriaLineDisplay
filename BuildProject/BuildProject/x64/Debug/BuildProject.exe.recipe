@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Personal\VictoriaLineDisplay\BuildProject\x64\Debug\BuildProject.exe</FullPath>
+      <FullPath>C:\Personal\VictoriaLineDisplay\builds\BuildProject.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

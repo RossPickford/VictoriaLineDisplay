@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
         exit(120);
 
     fclose(pyFile);
+
     return 0;
 }
 

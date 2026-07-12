@@ -17,6 +17,7 @@ link.py
 
 # Compile file - independant for each user
 compile.bat
+compileImg.bat
 
 # Distribution / packaging
 .Python

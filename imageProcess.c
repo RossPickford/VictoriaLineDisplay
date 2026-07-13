@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 #include <SDL3/SDL.h>
 
 #define APP_END false
@@ -9,7 +10,7 @@
 #define SOUTHBOUND 1
 
 #define WALTHAMSTOW_BOUND 4
-#define BRIXTON_BOUND 125
+#define BRIXTON_BOUND 123
 
 #define NORTHBOUND_Y 15
 #define SOUTHBOUND_Y 17
@@ -176,6 +177,15 @@ uint8_t ulerp(uint8_t minVal, uint8_t maxVal, float t)
     return minVal + (uint8_t)change;
 }
 
+uint8_t uslerp(uint8_t minVal, uint8_t maxVal, float t)
+{
+    // float newT = sqrtf((2 * t) - (t * t));
+    float newT = 1.0f - sqrtf(1.0f - (t * t));
+    uint8_t diff = maxVal - minVal;
+    float change = (float)diff * newT;
+    return minVal + (uint8_t)change;
+}
+
 void updatePixel(pixelData *pxl, uint8_t r, uint8_t g, uint8_t b)
 {
     pxl->r = r;
@@ -194,10 +204,14 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
     }
 
     uint64_t xInt = (uint64_t)x;
-    float fract = x - (float)xInt;
-    printf("direction: %u\n", dir);
     uint64_t y = dir == NORTHBOUND ? NORTHBOUND_Y : SOUTHBOUND_Y;
-    // printf("x: %f, y: %u\n", x, y);
+
+    float fract = x - (float)xInt;
+    if (fract > 0.0f && dir == NORTHBOUND)
+    {
+        xInt++;
+        fract = 1.0f - fract;
+    }
 
     // front pixels
     drawTrainBuffer[trainBufferOffset][0].y = y;
@@ -210,9 +224,9 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
 
     pixelData backPix = *(*(pxlMtrx + y) + xInt - dir);
 
-    uint8_t newR = ulerp(backPix.r, UINT8_MAX, (1.0f - fract));
-    uint8_t newG = ulerp(0, backPix.g, (1.0f - fract));
-    uint8_t newB = ulerp(0, backPix.b, (1.0f - fract));
+    uint8_t newR = uslerp(backPix.r, UINT8_MAX, (1.0f - fract));
+    uint8_t newG = uslerp(0, backPix.g, fract);
+    uint8_t newB = uslerp(0, backPix.b, fract);
 
     // back pixels
     drawTrainBuffer[trainBufferOffset][2].y = y;
@@ -225,15 +239,15 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
 
     pixelData forwardPix = *(*(pxlMtrx + y) + xInt + dir);
 
-    newR = ulerp(forwardPix.r, UINT8_MAX, fract);
-    newG = ulerp(0, forwardPix.g, fract);
-    newB = ulerp(0, forwardPix.b, fract);
+    newR = uslerp(forwardPix.r, UINT8_MAX, fract);
+    newG = uslerp(0, forwardPix.g, (1.0f - fract));
+    newB = uslerp(0, forwardPix.b, (1.0f - fract));
 
     drawTrainBuffer[trainBufferOffset][4].y = y;
     drawTrainBuffer[trainBufferOffset][4].x = xInt + dir;
     updatePixel(&drawTrainBuffer[trainBufferOffset][4].pxlData, newR, newG, newB);
 
-    drawTrainBuffer[trainBufferOffset][5].y = y;
+    drawTrainBuffer[trainBufferOffset][5].y = y + 1;
     drawTrainBuffer[trainBufferOffset][5].x = xInt + dir;
     updatePixel(&drawTrainBuffer[trainBufferOffset][5].pxlData, newR, newG, newB);
 
@@ -257,33 +271,28 @@ bool AppIterate(imageData *imgData)
             SDL_RenderFillRect(renderer, &pixel);
         }
 
-    SDL_RenderPresent(renderer);
-
+    uint64_t currentTick = SDL_GetTicks();
+    float time = (float)(currentTick - previousTick) / 1000.0f;
+    previousTick = currentTick;
     for (size_t i = 0; i < 2; i++)
     {
         drawTrainNode(imgData->pixelData, (trains + i)->x, (trains + i)->dir);
-
-        // printf("x: %f, xInt: %d, xFract: %f\n", (trains + i)->x, xInt, xFract);
-
-        /* uint64_t currentTick = SDL_GetTicks();
-        float time = (float)(currentTick - previousTick) / 1000.0f;
-        previousTick = currentTick;
-
         float delta = time * (trains + i)->speed * (trains + i)->dir;
-        (trains + i)->x += delta; */
+        (trains + i)->x += delta;
     }
 
     for (uint8_t i = 0; i < trainBufferOffset; i++)
         for (uint8_t j = 0; j < 6; j++)
         {
-            SDL_FRect pxl = {drawTrainBuffer[i][j].x, drawTrainBuffer[i][j].y, 1.0f, 1.0f};
-            // printf("x: %u, y: %u\n", pxl.x, pxl.y);
+            SDL_FRect pxl = {(float)drawTrainBuffer[i][j].x, (float)drawTrainBuffer[i][j].y, 1.0f, 1.0f};
             pixelData trainPxl = drawTrainBuffer[i][j].pxlData;
+
             SDL_SetRenderDrawColor(renderer, trainPxl.r, trainPxl.g, trainPxl.b, SDL_ALPHA_OPAQUE);
             SDL_RenderRect(renderer, &pxl);
         }
 
     trainBufferOffset = 0;
+    SDL_RenderPresent(renderer);
 
     return APP_CONTINUE;
 }
@@ -294,14 +303,14 @@ int main(int argc, char *argv[])
 
     trains = SDL_malloc(sizeof(trainNode) * 2);
 
-    trains->dir = NORTHBOUND;
-    trains->x = (float)BRIXTON_BOUND;
+    trains->dir = SOUTHBOUND;
+    trains->x = (float)WALTHAMSTOW_BOUND;
     trains->id = 202;
-    trains->speed = 0.1f;
-    (trains + 1)->dir = SOUTHBOUND;
-    (trains + 1)->x = (float)WALTHAMSTOW_BOUND;
+    trains->speed = 3.0f;
+    (trains + 1)->dir = NORTHBOUND;
+    (trains + 1)->x = (float)BRIXTON_BOUND;
     (trains + 1)->id = 200;
-    (trains + 1)->speed = 1.0f;
+    (trains + 1)->speed = 0.5f;
 
     if (!extractPixelDataFromFile(&imgData))
         return -1;

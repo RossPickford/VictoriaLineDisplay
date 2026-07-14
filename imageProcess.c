@@ -15,6 +15,43 @@
 #define NORTHBOUND_Y 15
 #define SOUTHBOUND_Y 17
 
+typedef enum TrainStops
+{
+    Southbound_Waltham = 4,
+    Southbound_Blackhorse = 12,
+    Southbound_Tottenham = 20,
+    Southbound_Seven = 28,
+    Southbound_Finsbury = 36,
+    Southbound_Highbury = 44,
+    Southbound_Kings = 52,
+    Southbound_Euston = 60,
+    Southbound_Warren = 68,
+    Southbound_Oxford = 76,
+    Southbound_Green = 84,
+    Southbound_Victoria = 92,
+    Southbound_Pimlico = 100,
+    Southbound_Vauxhall = 108,
+    Southbound_Stockwell = 116,
+    Southbound_Brixton = 124,
+
+    Northbound_Waltham = 3,
+    Northbound_Blackhorse = 11,
+    Northbound_Tottenham = 19,
+    Northbound_Seven = 27,
+    Northbound_Finsbury = 35,
+    Northbound_Highbury = 43,
+    Northbound_Kings = 51,
+    Northbound_Euston = 59,
+    Northbound_Warren = 67,
+    Northbound_Oxford = 75,
+    Northbound_Green = 83,
+    Northbound_Victoria = 91,
+    Northbound_Pimlico = 99,
+    Northbound_Vauxhall = 107,
+    Northbound_Stockwell = 115,
+    Northbound_Brixton = 123,
+} TrainStops;
+
 typedef struct pixelData
 {
     uint8_t b;
@@ -35,6 +72,7 @@ typedef struct trainNode
     uint16_t id;
     float x;
     float speed;
+    TrainStops nextStop;
 } trainNode;
 
 typedef struct pixelDataExtended
@@ -177,7 +215,7 @@ uint8_t ulerp(uint8_t minVal, uint8_t maxVal, float t)
     return minVal + (uint8_t)change;
 }
 
-uint8_t uslerp(uint8_t minVal, uint8_t maxVal, float t)
+uint8_t uinvslerp(uint8_t minVal, uint8_t maxVal, float t)
 {
     // float newT = sqrtf((2 * t) - (t * t));
     float newT = 1.0f - sqrtf(1.0f - (t * t));
@@ -213,7 +251,7 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
         fract = 1.0f - fract;
     }
 
-    // front pixels
+    // Front pixels
     drawTrainBuffer[trainBufferOffset][0].y = y;
     drawTrainBuffer[trainBufferOffset][0].x = xInt;
     updatePixel(&drawTrainBuffer[trainBufferOffset][0].pxlData, UINT8_MAX, 0, 0);
@@ -224,11 +262,11 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
 
     pixelData backPix = *(*(pxlMtrx + y) + xInt - dir);
 
-    uint8_t newR = uslerp(backPix.r, UINT8_MAX, (1.0f - fract));
-    uint8_t newG = uslerp(0, backPix.g, fract);
-    uint8_t newB = uslerp(0, backPix.b, fract);
+    uint8_t newR = uinvslerp(backPix.r, UINT8_MAX, (1.0f - fract));
+    uint8_t newG = uinvslerp(0, backPix.g, fract);
+    uint8_t newB = uinvslerp(0, backPix.b, fract);
 
-    // back pixels
+    // Back pixels
     drawTrainBuffer[trainBufferOffset][2].y = y;
     drawTrainBuffer[trainBufferOffset][2].x = xInt - dir;
     updatePixel(&drawTrainBuffer[trainBufferOffset][2].pxlData, newR, newG, newB);
@@ -239,10 +277,11 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
 
     pixelData forwardPix = *(*(pxlMtrx + y) + xInt + dir);
 
-    newR = uslerp(forwardPix.r, UINT8_MAX, fract);
-    newG = uslerp(0, forwardPix.g, (1.0f - fract));
-    newB = uslerp(0, forwardPix.b, (1.0f - fract));
+    newR = uinvslerp(forwardPix.r, UINT8_MAX, fract);
+    newG = uinvslerp(0, forwardPix.g, (1.0f - fract));
+    newB = uinvslerp(0, forwardPix.b, (1.0f - fract));
 
+    // Forward Pixels (future ones)
     drawTrainBuffer[trainBufferOffset][4].y = y;
     drawTrainBuffer[trainBufferOffset][4].x = xInt + dir;
     updatePixel(&drawTrainBuffer[trainBufferOffset][4].pxlData, newR, newG, newB);
@@ -279,6 +318,11 @@ bool AppIterate(imageData *imgData)
         drawTrainNode(imgData->pixelData, (trains + i)->x, (trains + i)->dir);
         float delta = time * (trains + i)->speed * (trains + i)->dir;
         (trains + i)->x += delta;
+
+        if ((trains + i)->dir == NORTHBOUND && (trains + i)->x < (trains + i)->nextStop)
+                (trains + i)->x = (float)(trains + i)->nextStop;
+        else if ((trains +i)->dir == SOUTHBOUND && (trains + i)->x > (trains + i)->nextStop)
+            (trains +i)->x = (float)(trains + i)->nextStop;
     }
 
     for (uint8_t i = 0; i < trainBufferOffset; i++)
@@ -307,10 +351,12 @@ int main(int argc, char *argv[])
     trains->x = (float)WALTHAMSTOW_BOUND;
     trains->id = 202;
     trains->speed = 3.0f;
+    trains->nextStop = Southbound_Blackhorse;
     (trains + 1)->dir = NORTHBOUND;
     (trains + 1)->x = (float)BRIXTON_BOUND;
     (trains + 1)->id = 200;
     (trains + 1)->speed = 0.5f;
+    (trains + 1)->nextStop = Northbound_Stockwell;
 
     if (!extractPixelDataFromFile(&imgData))
         return -1;

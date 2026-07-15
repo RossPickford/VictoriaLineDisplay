@@ -29,13 +29,18 @@ int main()
             {
                 printf("Result of call is a dictionary\n");
                 Py_ssize_t len = PyMapping_Length(pValue);
-                printf("Length of dict: %d\n", len);
+                printf("Length of dict: %lld\n", len);
                 PyObject *keys = PyMapping_Keys(pValue);
                 for (Py_ssize_t i = 0; i < len; i++)
                 {
                     PyObject *id = PyList_GetItem(keys, i);
                     uint64_t result = PyLong_AsLong(id);
-                    printf("Train id: %ld\n", result);
+                    if (result == -1)
+                    {
+                        fprintf(stderr, "result not converted");
+                        return -1;
+                    }
+                    printf("Train id: %lld\n", result);
                 }
                 Py_DECREF(keys);
                 Py_DECREF(pValue);

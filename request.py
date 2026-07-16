@@ -109,21 +109,26 @@ def getTrains():
             location = train.get("currentLocation", "Location unknown")
             station = location            
             timeToStation = 0
-            state = "None"
+            state = 0
             if "Between" in location:
                 station = getStationFromLocation(location)
-                state = "moving"
+                state = 1
                 timeToStation = train.get("timeToStation", "No time given")
+
             elif "Approaching" in location:
                 station = location.replace("Approaching ", "")
-                state = "moving"
+                state = 1
                 timeToStation = train.get("timeToStation", "No time given")
+                timeToStation = int(timeToStation) if timeToStation != "No time given" else -1
+
             elif "At Platform" in location:
                 station = station_name
-                state = "idle"
+                state = 2
+
             elif "At" in location:
                 station = location.replace("At ", "")
-                state = "idle"
+                state = 2
+
             elif "Departing" in location or "Departed" in location or "Left" in location: 
                 destination = train.get("towards", "no destination")
                 a = 1 if destination == "Brixton" else -1
@@ -135,9 +140,11 @@ def getTrains():
                     timeToStation = train.get("timeToStation", "No time given")
                 else:
                     continue
+
             elif "Area" in location and "Brixton" in location:
                 station = "Brixton"
-                state = "moving"
+                state = 1
+
             else:
                 print(f"Unknown Location Value: {location}")
 
@@ -151,14 +158,16 @@ def getTrains():
 
             direction = train.get("towards","No direction")
 
-            direction = "northbound" if direction == "Walthamstow Central" else "southbound"
+            direction = -1 if direction == "Walthamstow Central" else 1
+            id_int = int(id)
+            time_int = int(timeToStation)
 
-            if int(id) not in temp_trainData.keys():
-                temp_trainData.update({int(id) : TrainData(direction, station, timeToStation, state)})
-            elif temp_trainData[int(id)].nextStation != station:
-                print(f"Error 01: Different Location for train {id}")
-            elif timeToStation < temp_trainData[int(id)].timeToStation: 
-                    temp_trainData[int(id)].timeToStation = timeToStation
+            if id_int not in temp_trainData.keys():
+                temp_trainData.update({id_int : [direction, station_numerical[station], time_int, state]})
+            elif temp_trainData[id_int][1] != station_numerical[station]:
+                print(f"Error 01: Different Location for train {id_int} - saved Station {temp_trainData[id_int][1]} | new station {station}")
+            elif time_int < temp_trainData[id_int][2]: 
+                    temp_trainData[id_int][2] = time_int
 
             totalTime_trainDataCollection += time.time() - dataCollection_start
 

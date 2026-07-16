@@ -18,6 +18,24 @@ station_ids = { "Brixton" : "940GZZLUBXN",
                 "Blackhorse Road" : "940GZZLUBLR",
                 "Walthamstow Central" : "940GZZLUWWL"}
 
+station_numerical = { "Brixton" : 124,
+                "Stockwell" : 116,
+                "Vauxhall" : 108,
+                "Pimlico" : 100,
+                "Victoria" : 92,
+                "Green Park" : 84,
+                "Oxford Circus" : 76,
+                "Warren Street" : 68,
+                "Euston" : 60,
+                "Kings Cross St. Pancras" : 52,
+                "Highbury & Islington" : 44,
+                "Finsbury Park" : 36,
+                "Seven Sisters" : 28,
+                "Tottenham Hale" : 20,
+                "Blackhorse Road" : 12,
+                "Walthamstow Central" : 4}
+
+
 class TrainData:
     def __init__(self, direction, nextStation, timeToStation, state):
         self.direction = direction
@@ -136,7 +154,7 @@ def getTrains():
             direction = "northbound" if direction == "Walthamstow Central" else "southbound"
 
             if id not in temp_trainData.keys():
-                temp_trainData.update({id : TrainData(direction, station, timeToStation, state)})
+                temp_trainData.update({id : TrainData(direction, station_numerical[station], timeToStation, state)})
             elif temp_trainData[id].nextStation != station:
                 print(f"Error 01: Different Location for train {id}")
             elif timeToStation < temp_trainData[id].timeToStation: 

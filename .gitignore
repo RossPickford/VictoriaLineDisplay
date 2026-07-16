@@ -12,6 +12,9 @@ __pycache__/
 .vs/
 .vscode/
 
+# Visual Studio build project Settings
+BuildProject/
+
 # Specific Addresses to Ignore
 link.py
 

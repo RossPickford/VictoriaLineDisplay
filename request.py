@@ -153,12 +153,12 @@ def getTrains():
 
             direction = "northbound" if direction == "Walthamstow Central" else "southbound"
 
-            if id not in temp_trainData.keys():
-                temp_trainData.update({id : TrainData(direction, station_numerical[station], timeToStation, state)})
-            elif temp_trainData[id].nextStation != station:
+            if int(id) not in temp_trainData.keys():
+                temp_trainData.update({int(id) : TrainData(direction, station, timeToStation, state)})
+            elif temp_trainData[int(id)].nextStation != station:
                 print(f"Error 01: Different Location for train {id}")
-            elif timeToStation < temp_trainData[id].timeToStation: 
-                    temp_trainData[id].timeToStation = timeToStation
+            elif timeToStation < temp_trainData[int(id)].timeToStation: 
+                    temp_trainData[int(id)].timeToStation = timeToStation
 
             totalTime_trainDataCollection += time.time() - dataCollection_start
 

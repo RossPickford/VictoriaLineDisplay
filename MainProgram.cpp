@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define MODULE_NAME "matrixListTest"
+#define FUNC_NAME "testList"
+
 typedef struct TrainData
 {
     uint16_t id;
@@ -16,12 +19,6 @@ TrainData *tData;
 
 uint64_t getTrainData(PyObject *data, Py_ssize_t index)
 {
-    if (!PyList_Check(data))
-    {
-        printf("This is not a list\n");
-        return 0;
-    }
-
     PyObject *pItem = PyList_GetItem(data, index);
     if (pItem == NULL)
     {
@@ -52,7 +49,7 @@ int main()
     int i;
 
     Py_Initialize();
-    pName = PyUnicode_DecodeFSDefault("request");
+    pName = PyUnicode_DecodeFSDefault(MODULE_NAME);
     /* Error checking of pName left out */
 
     pModule = PyImport_Import(pName);
@@ -65,7 +62,7 @@ int main()
         return 1;
     }
 
-    pFunc = PyObject_GetAttrString(pModule, "getTrains");
+    pFunc = PyObject_GetAttrString(pModule, FUNC_NAME);
     /* pFunc is a new reference */
 
     if (!pFunc && !PyCallable_Check(pFunc))
@@ -98,6 +95,14 @@ int main()
     PyObject *keys = PyMapping_Keys(pValue);
     PyObject *items = PyMapping_Items(pValue);
 
+    if (!PyList_Check(keys) || !PyList_Check(items))
+    {
+        printf("keys or items are not lists");
+    }
+
+    Py_ssize_t item_len = PyList_Size(items);
+    printf("Length of items: %lld\n", item_len);
+
     for (Py_ssize_t i = 0; i < len; i++)
     {
         PyObject *idObj = PyList_GetItem(keys, i);
@@ -121,11 +126,21 @@ int main()
         // printf("Train id: %lld\n", id);
 
         PyObject *data = PyList_GetItem(items, i);
-        if (data == NULL || !PyList_Check(data))
+        if (data == NULL)
         {
             printf("list of data not found at index: %lld\n", i);
             continue;
         }
+        else if (!PyTuple_Check(data))
+        {
+            printf("item is not a list at index: %lld\n", i);
+            printf("Tuple? : %d, Long? : %d, Dicitonary? : %d\n", PyTuple_Check(data), PyLong_Check(data), PyMapping_Check(data));
+            Py_DECREF(data);
+            continue;
+        }
+
+        Py_ssize_t dataLen = PyMapping_Length(data);
+        printf("data length: %lld\n", dataLen);
 
         (tData + i)->direction = getTrainData(data, 0);
         (tData + i)->nextStation = getTrainData(data, 1);
@@ -137,13 +152,16 @@ int main()
 
     for (size_t i = 0; i < len; i++)
     {
-        printf("Train id: %d |", (tData + i)->id);
-        printf("direction: %s |", (tData + i)->direction == -1 ? "Northbound" : "Southbound");
-        printf("%s station: %d", (tData + i)->state == 1 ? "next" : "current", (tData + i)->nextStation);
+        printf("Train id: %d | ", (tData + i)->id);
+        // printf("direction: %s |", (tData + i)->direction == -1 ? "Northbound" : "Southbound");
+        printf("direction: %d | ", (tData + i)->direction);
+        printf("%d station: %d", (tData + i)->state, (tData + i)->nextStation);
+        // printf("%s station: %d", (tData + i)->state == 1 ? "next" : "current", (tData + i)->nextStation);
         printf("| time to station: %d\n", (tData + i)->timeToStation);
     }
 
     Py_DECREF(keys);
+    Py_DECREF(items);
     Py_DECREF(pValue);
     Py_XDECREF(pFunc);
     Py_DECREF(pModule);

@@ -176,14 +176,14 @@ def getTrains():
 
     print(f"Requests took {totalTime_request} seconds")
     print(f"Data collection took {totalTime_trainDataCollection} seconds\n")
+    print("\n==============Trains==============\n")
+    for id, loc in train_data.items():
+        print(f"ID: {id} | {loc[0]} | {"next" if loc[3] == "moving" else "current"} Stop: {loc[1]} | time to: {loc[2]}")
     return train_data
 
 totalTime_all = time.time() - totalTime_all
 import trainTimes
 
-# print("\n==============Trains==============\n")
-# for id, loc in train_data.items():
-        # print(f"ID: {id} | {loc.direction} | {"next" if loc.state == "moving" else "current"} Stop: {loc.nextStation} | time to: {loc.timeToStation} / {trainTimes.getStationTime(loc.direction, loc.nextStation)}")
 
 end = time.time()
 

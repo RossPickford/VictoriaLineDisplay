@@ -72,7 +72,7 @@ int main()
     }
 
     pValue = PyObject_CallObject(pFunc, NULL);
-    if (pValue == NULL || !PyMapping_Check(pValue))
+    if (pValue == NULL || !PyList_Check(pValue))
     {
         Py_DECREF(pFunc);
         Py_DECREF(pModule);
@@ -82,20 +82,38 @@ int main()
             fprintf(stderr, "Call failed\n");
         }
         else
-            printf("Object not a dictionary\n");
+            printf("Object not a list\n");
 
         return 1;
     }
+    // if (pValue == NULL || !PyMapping_Check(pValue))
+    // {
+    //     Py_DECREF(pFunc);
+    //     Py_DECREF(pModule);
+    //     if (pValue == NULL)
+    //     {
+    //         PyErr_Print();
+    //         fprintf(stderr, "Call failed\n");
+    //     }
+    //     else
+    //         printf("Object not a dictionary\n");
 
-    
-    Py_DECREF(pValue);
-    Py_DECREF(pFunc);
-    Py_DECREF(pModule);
-    
-    printf("We Made it here\n");
+    //     return 1;
+    // }
+
     // Py_ssize_t len = PyMapping_Size(pValue);
-    // tData = (TrainData *)malloc(sizeof(TrainData) * len);
-    // printf("Length of dict: %d\n", len);
+    Py_ssize_t len = PyList_Size(pValue);
+    tData = (TrainData *)malloc(sizeof(TrainData) * len);
+    if (!tData)
+    {
+        Py_DECREF(pFunc);
+        Py_DECREF(pModule);
+        Py_DECREF(pValue);
+        fprintf(stderr, "failed to allocate memory\n");
+        return -1;
+    }
+
+    printf("Length of list: %d\n", len);
 
     // PyObject *keys = PyMapping_Keys(pValue);
     // PyObject *items = PyMapping_Items(pValue);
@@ -108,52 +126,81 @@ int main()
     // Py_ssize_t item_len = PyList_Size(items);
     // printf("Length of items: %lld\n", item_len);
 
-    // for (Py_ssize_t i = 0; i < len; i++)
-    // {
-    //     PyObject *idObj = PyList_GetItem(keys, i);
-    //     if (idObj == NULL)
-    //     {
-    //         printf("key not found at index: %lld\n", i);
-    //         continue;
-    //     }
+    for (Py_ssize_t i = 0; i < len; i++)
+    {
+        // PyObject *idObj = PyList_GetItem(keys, i);
+        PyObject *idObj = PyList_GetItem(pValue, i);
+        if (idObj == NULL)
+        {
+            printf("key not found at index: %lld\n", i);
+            continue;
+        }
+        else if (!PyList_Check(idObj))
+        {
+            Py_DECREF(idObj);
+            printf("object is not a sub list at index: %lld\n", i);
+            continue;
+        }
 
-    //     int64_t id = PyLong_AsLong(idObj);
-    //     if (id < 0)
-    //     {
-    //         printf("id at index %lld - NaN\n", i);
-    //         if (PyErr_Occurred())
-    //             PyErr_Print();
-    //         continue;
-    //     }
+        Py_ssize_t itemLen = PyList_Size(idObj);
+        printf("Length of internal array: %lld\n", itemLen);
 
-    //     Py_DECREF(idObj);
-    //     (tData + i)->id = id;
-    //     // printf("Train id: %lld\n", id);
+        for (Py_ssize_t j = 0; j < itemLen; j++)
+        {
+            (tData + i)->id = getTrainData(idObj, 0); 
+            (tData + i)->direction = getTrainData(idObj, 1); 
+            (tData + i)->nextStation = getTrainData(idObj, 2); 
+            (tData + i)->timeToStation = getTrainData(idObj, 3); 
+            (tData + i)->state = getTrainData(idObj, 4); 
+        }
 
-    //     PyObject *data = PyList_GetItem(items, i);
-    //     if (data == NULL)
-    //     {
-    //         printf("list of data not found at index: %lld\n", i);
-    //         continue;
-    //     }
-    //     else if (!PyTuple_Check(data))
-    //     {
-    //         printf("item is not a list at index: %lld\n", i);
-    //         printf("Tuple? : %d, Long? : %d, Dicitonary? : %d\n", PyTuple_Check(data), PyLong_Check(data), PyMapping_Check(data));
-    //         Py_DECREF(data);
-    //         continue;
-    //     }
+        // Py_DECREF(idObj);
 
-    //     Py_ssize_t dataLen = PyMapping_Length(data);
-    //     printf("data length: %lld\n", dataLen);
+        // int64_t id = PyLong_AsLong(idObj);
+        // if (id < 0)
+        // {
+        //     printf("id at index %lld - NaN\n", i);
+        //     if (PyErr_Occurred())
+        //         PyErr_Print();
+        //     continue;
+        // }
+        // Py_DECREF(idObj);
 
-    //     (tData + i)->direction = getTrainData(data, 0);
-    //     (tData + i)->nextStation = getTrainData(data, 1);
-    //     (tData + i)->timeToStation = getTrainData(data, 2);
-    //     (tData + i)->state = getTrainData(data, 3);
+        // (tData + i)->id = id;
+        // printf("Train id: %lld\n", id);
 
-    //     Py_DECREF(data);
-    // }
+        // PyObject *data = PyList_GetItem(items, i);
+        // if (data == NULL)
+        // {
+        //     printf("list of data not found at index: %lld\n", i);
+        //     continue;
+        // }
+        // else if (!PyList_Check(data))
+        // {
+        //     printf("item is not a list at index: %lld\n", i);
+        //     printf("Tuple? : %d, Long? : %d, Dicitonary? : %d\n", PyTuple_Check(data), PyLong_Check(data), PyMapping_Check(data));
+        //     Py_DECREF(data);
+        //     continue;
+        // }
+
+        // Py_ssize_t dataLen = PyMapping_Length(data);
+        // printf("data length: %lld\n", dataLen);
+        printf("We Made it here\n");
+
+        // (tData + i)->direction = getTrainData(data, 0);
+        // (tData + i)->nextStation = getTrainData(data, 1);
+        // (tData + i)->timeToStation = getTrainData(data, 2);
+        // (tData + i)->state = getTrainData(data, 3);
+
+        // Py_DECREF(data);
+    }
+
+    free(tData);
+    // Py_XDECREF(keys);
+    // Py_XDECREF(items);
+    Py_DECREF(pValue);
+    Py_DECREF(pFunc);
+    Py_DECREF(pModule);
 
     // for (size_t i = 0; i < len; i++)
     // {
@@ -170,8 +217,6 @@ int main()
     // Py_DECREF(pValue);
     // Py_XDECREF(pFunc);
     // Py_DECREF(pModule);
-
-
 
     if (Py_FinalizeEx() < 0)
         return 120;

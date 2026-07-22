@@ -1,21 +1,15 @@
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
-#include <stdio.h>
-#include <stdint.h>
+#include <trains.h>
 
-#define MODULE_NAME "request"
-#define FUNC_NAME "getTrains"
-
-typedef struct TrainData
+void trainsInit()
 {
-    uint16_t id;
-    int8_t direction;
-    uint8_t timeToStation;
-    uint8_t nextStation;
-    uint8_t state;
-} TrainData;
+    Py_Initialize();
+}
 
-TrainData *tData;
+void trainsQuit()
+{
+    if (Py_FinalizeEx() < 0);
+        // return 120;
+}
 
 int64_t getItem(PyObject *data, Py_ssize_t index)
 {
@@ -38,13 +32,12 @@ int64_t getItem(PyObject *data, Py_ssize_t index)
     return item;
 }
 
-int main()
+TrainData *requestTrains() // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
 {
-    // curl https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUOXC -o OxfordCircus.json
+    TrainData *tData;
 
     PyObject *pName, *pModule, *pFunc;
     PyObject *pValue;
-    int i;
 
     Py_Initialize();
     pName = PyUnicode_DecodeFSDefault(MODULE_NAME);
@@ -56,7 +49,7 @@ int main()
     {
         PyErr_Print();
         fprintf(stderr, "Failed to load\n");
-        return 1;
+        return NULL;
     }
 
     pFunc = PyObject_GetAttrString(pModule, FUNC_NAME);
@@ -81,7 +74,7 @@ int main()
         else
             printf("Object not a list\n");
 
-        return 1;
+        return NULL;
     }
 
     Py_ssize_t len = PyList_Size(pValue);
@@ -92,7 +85,7 @@ int main()
         Py_DECREF(pModule);
         Py_DECREF(pValue);
         fprintf(stderr, "failed to allocate memory\n");
-        return -1;
+        return NULL;
     }
 
     printf("Length of list: %d\n", len);
@@ -121,7 +114,7 @@ int main()
         (tData + i)->timeToStation = getItem(train, 3);
         (tData + i)->state = getItem(train, 4);
     }
-    
+
     for (size_t i = 0; i < len; i++)
     {
         printf("Train id: %d | ", (tData + i)->id);
@@ -129,20 +122,11 @@ int main()
         printf("%s station: %d", (tData + i)->state == 1 ? "next" : "current", (tData + i)->nextStation);
         printf("| time to station: %d\n", (tData + i)->timeToStation);
     }
-    
+
     Py_DECREF(pModule);
     Py_DECREF(pFunc);
     Py_DECREF(pValue);
     free(tData);
-    
-    uint64_t pVCount = Py_REFCNT(pValue);
-    printf("pValue ref count: %llu\n", pVCount);
-    
-    uint64_t pMCount = Py_REFCNT(pModule);
-    printf("pModule ref count: %llu\n", pMCount);
-    
-    if (Py_FinalizeEx() < 0)
-        return 120;
 
-    return 0;
+    return tData;
 }

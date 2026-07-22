@@ -35,14 +35,6 @@ station_numerical = { "Brixton" : 124,
                 "Blackhorse Road" : 12,
                 "Walthamstow Central" : 4}
 
-
-class TrainData:
-    def __init__(self, direction, nextStation, timeToStation, state):
-        self.direction = direction
-        self.nextStation = nextStation
-        self.timeToStation = timeToStation
-        self.state = state
-
 import subprocess
 subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN", "-o", "southbound.json"])
@@ -79,7 +71,6 @@ params = {"app_key": API_KEY}
 totalTime_init = time.time() - totalTime_init
 print(f"\nPre-initialisation took {totalTime_init} seconds")
 
-totalTime_all = time.time()
 
 def getTrains():
     train_data = {}
@@ -146,7 +137,7 @@ def getTrains():
                 state = 1
 
             else:
-                print(f"Unknown Location Value: {location}")
+                print(f"Unknown Location Value: {location} for train: {id} at {station_name}")
 
             if station == "Highbury & Isl":
                 station = "Highbury & Islington"
@@ -177,17 +168,15 @@ def getTrains():
     print(f"Requests took {totalTime_request} seconds")
     print(f"Data collection took {totalTime_trainDataCollection} seconds\n")
     print("\n==============Trains==============\n")
+
+    list_data = []
     for id, loc in train_data.items():
         print(f"ID: {id} | {loc[0]} | {"next" if loc[3] == "moving" else "current"} Stop: {loc[1]} | time to: {loc[2]}")
-    return train_data
+        list_data.append([id, loc[0], loc[1], loc[2], loc[3]])
+    
+    return list_data
 
-totalTime_all = time.time() - totalTime_all
-import trainTimes
 
-
-end = time.time()
-
-print(f"Main program took {totalTime_all} seconds to run")
 
 
 

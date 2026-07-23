@@ -1,4 +1,7 @@
-#include <trains.h>
+#include "t_dataCollection.h"
+
+#define MODULE_NAME "request"
+#define FUNC_NAME "getTrains"
 
 void trainsInit()
 {
@@ -88,7 +91,7 @@ TrainData *requestTrains() // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
         return NULL;
     }
 
-    printf("Length of list: %d\n", len);
+    printf("Length of list: %lld\n", len);
 
     for (Py_ssize_t i = 0; i < len; i++)
     {
@@ -126,7 +129,8 @@ TrainData *requestTrains() // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
     Py_DECREF(pModule);
     Py_DECREF(pFunc);
     Py_DECREF(pValue);
-    free(tData);
+
+    //sort the trains into numerical order of IDs
 
     return tData;
 }

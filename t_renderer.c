@@ -1,93 +1,10 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <math.h>
-#include <SDL3/SDL.h>
+#include "t_renderer.h"
 
 #define APP_END false
 #define APP_CONTINUE true
 
-#define NORTHBOUND -1
-#define SOUTHBOUND 1
-
-#define WALTHAMSTOW_BOUND 4
-#define BRIXTON_BOUND 123
-
 #define NORTHBOUND_Y 15
 #define SOUTHBOUND_Y 17
-
-typedef enum TrainStops
-{
-    Southbound_Waltham = 4,
-    Southbound_Blackhorse = 12,
-    Southbound_Tottenham = 20,
-    Southbound_Seven = 28,
-    Southbound_Finsbury = 36,
-    Southbound_Highbury = 44,
-    Southbound_Kings = 52,
-    Southbound_Euston = 60,
-    Southbound_Warren = 68,
-    Southbound_Oxford = 76,
-    Southbound_Green = 84,
-    Southbound_Victoria = 92,
-    Southbound_Pimlico = 100,
-    Southbound_Vauxhall = 108,
-    Southbound_Stockwell = 116,
-    Southbound_Brixton = 124,
-
-    Northbound_Waltham = 3,
-    Northbound_Blackhorse = 11,
-    Northbound_Tottenham = 19,
-    Northbound_Seven = 27,
-    Northbound_Finsbury = 35,
-    Northbound_Highbury = 43,
-    Northbound_Kings = 51,
-    Northbound_Euston = 59,
-    Northbound_Warren = 67,
-    Northbound_Oxford = 75,
-    Northbound_Green = 83,
-    Northbound_Victoria = 91,
-    Northbound_Pimlico = 99,
-    Northbound_Vauxhall = 107,
-    Northbound_Stockwell = 115,
-    Northbound_Brixton = 123,
-} TrainStops;
-
-typedef struct pixelData
-{
-    uint8_t b;
-    uint8_t g;
-    uint8_t r;
-} pixelData;
-
-typedef struct imageData
-{
-    pixelData **pixelData;
-    int32_t width;
-    int32_t height;
-} imageData;
-
-typedef struct trainNode
-{
-    int8_t dir;
-    uint16_t id;
-    float x;
-    float speed;
-    TrainStops nextStop;
-} trainNode;
-
-typedef struct pixelDataExtended
-{
-    uint8_t x;
-    uint8_t y;
-    pixelData pxlData;
-} pixelDataExtended;
-
-SDL_Window *window = NULL;
-SDL_Renderer *renderer = NULL;
-
-uint32_t width = 0, height = 0;
-
-trainNode *trains = NULL;
 
 bool extractPixelDataFromFile(imageData *imgData)
 {
@@ -123,14 +40,14 @@ bool extractPixelDataFromFile(imageData *imgData)
     }
 
     uint32_t headerSize = *(uint32_t *)&DIBHeader[0];
-    imgData->width = width = *(int32_t *)&DIBHeader[4];
-    imgData->height = height = *(int32_t *)&DIBHeader[8];
+    imgData->width = *(int32_t *)&DIBHeader[4];
+    imgData->height = *(int32_t *)&DIBHeader[8];
     uint32_t pixelOffset = *(uint32_t *)&header[10];
     uint16_t bitsPerPixel = *(uint16_t *)&DIBHeader[14];
 
     printf("Header size in bytes: %u\n", headerSize);
     printf("Pixel Data offset: %u\n", pixelOffset);
-    printf("width: %d, height: %d\n", width, height);
+    printf("width: %d, height: %d\n", imgData->width, imgData->height);
     printf("Bits per pixel: %u\n", bitsPerPixel);
 
     if (bitsPerPixel != 24)
@@ -140,8 +57,8 @@ bool extractPixelDataFromFile(imageData *imgData)
     }
 
     // Has to be a multiple of 4 bytes, hence padding
-    uint32_t pixelRowLength = (((bitsPerPixel * width) + 31) / 32) * 4;
-    uint32_t pixelDataSize = pixelRowLength * height;
+    uint32_t pixelRowLength = (((bitsPerPixel * imgData->width) + 31) / 32) * 4;
+    uint32_t pixelDataSize = pixelRowLength * imgData->height;
 
     uint8_t padding = pixelRowLength % (bitsPerPixel * 8);
 
@@ -155,10 +72,10 @@ bool extractPixelDataFromFile(imageData *imgData)
         return APP_END;
     }
 
-    imgData->pixelData = (pixelData **)SDL_malloc(height * sizeof(pixelData *));
+    imgData->pixelData = (pixelData **)SDL_malloc(imgData->height * sizeof(pixelData *));
 
-    for (size_t i = 0; i < height; i++)
-        *(imgData->pixelData + i) = (pixelData *)SDL_malloc(width * sizeof(pixelData));
+    for (size_t i = 0; i < imgData->height; i++)
+        *(imgData->pixelData + i) = (pixelData *)SDL_malloc(imgData->width * sizeof(pixelData));
 
     for (size_t i = 0, c = 0, r = 1; i < pixelDataSize; i += 3)
     {
@@ -169,7 +86,7 @@ bool extractPixelDataFromFile(imageData *imgData)
             c = 0;
         }
 
-        *(*(imgData->pixelData + (height - r)) + c++) = *(pixelData *)(rawPixelData + i);
+        *(*(imgData->pixelData + (imgData->height - r)) + c++) = *(pixelData *)(rawPixelData + i);
         // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
     }
 
@@ -177,7 +94,7 @@ bool extractPixelDataFromFile(imageData *imgData)
     return APP_CONTINUE;
 }
 
-bool AppInit()
+bool t_renderer_init(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData)
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
@@ -185,18 +102,18 @@ bool AppInit()
         return APP_END;
     }
 
-    if (!SDL_CreateWindowAndRenderer("VL Display", width, height, SDL_WINDOW_FULLSCREEN, &window, &renderer))
+    if (!SDL_CreateWindowAndRenderer("VL Display", imgData->width, imgData->height, SDL_WINDOW_FULLSCREEN, &window, &renderer))
     {
         SDL_Log("Failed to create window and renderer: %s", SDL_GetError());
         return APP_END;
     }
 
-    SDL_SetRenderLogicalPresentation(renderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(renderer, imgData->width, imgData->height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    return APP_CONTINUE;
+    return extractPixelDataFromFile(imgData);
 }
 
-bool AppEvent()
+bool t_renderer_event()
 {
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -206,6 +123,18 @@ bool AppEvent()
     }
 
     return APP_CONTINUE;
+}
+
+void t_rend_quit(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData)
+{
+    for (size_t i = 0; i < imgData->height; i++)
+        SDL_free(*imgData->pixelData);
+
+    SDL_free(imgData->pixelData);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    SDL_Quit();
 }
 
 uint8_t ulerp(uint8_t minVal, uint8_t maxVal, float t)
@@ -293,8 +222,7 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
     trainBufferOffset++;
 }
 
-uint64_t previousTick = 0;
-bool AppIterate(imageData *imgData)
+bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes)
 {
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
@@ -311,18 +239,19 @@ bool AppIterate(imageData *imgData)
         }
 
     uint64_t currentTick = SDL_GetTicks();
+    static uint64_t previousTick = 0;
     float time = (float)(currentTick - previousTick) / 1000.0f;
     previousTick = currentTick;
     for (size_t i = 0; i < 2; i++)
     {
-        drawTrainNode(imgData->pixelData, (trains + i)->x, (trains + i)->dir);
-        float delta = time * (trains + i)->speed * (trains + i)->dir;
-        (trains + i)->x += delta;
+        drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir);
+        float delta = time * (tNodes + i)->speed * (tNodes + i)->dir;
+        (tNodes + i)->x += delta;
 
-        if ((trains + i)->dir == NORTHBOUND && (trains + i)->x < (trains + i)->nextStop)
-                (trains + i)->x = (float)(trains + i)->nextStop;
-        else if ((trains +i)->dir == SOUTHBOUND && (trains + i)->x > (trains + i)->nextStop)
-            (trains +i)->x = (float)(trains + i)->nextStop;
+        if ((tNodes + i)->dir == NORTHBOUND && (tNodes + i)->x < (tNodes + i)->nextStop)
+            (tNodes + i)->x = (float)(tNodes + i)->nextStop;
+        else if ((tNodes + i)->dir == SOUTHBOUND && (tNodes + i)->x > (tNodes + i)->nextStop)
+            (tNodes + i)->x = (float)(tNodes + i)->nextStop;
     }
 
     for (uint8_t i = 0; i < trainBufferOffset; i++)
@@ -339,43 +268,4 @@ bool AppIterate(imageData *imgData)
     SDL_RenderPresent(renderer);
 
     return APP_CONTINUE;
-}
-
-int main(int argc, char *argv[])
-{
-    imageData imgData;
-
-    trains = SDL_malloc(sizeof(trainNode) * 2);
-
-    trains->dir = SOUTHBOUND;
-    trains->x = (float)WALTHAMSTOW_BOUND;
-    trains->id = 202;
-    trains->speed = 3.0f;
-    trains->nextStop = Southbound_Blackhorse;
-    (trains + 1)->dir = NORTHBOUND;
-    (trains + 1)->x = (float)BRIXTON_BOUND;
-    (trains + 1)->id = 200;
-    (trains + 1)->speed = 0.5f;
-    (trains + 1)->nextStop = Northbound_Stockwell;
-
-    if (!extractPixelDataFromFile(&imgData))
-        return -1;
-
-    bool status = AppInit();
-
-    // While status is true it will loop
-    while (status)
-        status = AppEvent() && AppIterate(&imgData);
-
-    for (size_t i = 0; i < imgData.height; i++)
-        SDL_free(*(imgData.pixelData + i));
-
-    SDL_free(imgData.pixelData);
-    SDL_free(trains);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    SDL_Quit();
-
-    return 0;
 }

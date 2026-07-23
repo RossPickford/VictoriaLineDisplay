@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define MODULE_NAME "request"
-#define FUNC_NAME "getTrains"
+#define NORTHBOUND -1
+#define SOUTHBOUND 1
 
 typedef struct TrainData
 {

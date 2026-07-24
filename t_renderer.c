@@ -160,14 +160,12 @@ void updatePixel(pixelData *pxl, uint8_t r, uint8_t g, uint8_t b)
     pxl->b = b;
 }
 
-pixelDataExtended drawTrainBuffer[10][6];
-uint8_t trainBufferOffset = 0;
-bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
+void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended **tBuff, uint8_t tBuffOffset)
 {
     if (x > (float)UINT64_MAX || x < 0.0f)
     {
-        fprintf(stderr, "X float coordinate beyond uint64_t scope");
-        return false;
+        printf("X float coordinate beyond uint64_t scope");
+        return;
     }
 
     uint64_t xInt = (uint64_t)x;
@@ -181,13 +179,13 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
     }
 
     // Front pixels
-    drawTrainBuffer[trainBufferOffset][0].y = y;
-    drawTrainBuffer[trainBufferOffset][0].x = xInt;
-    updatePixel(&drawTrainBuffer[trainBufferOffset][0].pxlData, UINT8_MAX, 0, 0);
+    tBuff[tBuffOffset][0].y = y;
+    tBuff[tBuffOffset][0].x = xInt;
+    updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
 
-    drawTrainBuffer[trainBufferOffset][1].y = y + 1;
-    drawTrainBuffer[trainBufferOffset][1].x = xInt;
-    updatePixel(&drawTrainBuffer[trainBufferOffset][1].pxlData, UINT8_MAX, 0, 0);
+    tBuff[tBuffOffset][1].y = y + 1;
+    tBuff[tBuffOffset][1].x = xInt;
+    updatePixel(&tBuff[tBuffOffset][1].pxlData, UINT8_MAX, 0, 0);
 
     pixelData backPix = *(*(pxlMtrx + y) + xInt - dir);
 
@@ -196,13 +194,13 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
     uint8_t newB = uinvslerp(0, backPix.b, fract);
 
     // Back pixels
-    drawTrainBuffer[trainBufferOffset][2].y = y;
-    drawTrainBuffer[trainBufferOffset][2].x = xInt - dir;
-    updatePixel(&drawTrainBuffer[trainBufferOffset][2].pxlData, newR, newG, newB);
+    tBuff[tBuffOffset][2].y = y;
+    tBuff[tBuffOffset][2].x = xInt - dir;
+    updatePixel(&tBuff[tBuffOffset][2].pxlData, newR, newG, newB);
 
-    drawTrainBuffer[trainBufferOffset][3].y = y + 1;
-    drawTrainBuffer[trainBufferOffset][3].x = xInt - dir;
-    updatePixel(&drawTrainBuffer[trainBufferOffset][3].pxlData, newR, newG, newB);
+    tBuff[tBuffOffset][3].y = y + 1;
+    tBuff[tBuffOffset][3].x = xInt - dir;
+    updatePixel(&tBuff[tBuffOffset][3].pxlData, newR, newG, newB);
 
     pixelData forwardPix = *(*(pxlMtrx + y) + xInt + dir);
 
@@ -211,20 +209,18 @@ bool drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir)
     newB = uinvslerp(0, forwardPix.b, (1.0f - fract));
 
     // Forward Pixels (future ones)
-    drawTrainBuffer[trainBufferOffset][4].y = y;
-    drawTrainBuffer[trainBufferOffset][4].x = xInt + dir;
-    updatePixel(&drawTrainBuffer[trainBufferOffset][4].pxlData, newR, newG, newB);
+    tBuff[tBuffOffset][4].y = y;
+    tBuff[tBuffOffset][4].x = xInt + dir;
+    updatePixel(&tBuff[tBuffOffset][4].pxlData, newR, newG, newB);
 
-    drawTrainBuffer[trainBufferOffset][5].y = y + 1;
-    drawTrainBuffer[trainBufferOffset][5].x = xInt + dir;
-    updatePixel(&drawTrainBuffer[trainBufferOffset][5].pxlData, newR, newG, newB);
-
-    trainBufferOffset++;
+    tBuff[tBuffOffset][5].y = y + 1;
+    tBuff[tBuffOffset][5].x = xInt + dir;
+    updatePixel(&tBuff[tBuffOffset][5].pxlData, newR, newG, newB);
 }
 
-bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes)
+bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, uint8_t tNodeLength)
 {
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
 
     for (size_t y = 0; y < imgData->height; y++)
@@ -242,29 +238,32 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
     static uint64_t previousTick = 0;
     float time = (float)(currentTick - previousTick) / 1000.0f;
     previousTick = currentTick;
-    for (size_t i = 0; i < 2; i++)
-    {
-        drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir);
-        float delta = time * (tNodes + i)->speed * (tNodes + i)->dir;
-        (tNodes + i)->x += delta;
 
-        if ((tNodes + i)->dir == NORTHBOUND && (tNodes + i)->x < (tNodes + i)->nextStop)
-            (tNodes + i)->x = (float)(tNodes + i)->nextStop;
-        else if ((tNodes + i)->dir == SOUTHBOUND && (tNodes + i)->x > (tNodes + i)->nextStop)
-            (tNodes + i)->x = (float)(tNodes + i)->nextStop;
+    pixelDataExtended tBuff[tNodeLength][6];
+    uint8_t tBuffOffset = 0;
+
+    for (size_t i = 0; i < tNodeLength; i++) //Fill train buffer with node data
+    {
+        drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir, tBuff, i);
+        // float delta = time * (tNodes + i)->speed * (tNodes + i)->dir;
+        // (tNodes + i)->x += delta;
+
+        // if ((tNodes + i)->dir == NORTHBOUND && (tNodes + i)->x < (tNodes + i)->nextStop)
+        //     (tNodes + i)->x = (float)(tNodes + i)->nextStop;
+        // else if ((tNodes + i)->dir == SOUTHBOUND && (tNodes + i)->x > (tNodes + i)->nextStop)
+        //     (tNodes + i)->x = (float)(tNodes + i)->nextStop;
     }
 
-    for (uint8_t i = 0; i < trainBufferOffset; i++)
+    for (uint8_t i = 0; i < tNodeLength; i++)
         for (uint8_t j = 0; j < 6; j++)
         {
-            SDL_FRect pxl = {(float)drawTrainBuffer[i][j].x, (float)drawTrainBuffer[i][j].y, 1.0f, 1.0f};
-            pixelData trainPxl = drawTrainBuffer[i][j].pxlData;
+            SDL_FRect pxl = {(float)tBuff[i][j].x, (float)tBuff[i][j].y, 1.0f, 1.0f};
+            pixelData trainPxl = tBuff[i][j].pxlData;
 
             SDL_SetRenderDrawColor(renderer, trainPxl.r, trainPxl.g, trainPxl.b, SDL_ALPHA_OPAQUE);
             SDL_RenderRect(renderer, &pxl);
         }
 
-    trainBufferOffset = 0;
     SDL_RenderPresent(renderer);
 
     return APP_CONTINUE;

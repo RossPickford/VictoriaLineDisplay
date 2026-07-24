@@ -40,6 +40,7 @@ typedef enum TrainStops
 
 typedef struct trainNode
 {
+    uint8_t misses;
     int8_t dir;
     uint16_t id;
     float x;
@@ -47,6 +48,9 @@ typedef struct trainNode
     TrainStops nextStop;
 } trainNode;
 
-bool updateTrainNode(trainNode *tNodes, TrainData *tData);
-bool updateTrainPosition(trainNode *tNodes, uint64_t curTime);
+extern uint8_t tNodeOffset = 0;
+
+bool t_nodes_init(trainNode *tNodes);
+void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength);
+void updateTrainPosition(trainNode *tNodes, uint64_t deltaTime);
 trainNode *getTrainNodes();

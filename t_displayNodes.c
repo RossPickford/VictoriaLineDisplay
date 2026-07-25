@@ -37,6 +37,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
             tNode.dir = tInfo.direction;
             tNode.nextStop = tInfo.nextStation;
             tNode.speed = (float)(tNode.nextStop - tNode.x) / (float)tInfo.timeToStation;
+            // check if direction of speed matches the train's direction.
 
             node++;
             data++;
@@ -57,11 +58,26 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
             else
                 node++;
         }
-        else
+        else // Insert a new node into the current position
         {
-            // Insert a new node into the current position 
+            if (tNodeOffset >= TNODE_ARENA_SIZE)
+            {
+                printf("Cannot assign another train node due to reaching Arena max\n");
+                data++;
+                continue;
+            }
+
+            size_t i = ++tNodeOffset;
+            while(i > node)
+                *(tNodes + i--) = *(tNodes + i);
+
+            tNode.dir = tInfo.direction;
+            tNode.nextStop = tInfo.nextStation;
+            // figure out how to assign the x position
         }
     }
+
+    // If there are no nodes, need to fill it with new data
 }
 
 void updateTrainPosition(trainNode *tNodes, uint64_t deltaTime)

@@ -64,7 +64,12 @@ bool extractPixelDataFromFile(imageData *imgData)
 
     printf("Row size in bytes: %u | pixel data size: %u\n", pixelRowLength, pixelDataSize);
 
-    uint8_t rawPixelData[pixelDataSize];
+    uint8_t *rawPixelData = (uint8_t *)SDL_malloc(pixelDataSize);
+    if (!rawPixelData)
+    {
+        printf("failed to allocate memory for pixel data\n");
+        return APP_END;
+    }
 
     if (!fread(rawPixelData, 1, pixelDataSize, image))
     {
@@ -90,11 +95,12 @@ bool extractPixelDataFromFile(imageData *imgData)
         // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
     }
 
+    SDL_free(rawPixelData);
     fclose(image);
     return APP_CONTINUE;
 }
 
-bool t_renderer_init(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData)
+bool t_rend_init(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData)
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
@@ -113,7 +119,7 @@ bool t_renderer_init(SDL_Window *window, SDL_Renderer *renderer, imageData *imgD
     return extractPixelDataFromFile(imgData);
 }
 
-bool t_renderer_event()
+bool t_rend_event()
 {
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -220,6 +226,12 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
 
 bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, uint8_t tNodeLength)
 {
+    if (!imgData | !renderer || !tNodes)
+    {
+        printf("A pointer variables inserted is/are null\n");
+        return APP_END;
+    }
+
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
 
@@ -239,10 +251,28 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
     float time = (float)(currentTick - previousTick) / 1000.0f;
     previousTick = currentTick;
 
-    pixelDataExtended tBuff[tNodeLength][6];
+    // pixelDataExtended tBuff[tNodeLength][6];
+    pixelDataExtended **tBuff = (pixelDataExtended **)SDL_malloc(sizeof(pixelDataExtended *) * tNodeLength);
+
+    if (!tBuff)
+    {
+        printf("cannot allocate memory for train pixel buffer\n");
+        return APP_END;
+    }
+
+    for (size_t i = 0; i < tNodeLength; i++)
+    {
+        *(tBuff + i) = (pixelDataExtended *)SDL_malloc(sizeof(pixelDataExtended) * 6);
+        if (!*(tBuff + i))
+        {
+            printf("cannot allocate memory for train pixel buffer\n");
+            return APP_END;
+        }
+    }
+
     uint8_t tBuffOffset = 0;
 
-    for (size_t i = 0; i < tNodeLength; i++) //Fill train buffer with node data
+    for (size_t i = 0; i < tNodeLength; i++) // Fill train buffer with node data
     {
         drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir, tBuff, i);
         // float delta = time * (tNodes + i)->speed * (tNodes + i)->dir;

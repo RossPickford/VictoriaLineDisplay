@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#pragma once
+
 #define NORTHBOUND -1
 #define SOUTHBOUND 1
 
@@ -15,9 +17,9 @@ typedef struct TrainData
     uint8_t state;
 } TrainData;
 
-void trainsInit();
-void trainsQuit();
+void t_data_init();
+void t_data_quit();
 int64_t getItem(PyObject *data, Py_ssize_t index);
-TrainData *requestTrains();
+TrainData *requestTrains(uint8_t *tDataLen);
 
 

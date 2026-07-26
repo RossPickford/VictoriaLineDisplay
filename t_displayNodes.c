@@ -4,6 +4,8 @@
 #define WALTHAMSTOW_BOUND 4
 #define BRIXTON_BOUND 123
 
+#define STATION_GAP 6
+
 #define TNODE_ARENA_SIZE 50
 
 bool t_nodes_init(trainNode *tNodes)
@@ -19,15 +21,29 @@ bool t_nodes_init(trainNode *tNodes)
     for (size_t i = 0; i < TNODE_ARENA_SIZE; i++)
         (tNodes + i)->misses = 0;
 
+    tNodeOffset = -1;
+
     return true;
+}
+
+void t_nodes_quit(trainNode *tNodes)
+{
+    SDL_free(tNodes);
+    tNodeOffset = -1;
 }
 
 void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
 {
     // assume both are sorted in numerical order of IDs
 
+    if (!tNodes || !tData)
+    {
+        printf("nodes or data pointer is Null - aborting function 'updateTrainNode'\n");
+        return;
+    }
+
     uint8_t node = 0, data = 0;
-    while (node < tNodeOffset && data < tDataLength)
+    while (node <= tNodeOffset && data < tDataLength)
     {
         trainNode tNode = *(tNodes + node);
         TrainData tInfo = *(tData + data);
@@ -35,11 +51,19 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
         if (tNode.id == tInfo.id)
         {
             tNode.dir = tInfo.direction;
-            tNode.nextStop = tInfo.nextStation;
+            size_t dir = (tNode.dir + 1) / 2;
+            tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
             tNode.speed = (float)(tNode.nextStop - tNode.x) / (float)tInfo.timeToStation;
-            // check if direction of speed matches the train's direction.
 
-            node++;
+            if ((tNode.speed < 0 && tNode.dir > 0) || ((tNode.speed > 0 && tNode.dir < 0))) // check if direction of speed matches the train's direction.
+            {
+                printf("Speed in the wrong direction due to next station given being behind train's current position\n");
+                node++;
+                data++;
+                continue;
+            }
+
+            *(tNodes + node++) = tNode;
             data++;
         }
         else if (tNode.id < tInfo.id)
@@ -68,16 +92,44 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
             }
 
             size_t i = ++tNodeOffset;
-            while(i > node)
+            while (i > node)
                 *(tNodes + i--) = *(tNodes + i);
 
+            tNode.id = tInfo.id;
             tNode.dir = tInfo.direction;
-            tNode.nextStop = tInfo.nextStation;
-            // figure out how to assign the x position
+            size_t dir = (tNode.dir + 1) / 2;
+            tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
+            tNode.x = ((float)tInfo.timeToStation / (float)tStops_times[dir][tInfo.nextStation]) * STATION_GAP;
+
+            *(tNodes + node++) = tNode;
+            data++;
         }
     }
 
     // If there are no nodes, need to fill it with new data
+    if (tNodeOffset <= 0)
+        while (data < tDataLength)
+        {
+            tNodeOffset++;
+            if (tNodeOffset >= TNODE_ARENA_SIZE)
+            {
+                printf("Cannot assign another train node due to reaching Arena max\n");
+                tNodeOffset--;
+                break;
+            }
+
+            trainNode tNode = *(tNodes + node);
+            TrainData tInfo = *(tData + data);
+
+            tNode.id = tInfo.id;
+            tNode.dir = tInfo.direction;
+            size_t dir = (tNode.dir + 1) / 2;
+            tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
+            tNode.x = ((float)tInfo.timeToStation / (float)tStops_times[dir][tInfo.nextStation]) * STATION_GAP;
+
+            *(tNodes + node++) = tNode;
+            data++;
+        }
 }
 
 void updateTrainPosition(trainNode *tNodes, uint64_t deltaTime)

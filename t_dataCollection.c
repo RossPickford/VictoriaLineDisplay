@@ -3,15 +3,16 @@
 #define MODULE_NAME "request"
 #define FUNC_NAME "getTrains"
 
-void trainsInit()
+void t_data_init()
 {
     Py_Initialize();
 }
 
-void trainsQuit()
+void t_data_quit()
 {
-    if (Py_FinalizeEx() < 0);
-        // return 120;
+    if (Py_FinalizeEx() < 0)
+        ;
+    // return 120;
 }
 
 int64_t getItem(PyObject *data, Py_ssize_t index)
@@ -35,7 +36,8 @@ int64_t getItem(PyObject *data, Py_ssize_t index)
     return item;
 }
 
-TrainData *requestTrains() // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
+// Make sure to free the data afterwards
+TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
 {
     TrainData *tData;
 
@@ -80,8 +82,8 @@ TrainData *requestTrains() // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
         return NULL;
     }
 
-    Py_ssize_t len = PyList_Size(pValue);
-    tData = (TrainData *)malloc(sizeof(TrainData) * len);
+    *tDataLen = (uint8_t)PyList_Size(pValue);
+    tData = (TrainData *)malloc(sizeof(TrainData) * *tDataLen);
     if (!tData)
     {
         Py_DECREF(pFunc);
@@ -91,9 +93,9 @@ TrainData *requestTrains() // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
         return NULL;
     }
 
-    printf("Length of list: %lld\n", len);
+    printf("Length of list: %lld\n", *tDataLen);
 
-    for (Py_ssize_t i = 0; i < len; i++)
+    for (Py_ssize_t i = 0; i < *tDataLen; i++)
     {
         PyObject *train = PyList_GetItem(pValue, i);
         if (train == NULL)
@@ -118,19 +120,30 @@ TrainData *requestTrains() // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
         (tData + i)->state = getItem(train, 4);
     }
 
-    for (size_t i = 0; i < len; i++)
+    Py_DECREF(pModule);
+    Py_DECREF(pFunc);
+    Py_DECREF(pValue);
+
+    // sort the trains into numerical order of IDs
+
+    for (size_t i = 0; i < *tDataLen - 1; i++)
+        for (size_t j = i + 1; j < *tDataLen; j++)
+        {
+            if ((tData + i) > (tData + j))
+            {
+                TrainData tempData = *(tData + i);
+                *(tData + i) = *(tData + j);
+                *(tData + j) = tempData;
+            } 
+        }
+
+    for (size_t i = 0; i < *tDataLen; i++)
     {
         printf("Train id: %d | ", (tData + i)->id);
         printf("direction: %s |", (tData + i)->direction == -1 ? "Northbound" : "Southbound");
         printf("%s station: %d", (tData + i)->state == 1 ? "next" : "current", (tData + i)->nextStation);
         printf("| time to station: %d\n", (tData + i)->timeToStation);
     }
-
-    Py_DECREF(pModule);
-    Py_DECREF(pFunc);
-    Py_DECREF(pValue);
-
-    //sort the trains into numerical order of IDs
 
     return tData;
 }

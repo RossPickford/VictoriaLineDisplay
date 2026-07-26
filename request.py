@@ -18,22 +18,22 @@ station_ids = { "Brixton" : "940GZZLUBXN",
                 "Blackhorse Road" : "940GZZLUBLR",
                 "Walthamstow Central" : "940GZZLUWWL"}
 
-station_numerical = { "Brixton" : 124,
-                "Stockwell" : 116,
-                "Vauxhall" : 108,
-                "Pimlico" : 100,
-                "Victoria" : 92,
-                "Green Park" : 84,
-                "Oxford Circus" : 76,
-                "Warren Street" : 68,
-                "Euston" : 60,
-                "Kings Cross St. Pancras" : 52,
-                "Highbury & Islington" : 44,
-                "Finsbury Park" : 36,
-                "Seven Sisters" : 28,
-                "Tottenham Hale" : 20,
-                "Blackhorse Road" : 12,
-                "Walthamstow Central" : 4}
+station_index = { "Brixton" : 15,
+                "Stockwell" : 14,
+                "Vauxhall" : 13,
+                "Pimlico" : 12,
+                "Victoria" : 11,
+                "Green Park" : 10,
+                "Oxford Circus" : 9,
+                "Warren Street" : 8,
+                "Euston" : 7,
+                "Kings Cross St. Pancras" : 6,
+                "Highbury & Islington" : 5,
+                "Finsbury Park" : 4,
+                "Seven Sisters" : 3,
+                "Tottenham Hale" : 2,
+                "Blackhorse Road" : 1,
+                "Walthamstow Central" : 0}
 
 # import subprocess
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
@@ -154,8 +154,8 @@ def getTrains():
             time_int = int(timeToStation)
 
             if id_int not in temp_trainData.keys():
-                temp_trainData.update({id_int : [direction, station_numerical[station], time_int, state]})
-            elif temp_trainData[id_int][1] != station_numerical[station]:
+                temp_trainData.update({id_int : [direction, station_index[station], time_int, state]})
+            elif temp_trainData[id_int][1] != station_index[station]:
                 print(f"Error 01: Different Location for train {id_int} - saved Station {temp_trainData[id_int][1]} | new station {station}")
             elif time_int < temp_trainData[id_int][2]: 
                     temp_trainData[id_int][2] = time_int

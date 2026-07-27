@@ -121,6 +121,7 @@ bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgDat
 
 bool t_rend_event()
 {
+    printf("event\n");
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -185,9 +186,13 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
     }
 
     // Front pixels
-    tBuff[tBuffOffset][0].y = y;
-    tBuff[tBuffOffset][0].x = xInt;
-    updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
+    // tBuff[tBuffOffset][0].y = y;
+    // tBuff[tBuffOffset][0].x = xInt;
+    // updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
+
+    (*(tBuff + tBuffOffset) + 0)->y = y;
+    (*(tBuff + tBuffOffset) + 0)->x = xInt;
+    updatePixel(&(*(tBuff + tBuffOffset) + 0)->pxlData, UINT8_MAX, 0, 0);
 
     tBuff[tBuffOffset][1].y = y + 1;
     tBuff[tBuffOffset][1].x = xInt;
@@ -226,7 +231,8 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
 
 bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, uint8_t tNodeLength)
 {
-    if (!imgData | !renderer || !tNodes)
+    printf("draw\n");
+    if (!imgData | !renderer)
     {
         printf("A pointer variables inserted is/are null\n");
         return APP_END;
@@ -250,6 +256,9 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
     static uint64_t previousTick = 0;
     float time = (float)(currentTick - previousTick) / 1000.0f;
     previousTick = currentTick;
+
+    if (tNodeLength < 0 || !tNodes)
+        goto renderToScreen;
 
     // pixelDataExtended tBuff[tNodeLength][6];
     pixelDataExtended **tBuff = (pixelDataExtended **)SDL_malloc(sizeof(pixelDataExtended *) * tNodeLength);
@@ -298,6 +307,8 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
         SDL_free(*(tBuff + i));
 
     SDL_free(tBuff);
+
+renderToScreen:
     SDL_RenderPresent(renderer);
 
     return APP_CONTINUE;

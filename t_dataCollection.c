@@ -120,10 +120,6 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
         (tData + i)->state = getItem(train, 4);
     }
 
-    Py_DECREF(pModule);
-    Py_DECREF(pFunc);
-    Py_DECREF(pValue);
-
     // sort the trains into numerical order of IDs
 
     for (size_t i = 0; i < *tDataLen - 1; i++)
@@ -134,8 +130,12 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
                 TrainData tempData = *(tData + i);
                 *(tData + i) = *(tData + j);
                 *(tData + j) = tempData;
-            } 
+            }
         }
+
+    Py_DECREF(pModule);
+    Py_DECREF(pFunc);
+    Py_DECREF(pValue);
 
     /* for (size_t i = 0; i < *tDataLen; i++)
     {

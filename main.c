@@ -21,6 +21,7 @@ int main()
 
     uint64_t previousTick = 0;
     uint64_t requestRefreshTime = 0;
+    printf("into the loop\n");
     while (status)
     {
         uint64_t currentTick = SDL_GetTicks();
@@ -28,15 +29,15 @@ int main()
         requestRefreshTime += currentTick - previousTick;
         previousTick = currentTick;
 
-        if ((requestRefreshTime % 30000) > 0)
+        /* if ((requestRefreshTime % 30000) > 0)
         {
             requestRefreshTime -= 30000;
             tData = requestTrains(&tDataLen);
             updateTrainNode(tNodes, tData, tDataLen);
             SDL_free(tData);
-        }
+        } */
 
-        updateTrainPosition(tNodes, delta);
+        // updateTrainPosition(tNodes, delta);
 
         status = t_rend_event() && t_rend_drawPixels(&imgData, renderer, tNodes, tNodeOffset + 1);
     }

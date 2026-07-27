@@ -100,7 +100,7 @@ bool extractPixelDataFromFile(imageData *imgData)
     return APP_CONTINUE;
 }
 
-bool t_rend_init(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData)
+bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgData)
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
@@ -108,13 +108,13 @@ bool t_rend_init(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData)
         return APP_END;
     }
 
-    if (!SDL_CreateWindowAndRenderer("VL Display", imgData->width, imgData->height, SDL_WINDOW_FULLSCREEN, &window, &renderer))
+    if (!SDL_CreateWindowAndRenderer("VL Display", imgData->width, imgData->height, SDL_WINDOW_FULLSCREEN, window, renderer))
     {
         SDL_Log("Failed to create window and renderer: %s", SDL_GetError());
         return APP_END;
     }
 
-    SDL_SetRenderLogicalPresentation(renderer, imgData->width, imgData->height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(*renderer, imgData->width, imgData->height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     return extractPixelDataFromFile(imgData);
 }
@@ -170,7 +170,7 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
 {
     if (x > (float)UINT64_MAX || x < 0.0f)
     {
-        printf("X float coordinate beyond uint64_t scope");
+        printf("X float coordinate beyond uint64_t scope - %f", x);
         return;
     }
 
@@ -294,6 +294,10 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
             SDL_RenderRect(renderer, &pxl);
         }
 
+    for (size_t i = 0; tNodeLength; i++)
+        SDL_free(*(tBuff + i));
+
+    SDL_free(tBuff);
     SDL_RenderPresent(renderer);
 
     return APP_CONTINUE;

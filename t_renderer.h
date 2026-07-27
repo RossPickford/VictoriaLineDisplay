@@ -23,7 +23,7 @@ typedef struct pixelDataExtended
     pixelData pxlData;
 } pixelDataExtended;
 
-bool t_rend_init(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData);
+bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgData);
 bool t_rend_event();
 bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, uint8_t tNodeSize);
 void t_rend_quit(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData);

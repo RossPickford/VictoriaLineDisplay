@@ -167,11 +167,11 @@ def getTrains():
 
     print(f"Requests took {totalTime_request} seconds")
     print(f"Data collection took {totalTime_trainDataCollection} seconds\n")
-    print("\n==============Trains==============\n")
+    # print("\n==============Trains==============\n")
 
     list_data = []
     for id, loc in train_data.items():
-        print(f"ID: {id} | {loc[0]} | {"next" if loc[3] == "moving" else "current"} Stop: {loc[1]} | time to: {loc[2]}")
+        # print(f"ID: {id} | {loc[0]} | {"next" if loc[3] == "moving" else "current"} Stop: {loc[1]} | time to: {loc[2]}")
         list_data.append([id, loc[0], loc[1], loc[2], loc[3]])
     
     return list_data

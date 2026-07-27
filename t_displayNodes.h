@@ -130,9 +130,9 @@ typedef struct trainNode
     TrainStops nextStop;
 } trainNode;
 
-static uint8_t tNodeOffset; // The offset starts from 0 - if it is below it means there are no nodse in the Arena
+static int16_t tNodeOffset; // The offset starts from 0 - if it is below it means there are no nodse in the Arena
 
-bool t_nodes_init(trainNode *tNodes);
+bool t_nodes_init(trainNode **tNodes);
 void t_nodes_quit(trainNode *tNodes);
 void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength);
 void updateTrainPosition(trainNode *tNodes, uint64_t deltaTime);

@@ -8,9 +8,9 @@
 
 #define TNODE_ARENA_SIZE 50
 
-bool t_nodes_init(trainNode *tNodes)
+bool t_nodes_init(trainNode **tNodes)
 {
-    tNodes = SDL_malloc(sizeof(trainNode) * TNODE_ARENA_SIZE);
+    *tNodes = (trainNode *)SDL_malloc(sizeof(trainNode) * TNODE_ARENA_SIZE);
 
     if (!tNodes)
     {
@@ -19,7 +19,7 @@ bool t_nodes_init(trainNode *tNodes)
     }
 
     for (size_t i = 0; i < TNODE_ARENA_SIZE; i++)
-        (tNodes + i)->misses = 0;
+        (*tNodes + i)->misses = 0;
 
     tNodeOffset = -1;
 
@@ -34,7 +34,7 @@ void t_nodes_quit(trainNode *tNodes)
 
 void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
 {
-    // assume both are sorted in numerical order of IDs
+    // This only works under the assumption both are sorted in numerical order of IDs
 
     if (!tNodes || !tData)
     {
@@ -86,7 +86,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
         {
             if (tNodeOffset >= TNODE_ARENA_SIZE)
             {
-                printf("Cannot assign another train node due to reaching Arena max\n");
+                printf("Cannot assign another train node due to reaching Arena max - %u\n", tNodeOffset);
                 data++;
                 continue;
             }

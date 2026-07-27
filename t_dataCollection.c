@@ -137,13 +137,13 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
             } 
         }
 
-    for (size_t i = 0; i < *tDataLen; i++)
+    /* for (size_t i = 0; i < *tDataLen; i++)
     {
         printf("Train id: %d | ", (tData + i)->id);
         printf("direction: %s |", (tData + i)->direction == -1 ? "Northbound" : "Southbound");
         printf("%s station: %d", (tData + i)->state == 1 ? "next" : "current", (tData + i)->nextStation);
         printf("| time to station: %d\n", (tData + i)->timeToStation);
-    }
+    } */
 
     return tData;
 }

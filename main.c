@@ -12,11 +12,12 @@ int main()
     imageData imgData;
 
     t_data_init();
-    bool status = t_nodes_init(tNodes) && t_rend_init(window, renderer, &imgData);
+    bool status = t_nodes_init(&tNodes) && t_rend_init(&window, &renderer, &imgData);
 
     // Collect initial data
     tData = requestTrains(&tDataLen);
     updateTrainNode(tNodes, tData, tDataLen);
+    SDL_free(tData);
 
     uint64_t previousTick = 0;
     uint64_t requestRefreshTime = 0;

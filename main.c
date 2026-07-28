@@ -1,15 +1,18 @@
 #include "t_renderer.h"
 
+extern int16_t tNodeOffset;
+
+
 int main()
 {
     TrainData *tData = NULL;
     uint8_t tDataLen = 0;
-
+    
     trainNode *tNodes = NULL;
-
+    
+    imageData imgData;
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
-    imageData imgData;
 
     t_data_init();
     bool status = t_nodes_init(&tNodes) && t_rend_init(&window, &renderer, &imgData);
@@ -19,9 +22,17 @@ int main()
     updateTrainNode(tNodes, tData, tDataLen);
     SDL_free(tData);
 
+    /* for (size_t i = 0; i < tNodeOffset; i++)
+    {
+        printf("Train id: %d | ", (tNodes + i)->id);
+        printf("direction: %s |", (tNodes + i)->dir == -1 ? "Northbound" : "Southbound");
+        printf("station: %d", (tNodes + i)->nextStop);
+        printf("| x coord: %f\n", (tNodes + i)->x);
+        printf("| speed: %f\n", (tNodes + i)->speed);
+    } */
+
     uint64_t previousTick = 0;
     uint64_t requestRefreshTime = 0;
-    printf("into the loop\n");
     while (status)
     {
         uint64_t currentTick = SDL_GetTicks();
@@ -37,9 +48,11 @@ int main()
             SDL_free(tData);
         } */
 
-        // updateTrainPosition(tNodes, delta);
+        updateTrainPosition(tNodes, delta);
 
+        printf("tnodeoffset before loop: %d\n", tNodeOffset);
         status = t_rend_event() && t_rend_drawPixels(&imgData, renderer, tNodes, tNodeOffset + 1);
+        // status = false;
     }
 
     t_data_quit();

@@ -91,7 +91,7 @@ bool extractPixelDataFromFile(imageData *imgData)
             c = 0;
         }
 
-        *(*(imgData->pixelData + (imgData->height - r)) + c++) = *(pixelData *)(rawPixelData + i);
+        pixelData pData = *(*(imgData->pixelData + (imgData->height - r)) + c++) = *(pixelData *)(rawPixelData + i);
         // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
     }
 
@@ -108,6 +108,12 @@ bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgDat
         return APP_END;
     }
 
+    if (!extractPixelDataFromFile(imgData))
+    {
+        printf("couldn't load bitmap image\n");
+        return APP_END;
+    }
+
     if (!SDL_CreateWindowAndRenderer("VL Display", imgData->width, imgData->height, SDL_WINDOW_FULLSCREEN, window, renderer))
     {
         SDL_Log("Failed to create window and renderer: %s", SDL_GetError());
@@ -116,12 +122,12 @@ bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgDat
 
     SDL_SetRenderLogicalPresentation(*renderer, imgData->width, imgData->height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    return extractPixelDataFromFile(imgData);
+    return APP_CONTINUE;
 }
 
 bool t_rend_event()
 {
-    printf("event\n");
+    // printf("event\n");
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -135,7 +141,7 @@ bool t_rend_event()
 void t_rend_quit(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData)
 {
     for (size_t i = 0; i < imgData->height; i++)
-        SDL_free(*imgData->pixelData);
+        SDL_free((imgData->pixelData + i));
 
     SDL_free(imgData->pixelData);
     SDL_DestroyRenderer(renderer);
@@ -169,6 +175,8 @@ void updatePixel(pixelData *pxl, uint8_t r, uint8_t g, uint8_t b)
 
 void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended **tBuff, uint8_t tBuffOffset)
 {
+    printf("still drawing nodes\n");
+
     if (x > (float)UINT64_MAX || x < 0.0f)
     {
         printf("X float coordinate beyond uint64_t scope - %f", x);
@@ -186,13 +194,13 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
     }
 
     // Front pixels
-    // tBuff[tBuffOffset][0].y = y;
-    // tBuff[tBuffOffset][0].x = xInt;
-    // updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
+    tBuff[tBuffOffset][0].y = y;
+    tBuff[tBuffOffset][0].x = xInt;
+    updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
 
-    (*(tBuff + tBuffOffset) + 0)->y = y;
-    (*(tBuff + tBuffOffset) + 0)->x = xInt;
-    updatePixel(&(*(tBuff + tBuffOffset) + 0)->pxlData, UINT8_MAX, 0, 0);
+    // (*(tBuff + tBuffOffset) + 0)->y = y;
+    // (*(tBuff + tBuffOffset) + 0)->x = xInt;
+    // updatePixel(&(*(tBuff + tBuffOffset) + 0)->pxlData, UINT8_MAX, 0, 0);
 
     tBuff[tBuffOffset][1].y = y + 1;
     tBuff[tBuffOffset][1].x = xInt;
@@ -229,9 +237,8 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
     updatePixel(&tBuff[tBuffOffset][5].pxlData, newR, newG, newB);
 }
 
-bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, uint8_t tNodeLength)
+bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, int16_t tNodeLength)
 {
-    printf("draw\n");
     if (!imgData | !renderer)
     {
         printf("A pointer variables inserted is/are null\n");
@@ -257,58 +264,59 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
     float time = (float)(currentTick - previousTick) / 1000.0f;
     previousTick = currentTick;
 
-    if (tNodeLength < 0 || !tNodes)
-        goto renderToScreen;
-
-    // pixelDataExtended tBuff[tNodeLength][6];
-    pixelDataExtended **tBuff = (pixelDataExtended **)SDL_malloc(sizeof(pixelDataExtended *) * tNodeLength);
-
-    if (!tBuff)
+    if (tNodeLength > 0 && tNodes)
     {
-        printf("cannot allocate memory for train pixel buffer\n");
-        return APP_END;
-    }
+        printf("drawing nodes - %u\n", tNodeLength);
+        // pixelDataExtended tBuff[tNodeLength][6];
+        pixelDataExtended **tBuff = (pixelDataExtended **)SDL_malloc(sizeof(pixelDataExtended *) * tNodeLength);
 
-    for (size_t i = 0; i < tNodeLength; i++)
-    {
-        *(tBuff + i) = (pixelDataExtended *)SDL_malloc(sizeof(pixelDataExtended) * 6);
-        if (!*(tBuff + i))
+        if (!tBuff)
         {
             printf("cannot allocate memory for train pixel buffer\n");
             return APP_END;
         }
-    }
 
-    uint8_t tBuffOffset = 0;
-
-    for (size_t i = 0; i < tNodeLength; i++) // Fill train buffer with node data
-    {
-        drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir, tBuff, i);
-        // float delta = time * (tNodes + i)->speed * (tNodes + i)->dir;
-        // (tNodes + i)->x += delta;
-
-        // if ((tNodes + i)->dir == NORTHBOUND && (tNodes + i)->x < (tNodes + i)->nextStop)
-        //     (tNodes + i)->x = (float)(tNodes + i)->nextStop;
-        // else if ((tNodes + i)->dir == SOUTHBOUND && (tNodes + i)->x > (tNodes + i)->nextStop)
-        //     (tNodes + i)->x = (float)(tNodes + i)->nextStop;
-    }
-
-    for (uint8_t i = 0; i < tNodeLength; i++)
-        for (uint8_t j = 0; j < 6; j++)
+        for (size_t i = 0; i < tNodeLength; i++)
         {
-            SDL_FRect pxl = {(float)tBuff[i][j].x, (float)tBuff[i][j].y, 1.0f, 1.0f};
-            pixelData trainPxl = tBuff[i][j].pxlData;
-
-            SDL_SetRenderDrawColor(renderer, trainPxl.r, trainPxl.g, trainPxl.b, SDL_ALPHA_OPAQUE);
-            SDL_RenderRect(renderer, &pxl);
+            *(tBuff + i) = (pixelDataExtended *)SDL_malloc(sizeof(pixelDataExtended) * 6);
+            if (!*(tBuff + i))
+            {
+                printf("cannot allocate memory for train pixel buffer\n");
+                return APP_END;
+            }
         }
 
-    for (size_t i = 0; tNodeLength; i++)
-        SDL_free(*(tBuff + i));
+        uint8_t tBuffOffset = 0;
 
-    SDL_free(tBuff);
+        for (size_t i = 0; i < tNodeLength; i++) // Fill train buffer with node data
+        {
+            drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir, tBuff, i);
+            // float delta = time * (tNodes + i)->speed * (tNodes + i)->dir;
+            // (tNodes + i)->x += delta;
 
-renderToScreen:
+            // if ((tNodes + i)->dir == NORTHBOUND && (tNodes + i)->x < (tNodes + i)->nextStop)
+            //     (tNodes + i)->x = (float)(tNodes + i)->nextStop;
+            // else if ((tNodes + i)->dir == SOUTHBOUND && (tNodes + i)->x > (tNodes + i)->nextStop)
+            //     (tNodes + i)->x = (float)(tNodes + i)->nextStop;
+        }
+
+        for (uint8_t i = 0; i < tNodeLength; i++)
+            for (uint8_t j = 0; j < 6; j++)
+            {
+                SDL_FRect pxl = {(float)tBuff[i][j].x, (float)tBuff[i][j].y, 1.0f, 1.0f};
+                pixelData trainPxl = tBuff[i][j].pxlData;
+
+                SDL_SetRenderDrawColor(renderer, trainPxl.r, trainPxl.g, trainPxl.b, SDL_ALPHA_OPAQUE);
+                SDL_RenderRect(renderer, &pxl);
+            }
+
+        for (size_t i = 0; i < tNodeLength; i++)
+            SDL_free(*(tBuff + i));
+
+        SDL_free(tBuff);
+    }
+    printf("finished drawing nodes\n");
+
     SDL_RenderPresent(renderer);
 
     return APP_CONTINUE;

@@ -125,7 +125,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
     for (size_t i = 0; i < *tDataLen - 1; i++)
         for (size_t j = i + 1; j < *tDataLen; j++)
         {
-            if ((tData + i) > (tData + j))
+            if ((tData + i)->id > (tData + j)->id)
             {
                 TrainData tempData = *(tData + i);
                 *(tData + i) = *(tData + j);

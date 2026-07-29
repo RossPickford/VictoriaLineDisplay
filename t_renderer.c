@@ -177,12 +177,12 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
 {
     if (x > (float)UINT64_MAX || x < 0.0f)
     {
-        printf("t_renderer: X float coordinate beyond uint64_t scope - %f", x);
+        // printf("t_renderer: X float coordinate beyond uint64_t scope - %f\n", x);
         return;
     }
     else if (x == NAN)
     {
-        printf("t_renderer: x float nat a number");
+        // printf("t_renderer: x float nat a number\n");
         return;
     }
 

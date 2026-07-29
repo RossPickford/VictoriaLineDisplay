@@ -124,7 +124,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
     if (tNodeOffset <= 0)
         while (data < tDataLength)
         {
-            printf("t_displayNodes: filling node array");
+            printf("t_displayNodes: filling node array\n");
             tNodeOffset++;
             if (tNodeOffset >= TNODE_ARENA_SIZE)
             {

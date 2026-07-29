@@ -35,8 +35,8 @@ station_index = { "Brixton" : 15,
                 "Blackhorse Road" : 1,
                 "Walthamstow Central" : 0}
 
-# import subprocess
-# subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
+import subprocess
+subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN", "-o", "southbound.json"])
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUWWL", "-o", "northbound.json"])
 
@@ -71,6 +71,7 @@ params = {"app_key": API_KEY}
 totalTime_init = time.time() - totalTime_init
 print(f"\nPre-initialisation took {totalTime_init} seconds")
 
+train_ids = []
 
 def getTrains():
     train_data = {}
@@ -89,13 +90,15 @@ def getTrains():
         temp_trainData = {}
         for train in data:
             dataCollection_start = time.time()
-
             id = train.get("vehicleId", "No vehicle Id")
             if not id.isdigit():
                 print("Invalid train id")
                 continue
             if id in train_data.keys():
                 continue
+
+            if id not in train_ids:
+                train_ids.append(id)
 
             location = train.get("currentLocation", "Location unknown")
             station = location            
@@ -173,11 +176,15 @@ def getTrains():
     for id, loc in train_data.items():
         list_data.append([id, loc[0], loc[1], loc[2], loc[3]])
         # print(f"ID: {id} | {loc[0]} | {"next" if loc[3] == "moving" else "current"} Stop: {loc[1]} | time to: {loc[2]}")
+
+    for id in train_ids:
+        print(id)
+    print(len(train_ids))
     
     return list_data
 
 
 
-
+getTrains()
 
     

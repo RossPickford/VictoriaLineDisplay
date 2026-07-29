@@ -133,5 +133,5 @@ typedef struct trainNode
 bool t_nodes_init(trainNode **tNodes);
 void t_nodes_quit(trainNode *tNodes);
 void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength);
-void updateTrainPosition(trainNode *tNodes, uint64_t deltaTime);
+void updateTrainPosition(trainNode *tNodes, double deltaTime);
 trainNode *getTrainNodes();

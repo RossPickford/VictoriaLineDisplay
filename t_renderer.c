@@ -175,11 +175,14 @@ void updatePixel(pixelData *pxl, uint8_t r, uint8_t g, uint8_t b)
 
 void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended **tBuff, uint8_t tBuffOffset)
 {
-    printf("still drawing nodes\n");
-
     if (x > (float)UINT64_MAX || x < 0.0f)
     {
-        printf("X float coordinate beyond uint64_t scope - %f", x);
+        printf("t_renderer: X float coordinate beyond uint64_t scope - %f", x);
+        return;
+    }
+    else if (x == NAN)
+    {
+        printf("t_renderer: x float nat a number");
         return;
     }
 
@@ -259,15 +262,14 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
             SDL_RenderFillRect(renderer, &pixel);
         }
 
-    uint64_t currentTick = SDL_GetTicks();
-    static uint64_t previousTick = 0;
-    float time = (float)(currentTick - previousTick) / 1000.0f;
-    previousTick = currentTick;
+    // uint64_t currentTick = SDL_GetTicks();
+    // static uint64_t previousTick = 0;
+    // double time = (double)(currentTick - previousTick) / 1000.0f;
+    // previousTick = currentTick;
 
     if (tNodeLength > 0 && tNodes)
     {
-        printf("drawing nodes - %u\n", tNodeLength);
-        // pixelDataExtended tBuff[tNodeLength][6];
+        // printf("t_renderer: drawing nodes - %u\n", tNodeLength);
         pixelDataExtended **tBuff = (pixelDataExtended **)SDL_malloc(sizeof(pixelDataExtended *) * tNodeLength);
 
         if (!tBuff)
@@ -315,7 +317,6 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
 
         SDL_free(tBuff);
     }
-    printf("finished drawing nodes\n");
 
     SDL_RenderPresent(renderer);
 

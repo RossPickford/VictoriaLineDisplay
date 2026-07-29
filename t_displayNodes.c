@@ -39,7 +39,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
 
     if (!tNodes || !tData)
     {
-        printf("nodes or data pointer is Null - aborting function 'updateTrainNode'\n");
+        printf("t_displayNodes: nodes or data pointer is Null - aborting function 'updateTrainNode'\n");
         return;
     }
 
@@ -54,11 +54,11 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
             tNode.dir = tInfo.direction;
             size_t dir = (tNode.dir + 1) / 2;
             tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
-            tNode.speed = (double)((float)tNode.nextStop - tNode.x) / (double)tInfo.timeToStation;
+            tNode.speed = tInfo.timeToStation == 0 ? 0.0f : (double)((float)tNode.nextStop - tNode.x) / (double)tInfo.timeToStation;
 
             if ((tNode.speed < 0 && tNode.dir > 0) || ((tNode.speed > 0 && tNode.dir < 0))) // check if direction of speed matches the train's direction.
             {
-                printf("Speed in the wrong direction due to next station given being behind train's current position\n");
+                printf("t_displayNodes: Speed in the wrong direction due to next station given being behind train's current position\n");
                 node++;
                 data++;
                 continue;
@@ -72,7 +72,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
             tNode.misses++;
             if (tNode.misses >= 3)
             {
-                printf("Train %d did not receive data after 3 requests - removing node\n", tNode.id);
+                printf("t_displayNodes: Train %d did not receive data after 3 requests - removing node\n", tNode.id);
 
                 size_t i = node;
                 while (i < tNodeOffset)
@@ -101,7 +101,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
             size_t dir = (tNode.dir + 1) / 2;
             tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
             tNode.x = (((float)tInfo.timeToStation / (float)tStops_times[dir][tInfo.nextStation]) * STATION_GAP * -tNode.dir) + tNode.nextStop;
-            tNode.speed = (double)((float)tNode.nextStop - tNode.x) / (double)tInfo.timeToStation;
+            tNode.speed = tInfo.timeToStation == 0 ? 0.0f : (double)((float)tNode.nextStop - tNode.x) / (double)tInfo.timeToStation;
 
             if ((tNode.speed < 0 && tNode.dir > 0) || ((tNode.speed > 0 && tNode.dir < 0))) // check if direction of speed matches the train's direction.
             {
@@ -135,9 +135,14 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
             tNode.dir = tInfo.direction;
             size_t dir = (tNode.dir + 1) / 2;
             tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
-            tNode.x = (float)((tInfo.timeToStation / (float)tStops_times[dir][tInfo.nextStation]) * STATION_GAP * -tNode.dir) + tNode.nextStop;
-            tNode.speed = (double)((float)tNode.nextStop - tNode.x) / (double)tInfo.timeToStation;
+            tNode.x = (((float)tInfo.timeToStation / (float)tStops_times[dir][tInfo.nextStation]) * STATION_GAP * (float)tNode.dir * -1.0f) + (float)tNode.nextStop;
+            if (isnan(tNode.x))
+            {
+                tNode.x = (float)tNode.nextStop;
+                // printf("t_displayNodes: x is Nan, %f / %f with index: %lu and %u \n", (float)tInfo.timeToStation, (float)tStops_times[dir][tInfo.nextStation], dir, tInfo.nextStation);
+            }
 
+            tNode.speed = tInfo.timeToStation == 0 ? 0.0f : (double)((float)tNode.nextStop - tNode.x) / (double)tInfo.timeToStation;
             if ((tNode.speed < 0 && tNode.dir > 0) || ((tNode.speed > 0 && tNode.dir < 0))) // check if direction of speed matches the train's direction.
             {
                 printf("Speed in the wrong direction due to next station given being behind train's current position - %f : %d | x: %f stationpos: %u\n", tNode.speed, tNode.dir, tNode.x, tNode.nextStop);
@@ -146,32 +151,34 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
                 continue;
             }
 
+
             *(tNodes + node++) = tNode;
             data++;
         }
 }
 
-void updateTrainPosition(trainNode *tNodes, uint64_t deltaTime)
+void updateTrainPosition(trainNode *tNodes, double deltaTime)
 {
     if (tNodeOffset == 0)
     {
-        printf("No current Trains Nodes\n");
+        printf("t_displayNodes: No current Trains Nodes\n");
         return;
     }
     else if (!tNodes)
     {
-        printf("tNodes pointer Null\n");
+        printf("t_displayNodes: tNodes pointer Null\n");
         return;
     }
-    else if (deltaTime == 0)
+    else if (deltaTime == 0.0f)
     {
-        printf("delta time is 0\n");
+        // printf("t_displayNodes: delta time is: %f\n", deltaTime);
         return;
     }
+    
 
     for (size_t i = 0; i < tNodeOffset; i++)
     {
-        float xDelta = deltaTime * (tNodes + i)->speed * (tNodes + i)->dir;
+        float xDelta = deltaTime * (tNodes + i)->speed /* * (tNodes + i)->dir */;
         (tNodes + i)->x += xDelta;
 
         if ((tNodes + i)->dir == NORTHBOUND && (tNodes + i)->x < (tNodes + i)->nextStop)

@@ -2,14 +2,13 @@
 
 extern int16_t tNodeOffset;
 
-
 int main()
 {
     TrainData *tData = NULL;
     uint8_t tDataLen = 0;
-    
+
     trainNode *tNodes = NULL;
-    
+
     imageData imgData;
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -47,6 +46,15 @@ int main()
             tData = requestTrains(&tDataLen);
             updateTrainNode(tNodes, tData, tDataLen);
             SDL_free(tData);
+
+            for (size_t i = 0; i < tNodeOffset; i++)
+            {
+                printf("Train id: %d | ", (tNodes + i)->id);
+                printf("direction: %s |", (tNodes + i)->dir == -1 ? "Northbound" : "Southbound");
+                printf("station: %d", (tNodes + i)->nextStop);
+                printf("| x coord: %f\n", (tNodes + i)->x);
+                printf("| speed: %f\n", (tNodes + i)->speed);
+            }
         }
 
         updateTrainPosition(tNodes, delta);

@@ -51,6 +51,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
 
         if (tNode.id == tInfo.id)
         {
+            printf("t_displayNodes: changing single node data\n");
             tNode.dir = tInfo.direction;
             size_t dir = (tNode.dir + 1) / 2;
             tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
@@ -69,6 +70,8 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
         }
         else if (tNode.id < tInfo.id)
         {
+            printf("node missing data\n");
+
             tNode.misses++;
             if (tNode.misses >= 3)
             {
@@ -85,6 +88,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
         }
         else // Insert a new node into the current position
         {
+            printf("inserting new node\n");
             if (tNodeOffset >= TNODE_ARENA_SIZE)
             {
                 printf("Cannot assign another train node due to reaching Arena max - %u\n", tNodeOffset);
@@ -120,6 +124,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t tDataLength)
     if (tNodeOffset <= 0)
         while (data < tDataLength)
         {
+            printf("t_displayNodes: filling node array");
             tNodeOffset++;
             if (tNodeOffset >= TNODE_ARENA_SIZE)
             {

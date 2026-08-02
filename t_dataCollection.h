@@ -19,7 +19,6 @@ typedef struct TrainData
 
 void t_data_init();
 void t_data_quit();
-int64_t getItem(PyObject *data, Py_ssize_t index);
 TrainData *requestTrains(uint8_t *tDataLen);
 
 

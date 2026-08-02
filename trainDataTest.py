@@ -123,7 +123,7 @@ for train in data:
 
     if station == "Highbury & Isl":
         station = "Highbury & Islington"
-    elif station == "Kings Cross St. P":
+    elif station == "Kings Cross St. P" or station == "Kings Cross St. Pancras":
         station = "King's Cross St. Pancras"
 
     
@@ -137,7 +137,13 @@ for train in data:
     time_int = int(timeToStation)
 
     direction = train.get("towards","No direction")
-    direction = 1 if direction == "Brixton" else -1
+    if direction == "Brixton":
+        direction = 1
+    elif direction == "Walthamstow Central":
+        direction = -1
+    else:
+        print(f"{id} has an unknown different destination: {direction}")
+        direction = 0
 
     id = int(id)
     if id not in train_data.keys():

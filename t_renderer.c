@@ -242,6 +242,8 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
 
 bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, int16_t tNodeLength)
 {
+    printf("rendering\n");
+
     if (!imgData | !renderer)
     {
         printf("A pointer variables inserted is/are null\n");

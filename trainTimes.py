@@ -32,7 +32,7 @@ southbound = {"Brixton" : 105,
               "Highbury & Isl" : 140,
               "Finsbury Park" : 200,
               "Seven Sisters" : 110,
-              "Tottenham Hale" : 115,
+              "Tottenham Hale" : 115,                  
               "Blackhorse Road" : 125,
               "Walthamstow Central" : 0}
 

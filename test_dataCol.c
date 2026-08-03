@@ -70,13 +70,17 @@ uint8_t isCopy(uint16_t id, uint8_t index, TrainData *t, uint8_t tDataLen)
 int count = 10;
 TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
 {
-    printf("requesting trains\n");
+    // printf("requesting trains\n");
 
     if (count <= 0)
+    {
+        *tDataLen = 0;
         return NULL;
+    }
 
     uint8_t len = *tDataLen;
     len = 1;
+    srand(time(NULL));
 
     TrainData *t = (TrainData *)malloc(sizeof(TrainData) * len);
     if (!t)
@@ -87,7 +91,8 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
         (t + i)->id = count--;
 
         (t + i)->direction = ((rand() % 2) * 2) - 1;
-        (t + i)->timeToStation = rand() % 16;
+        (t + i)->nextStation = rand() % 16;
+        (t + i)->timeToStation = rand() % 50;
         (t + i)->state = 0;
     }
 
@@ -103,6 +108,13 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
         }
 
     *tDataLen = len;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        printf("Data id: %d | ", (t + i)->id);
+        printf("direction: %d |", (t + i)->direction);
+        printf("station: %d\n", (t + i)->nextStation);
+    }
 
     return t;
 }

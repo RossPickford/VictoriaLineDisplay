@@ -11,11 +11,11 @@ typedef struct trainNode
     int8_t dir;
     int16_t id;
     float x;
-    double speed;
+    float speed;
 } trainNode;
 
 bool t_nodes_init(trainNode **tNodes);
 void t_nodes_quit(trainNode *tNodes);
 void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, uint8_t tDataLength);
-void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, double deltaTime);
+void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, float deltaTime);
 trainNode *getTrainNodes();

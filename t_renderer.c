@@ -242,7 +242,7 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
 
 bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, int16_t tNodeLength)
 {
-    printf("rendering\n");
+    // printf("rendering\n");
 
     if (!imgData | !renderer)
     {
@@ -253,6 +253,7 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
 
+    // printf("drawing background\n");
     for (size_t y = 0; y < imgData->height; y++)
         for (size_t x = 0; x < imgData->width; x++)
         {
@@ -269,6 +270,7 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
     // double time = (double)(currentTick - previousTick) / 1000.0f;
     // previousTick = currentTick;
 
+    // printf("creating and drawing train pixels\n");
     if (tNodeLength > 0 && tNodes)
     {
         // printf("t_renderer: drawing nodes - %u\n", tNodeLength);
@@ -280,6 +282,7 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
             return APP_END;
         }
 
+        // printf("allocating memory for buffer\n");
         for (size_t i = 0; i < tNodeLength; i++)
         {
             *(tBuff + i) = (pixelDataExtended *)SDL_malloc(sizeof(pixelDataExtended) * 6);
@@ -292,6 +295,7 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
 
         uint8_t tBuffOffset = 0;
 
+        // printf("filling train buffer\n");
         for (size_t i = 0; i < tNodeLength; i++) // Fill train buffer with node data
         {
             drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir, tBuff, i);
@@ -304,6 +308,7 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
             //     (tNodes + i)->x = (float)(tNodes + i)->nextStop;
         }
 
+        // printf("drawing buffer pixels\n");
         for (uint8_t i = 0; i < tNodeLength; i++)
             for (uint8_t j = 0; j < 6; j++)
             {
@@ -314,12 +319,14 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
                 SDL_RenderRect(renderer, &pxl);
             }
 
+        // printf("freeing buffer\n");
         for (size_t i = 0; i < tNodeLength; i++)
             SDL_free(*(tBuff + i));
 
         SDL_free(tBuff);
     }
 
+    // printf("presenting pixels\n");
     SDL_RenderPresent(renderer);
 
     return APP_CONTINUE;

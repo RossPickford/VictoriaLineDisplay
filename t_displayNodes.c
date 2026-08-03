@@ -107,6 +107,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
     uint8_t nodeLen = *tNodeLength; // saving my sanity in the stack
     uint8_t inode = 0, idata = 0;
 
+    printf("node length: %u || data length: %u\n", *tNodeLength, tDataLength);
     while (inode < nodeLen && idata < tDataLength)
     {
         trainNode tNode = *(tNodes + inode);
@@ -120,6 +121,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
             size_t dir = (tNode.dir + 1) / 2;
             tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
             tNode.speed = getSpeedf(tNode, (float)tInfo.timeToStation);
+            tNode.misses = 0;
         }
         else if (tNode.id < tInfo.id) // There is no data for current node
         {
@@ -165,7 +167,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
             // printf("t_displayNodes: filling node array\n");
             nodeLen++;
 
-            insertNewNode((tNodes + inode), *(tData + idata++));
+            insertNewNode((tNodes + inode++), *(tData + idata++));
         }
 
     *tNodeLength = nodeLen;

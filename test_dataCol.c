@@ -67,7 +67,7 @@ uint8_t isCopy(uint16_t id, uint8_t index, TrainData *t, uint8_t tDataLen)
     return t;
 } */
 
-int count = 10;
+/* int count = 10;
 TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
 {
     // printf("requesting trains\n");
@@ -95,6 +95,55 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
         (t + i)->timeToStation = rand() % 50;
         (t + i)->state = 0;
     }
+
+    for (size_t i = 0; i < len - 1; i++)
+        for (size_t j = i + 1; j < len; j++)
+        {
+            if ((t + i)->id > (t + j)->id)
+            {
+                TrainData tempData = *(t + i);
+                *(t + i) = *(t + j);
+                *(t + j) = tempData;
+            }
+        }
+
+    *tDataLen = len;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        printf("Data id: %d | ", (t + i)->id);
+        printf("direction: %d |", (t + i)->direction);
+        printf("station: %d\n", (t + i)->nextStation);
+    }
+
+    return t;
+} */
+
+int count = 0;
+TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
+{
+    // printf("requesting trains\n");
+    
+    if (count > 0)
+    {
+        *tDataLen = 0;
+        return NULL;
+    }
+
+    count++;
+
+    uint8_t len = 1;
+    srand(time(NULL));
+
+    TrainData *t = (TrainData *)malloc(sizeof(TrainData) * len);
+    if (!t)
+        printf("could not allocate memory for train data");
+
+    t->id = 25;
+    t->direction = ((rand() % 2) * 2) - 1;
+    t->nextStation = rand() % 16;
+    t->timeToStation = rand() % 50;
+    t->state = 0;
 
     for (size_t i = 0; i < len - 1; i++)
         for (size_t j = i + 1; j < len; j++)

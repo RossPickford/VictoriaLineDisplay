@@ -1,7 +1,10 @@
 #include "t_dataCollection.h"
 
-#define MODULE_NAME "request"
-#define FUNC_NAME "getTrains"
+#define MODULE_NAME "trainDataTest"
+#define FUNC_NAME "requestTrainData"
+
+// #define MODULE_NAME "request"
+// #define FUNC_NAME "getTrains"
 
 void t_data_init()
 {
@@ -29,7 +32,7 @@ int64_t getItem(PyObject *data, Py_ssize_t index)
 
     if (item < 0 && index != 1)
     {
-        printf("item at index %lld - is less than zero\n", index);
+        printf("item at index %lld - is less than zero: %lld\n", index, item);
         return 0;
     }
 
@@ -40,11 +43,11 @@ int64_t getItem(PyObject *data, Py_ssize_t index)
 TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
 {
     TrainData *tData;
+    *tDataLen = 0;
 
     PyObject *pName, *pModule, *pFunc;
     PyObject *pValue;
 
-    Py_Initialize();
     pName = PyUnicode_DecodeFSDefault(MODULE_NAME);
 
     pModule = PyImport_Import(pName);

@@ -10,6 +10,7 @@ station_index = {
                 "Seven Sisters" : 3,
                 "Finsbury Park" : 4,
                 "Highbury & Islington" : 5,
+                "King's Cross St. Pancras" : 6,
                 "Kings Cross St. Pancras" : 6,
                 "Euston" : 7,
                 "Warren Street" : 8,
@@ -55,123 +56,134 @@ params = {"app_key": API_KEY}
 
 totalIds = {}
 
-request = get(base_url, params=params)
-data = request.json()
+def requestTrainData():
+    totalTime_request = time.time()
+    request = get(base_url, params=params)
+    data = request.json()
+    totalTime_request = time.time() - totalTime_request
 
-train_data = {}
-totalTime_trainDataCollection = 0
-totalTime_request = 0
-for train in data:
-    dataCollection_start = time.time()
+    train_data = {}
+    totalTime_trainDataCollection = time.time()
+    for train in data:
+        id = train.get("vehicleId", "no vehicle ID")
+        station_name = train.get("stationName", "no station found")
+        station_name = station_name.replace(" Underground Station", "")
 
-    id = train.get("vehicleId", "no vehicle ID")
-    station_name = train.get("stationName", "no station found")
-    station_name = station_name.replace(" Underground Station", "")
+        if int(id) not in totalIds:
+            location = train.get("currentLocation", "no location found")
+            totalIds.update({int(id) : location})
 
-    if int(id) not in totalIds:
-        location = train.get("currentLocation", "no location found")
-        totalIds.update({int(id) : location})
+        if not id.isdigit():
+            print("Invalid train id")
+            continue
 
-    if not id.isdigit():
-        print("Invalid train id")
-        continue
+        location = train.get("currentLocation", "Location unknown")
+        station = location            
+        timeToStation = 0
+        state = 0
 
-    location = train.get("currentLocation", "Location unknown")
-    station = location            
-    timeToStation = 0
-    state = 0
+        if "Between" in location:
+            station = getStationFromLocation(location)
+            state = 1
 
-    if "Between" in location:
-        station = getStationFromLocation(location)
-        state = 1
+        elif "Approaching" in location:
+            station = location.replace("Approaching ", "")
+            state = 1
 
-    elif "Approaching" in location:
-        station = location.replace("Approaching ", "")
-        state = 1
+        elif "At Platform" in location:
+            station = station_name
 
-    elif "At Platform" in location:
-        station = station_name
+        elif "At" in location:
+            station = location.replace("At ", "")
+            if "Seven Sisters" in station:
+                station = station.replace(" Platform 5", "")
 
-    elif "At" in location:
-        station = location.replace("At ", "")
-        if "Seven Sisters" in station:
-            station = station.replace(" Platform 5", "")
+        elif "Departing" in location or "Departed" in location or "Left" in location: 
+            station = station.replace("Departed ", "")
+            station = station.replace("Departing ", "")
+            station = station.replace("Left ", "")
+            print(f"station name is now: {station}")
 
-    elif "Departing" in location or "Departed" in location or "Left" in location: 
-        station = station.replace("Departed ", "")
-        station = station.replace("Departing ", "")
-        station = station.replace("Left ", "")
-        print(f"station name is now: {station}")
+            destination = train.get("towards", "no destination")
+            a = 1 if destination == "Brixton" else -1
 
-        destination = train.get("towards", "no destination")
-        a = 1 if destination == "Brixton" else -1
+            index = station_index[station]
+            station = list(station_index.keys())[index + a]
 
-        index = station_index[station]
-        station = list(station_index.keys())[index + a]
-
-        state = 1
-        # print(f"{id} | {destination} : {location} : {station} : {station_name}")
-
-
-    elif "Area" in location and "Brixton" in location:
-        station = "Brixton"
-        state = 1
-
-    else:
-        print(f"Unknown Location Value: {location} for train: {id} at {station_name}")
-        continue
-
-    if station == "Highbury & Isl":
-        station = "Highbury & Islington"
-    elif station == "Kings Cross St. P" or station == "Kings Cross St. Pancras":
-        station = "King's Cross St. Pancras"
-
-    
-    if station != station_name and state != 0:
-        print(f" {id} station: {station} | current station: {station_name}")
-        continue
-
-    if state == 1:
-        timeToStation = train.get("timeToStation", "No time found")
-
-    time_int = int(timeToStation)
-
-    direction = train.get("towards","No direction")
-    if direction == "Brixton":
-        direction = 1
-    elif direction == "Walthamstow Central":
-        direction = -1
-    else:
-        print(f"{id} has an unknown different destination: {direction}")
-        direction = 0
-
-    id = int(id)
-    if id not in train_data.keys():
-        train_data.update({id : [station, location, time_int]})
-    else:
-        if station != train_data[id][0]:
-            t_stationIndex = station_index[train_data[id][0]]
-            nextStation_i = station_index[station] + direction
-            if (direction == 1 and nextStation_i > t_stationIndex) or (direction == -1 and nextStation_i < t_stationIndex):
-                train_data[id][0] = station
-                train_data[id][1] = location
-                train_data[id][1] = time_int
-        elif time_int < train_data[id][2]:
-            train_data[id][2] = time_int
+            state = 1
+            # print(f"{id} | {destination} : {location} : {station} : {station_name}")
 
 
+        elif "Area" in location and "Brixton" in location:
+            station = "Brixton"
+            state = 1
 
-# for id in totalIds.keys():
-    # if id not in train_data.keys():
+        else:
+            print(f"Unknown Location Value: {location} for train: {id} at {station_name}")
+            continue
+
+        if station == "Highbury & Isl":
+            station = "Highbury & Islington"
+        elif station == "Kings Cross St. P" or station == "Kings Cross St. Pancras":
+            station = "King's Cross St. Pancras"
 
 
-print(f"length of total request ids: {len(totalIds)}")
-print(f"length of my request id list: {len(train_data)}")
+        if station != station_name and state != 0:
+            print(f" {id} station: {station} | current station: {station_name}")
+            continue
 
-for id, loc in totalIds.items():
-    if id not in train_data.keys():
-        print(f"{id} at {loc} - not in train_data")
+        if state == 1:
+            timeToStation = train.get("timeToStation", "No time found")
 
-print("=======================================================")
-for id, data in train_data.items():
-    print(f"{id} | station: {data[0]} | location: {data[1]} | time to station: {data[2]}")
+        time_int = int(timeToStation)
+
+        direction = train.get("towards","No direction")
+        if direction == "Brixton":
+            direction = 1
+        elif direction == "Walthamstow Central":
+            direction = -1
+        else:
+            print(f"{id} has an unknown different destination: {direction}")
+            direction = 0
+
+        id = int(id)
+        if id not in train_data.keys():
+            train_data.update({id : [direction, station_index[station], time_int, state, location]})
+        else:
+            if station_index[station] != train_data[id][1]:
+                t_stationIndex = train_data[id][1]
+                nextStation_i = station_index[station] + direction
+                if (direction == 1 and nextStation_i > t_stationIndex) or (direction == -1 and nextStation_i < t_stationIndex):
+                    train_data[id][0] = direction
+                    train_data[id][1] = station_index[station]
+                    train_data[id][2] = time_int
+                    train_data[id][3] = state
+                    train_data[id][4] = location
+            elif time_int < train_data[id][2]:
+                train_data[id][2] = time_int
+
+    totalTime_trainDataCollection = time.time() - totalTime_trainDataCollection
+
+    # for id in totalIds.keys():
+        # if id not in train_data.keys():
+
+    print(f"request took: {totalTime_request}s")
+    print(f"data collection took: {totalTime_trainDataCollection}s")
+    print(f"length of total request ids: {len(totalIds)}")
+    print(f"length of my request id list: {len(train_data)}")
+
+    for id, loc in totalIds.items():
+        if id not in train_data.keys():
+            print(f"{id} at {loc} - not in train_data")
+
+    list_data = []
+    print("=======================================================")
+    for id, data in train_data.items():
+        print(f"{id} | direction: {data[0]} | station: {data[1]} | location: {data[4]} | time to station: {data[2]}")
+
+        list_data.append([id, data[0], data[1], data[2], data[3]])
+
+    test_list = []
+    test_list.append([1, 1, 3, 4, 5])
+    test_list.append([2, -1, 5, 6, 8])
+    return list_data

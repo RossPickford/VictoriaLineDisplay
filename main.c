@@ -1,6 +1,6 @@
 #include "t_renderer.h"
 
-#define REQUEST_TIME 5000
+#define REQUEST_TIME 30000
 
 int main()
 {
@@ -8,14 +8,16 @@ int main()
     uint8_t tDataLen = 0;
 
     trainNode *tNodes = NULL;
-    uint8_t tNodeLen = 0; // This represents the index, NOT the length
+    uint8_t tNodeLen = 0;
 
     imageData imgData;
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
+    pixelDataExtended **tBuffer = NULL;
+
     t_data_init();
-    bool status = t_nodes_init(&tNodes) && t_rend_init(&window, &renderer, &imgData);
+    bool status = t_nodes_init(&tNodes) && t_rend_init(&window, &renderer, &imgData, &tBuffer);
 
     // Collect initial data
     tData = requestTrains(&tDataLen);
@@ -64,7 +66,7 @@ int main()
         updateTrainPosition(tNodes, tNodeLen, delta);
 
         // printf("tnodeoffset before loop: %d\n", tNodeOffset);
-        status = t_rend_event() && t_rend_drawPixels(&imgData, renderer, tNodes, tNodeLen);
+        status = t_rend_event() && t_rend_drawPixels(&imgData, renderer, tNodes, tNodeLen, tBuffer);
         // printf("finished a cycle\n");
         // status = false;
     }

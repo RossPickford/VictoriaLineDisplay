@@ -59,10 +59,7 @@ float getSpeedf(trainNode tNode, float time)
         speed = -0.9f;
 
     if ((speed < 0 && tNode.dir > 0) || ((speed > 0 && tNode.dir < 0))) // check if direction of speed matches the train's direction.
-    {
-        printf("t_displayNodes: Speed in the wrong direction due to next station given being behind train's current position\n");
         speed *= -1.0f;
-    }
 
     return speed;
 }
@@ -92,12 +89,9 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
 
     // printf("updating train nodes\n");
 
-    if (!tNodes || !tNodeLength)
-    {
-        printf("t_displayNodes: nodes or node length is Null - aborting function 'updateTrainNode'\n");
-        return;
-    }
-    else if (!tData)
+    assert(tNodes || tNodeLength);
+
+    if (!tData)
     {
         for (size_t i = 0; i < *tNodeLength; i += MissingNodeDataCheck(tNodes, i, tNodeLength))
             ;
@@ -112,13 +106,13 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
     {
         trainNode tNode = *(tNodes + inode);
         TrainData tInfo = *(tData + idata);
-        printf("tNodes[%u]: %u | tData[%u]: %u\n", inode, tNode.id, idata, tInfo.id);
+        // printf("tNodes[%u]: %u | tData[%u]: %u\n", inode, tNode.id, idata, tInfo.id);
 
         if (tNode.id == tInfo.id) // There is a match in data IDs
         {
-            // printf("t_displayNodes: changing single node data\n");
             tNode.dir = tInfo.direction;
             size_t dir = (tNode.dir + 1) / 2;
+            assert(dir == 0 || dir == 1);
             tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
             tNode.speed = getSpeedf(tNode, (float)tInfo.timeToStation);
             tNode.misses = 0;
@@ -128,7 +122,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
             inode += MissingNodeDataCheck(tNodes, inode, &nodeLen);
             continue;
         }
-        else if ((nodeLen + 1) < TNODE_ARENA_SIZE) // Insert a new node into the current position
+        else if (nodeLen < TNODE_ARENA_SIZE) // Insert a new node into the current position
         {
             // printf("inserting new node\n");
 
@@ -158,13 +152,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
     if (idata < tDataLength)
         while (idata < tDataLength)
         {
-            if (nodeLen >= TNODE_ARENA_SIZE)
-            {
-                printf("Cannot assign another train node due to reaching Arena max\n");
-                break;
-            }
-
-            // printf("t_displayNodes: filling node array\n");
+            assert(nodeLen < TNODE_ARENA_SIZE);
             nodeLen++;
 
             insertNewNode((tNodes + inode++), *(tData + idata++));
@@ -177,26 +165,14 @@ void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, float deltaTime
 {
     // printf("updating Pos\n");
 
-    if (tNodeLength == 0)
-    {
-        printf("t_displayNodes: No current Trains Nodes\n");
+    if (tNodeLength == 0 || deltaTime == 0.0f || !tNodes)
         return;
-    }
-    else if (!tNodes)
-    {
-        printf("t_displayNodes: tNodes pointer Null\n");
-        return;
-    }
-    else if (deltaTime == 0.0f)
-    {
-        // printf("t_displayNodes: delta time is: %f\n", deltaTime);
-        return;
-    }
 
     for (size_t i = 0; i < tNodeLength; i++)
     {
         trainNode tNode = *(tNodes + i);
         float xDelta = deltaTime * tNode.speed /* * (tNodes + i)->dir */;
+        assert(xDelta * tNode.dir >= 0.0f);
         tNode.x += xDelta;
 
         if (tNode.dir == NORTHBOUND && tNode.x < tNode.nextStop)

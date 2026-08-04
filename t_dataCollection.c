@@ -53,7 +53,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
-    if (pModule == NULL)
+    if (!pModule)
     {
         PyErr_Print();
         fprintf(stderr, "Failed to load\n");
@@ -64,8 +64,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
 
     if (!pFunc && !PyCallable_Check(pFunc))
     {
-        if (PyErr_Occurred())
-            PyErr_Print();
+        PyErr_Print();
         fprintf(stderr, "Cannot find function\n");
     }
 
@@ -117,8 +116,11 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
         // printf("Length of internal array: %lld\n", itemLen);
 
         (tData + i)->id = getItem(train, 0);
+        assert((tData + i)->id >= 0);
         (tData + i)->direction = getItem(train, 1);
+        assert((tData + i)->direction == -1 || (tData + i)->direction == 1);
         (tData + i)->nextStation = getItem(train, 2);
+        assert((tData + i)->nextStation >= 0 || (tData + i)->nextStation < 16);
         (tData + i)->timeToStation = getItem(train, 3);
         (tData + i)->state = getItem(train, 4);
     }

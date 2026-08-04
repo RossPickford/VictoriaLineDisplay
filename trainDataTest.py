@@ -140,11 +140,11 @@ def requestTrainData():
         direction = train.get("towards","No direction")
         if direction == "Brixton":
             direction = 1
-        elif direction == "Walthamstow Central":
+        elif direction == "Walthamstow Central" or direction == "Seven Sisters":
             direction = -1
         else:
             print(f"{id} has an unknown different destination: {direction}")
-            direction = 0
+            continue
 
         id = int(id)
         if id not in train_data.keys():

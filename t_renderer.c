@@ -7,10 +7,11 @@
 #define SOUTHBOUND_Y 17
 
 #define ARENA_MAX 50
+#define NODE_PIXELS_MAX 6
 
 bool extractPixelDataFromFile(imageData *imgData)
 {
-    FILE *image = fopen("./media/background.bmp", "rb");
+    FILE *image = fopen("./media/background_128x32.bmp", "rb");
     uint8_t header[14];
     uint8_t DIBHeader[40];
 
@@ -129,7 +130,7 @@ bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgDat
 
     for (size_t i = 0; i < ARENA_MAX; i++)
     {
-        *(*tBuffer + i) = (pixelDataExtended *)SDL_malloc(sizeof(pixelDataExtended) * 6);
+        *(*tBuffer + i) = (pixelDataExtended *)SDL_malloc(sizeof(pixelDataExtended) * NODE_PIXELS_MAX);
         assert(*(*tBuffer + i));
     }
 
@@ -168,6 +169,7 @@ void t_rend_quit(SDL_Window *window, SDL_Renderer *renderer, imageData *imgData,
 
 uint8_t ulerp(uint8_t minVal, uint8_t maxVal, float t)
 {
+    assert(t <= 1.0f && t >= 0.0f);
     uint8_t diff = maxVal - minVal;
     float change = (float)diff * t;
     return minVal + (uint8_t)change;
@@ -176,6 +178,7 @@ uint8_t ulerp(uint8_t minVal, uint8_t maxVal, float t)
 uint8_t uinvslerp(uint8_t minVal, uint8_t maxVal, float t)
 {
     // float newT = sqrtf((2 * t) - (t * t));
+    assert(t <= 1.0f && t >= 0.0f);
     float newT = 1.0f - sqrtf(1.0f - (t * t));
     uint8_t diff = maxVal - minVal;
     float change = (float)diff * newT;
@@ -191,16 +194,8 @@ void updatePixel(pixelData *pxl, uint8_t r, uint8_t g, uint8_t b)
 
 void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended **tBuff, uint8_t tBuffOffset)
 {
-    if (x > (float)UINT64_MAX || x < 0.0f)
-    {
-        // printf("t_renderer: X float coordinate beyond uint64_t scope - %f\n", x);
-        return;
-    }
-    else if (x == NAN)
-    {
-        // printf("t_renderer: x float nat a number\n");
-        return;
-    }
+    assert(x >= 0.0f && x <= 128.0f);
+    assert(!isnan(x));
 
     uint64_t xInt = (uint64_t)x;
     uint64_t y = dir == NORTHBOUND ? NORTHBOUND_Y : SOUTHBOUND_Y;
@@ -212,39 +207,47 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
         fract = 1.0f - fract;
     }
 
-    // Front pixels
+    // pixelDataExtended *buffPixel =
+    // for (size_t )
+
+    /* // Front pixels
     tBuff[tBuffOffset][0].y = y;
     tBuff[tBuffOffset][0].x = xInt;
     updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
 
-    // (*(tBuff + tBuffOffset) + 0)->y = y;
-    // (*(tBuff + tBuffOffset) + 0)->x = xInt;
-    // updatePixel(&(*(tBuff + tBuffOffset) + 0)->pxlData, UINT8_MAX, 0, 0);
-
     tBuff[tBuffOffset][1].y = y + 1;
     tBuff[tBuffOffset][1].x = xInt;
-    updatePixel(&tBuff[tBuffOffset][1].pxlData, UINT8_MAX, 0, 0);
+    updatePixel(&tBuff[tBuffOffset][1].pxlData, UINT8_MAX, 0, 0); */
 
-    pixelData backPix = *(*(pxlMtrx + y) + xInt - dir);
+    // pixelData backPix = *(*(pxlMtrx + y) + xInt - dir);
+    pixelData backPix = *(*(pxlMtrx + y) + xInt);
 
-    uint8_t newR = uinvslerp(backPix.r, UINT8_MAX, (1.0f - fract));
-    uint8_t newG = uinvslerp(0, backPix.g, fract);
-    uint8_t newB = uinvslerp(0, backPix.b, fract);
+    uint8_t newR = ulerp(backPix.r, UINT8_MAX, (1.0f - fract));
+    uint8_t newG = ulerp(0, backPix.g, fract);
+    uint8_t newB = ulerp(0, backPix.b, fract);
 
     // Back pixels
-    tBuff[tBuffOffset][2].y = y;
+    /* tBuff[tBuffOffset][2].y = y;
     tBuff[tBuffOffset][2].x = xInt - dir;
     updatePixel(&tBuff[tBuffOffset][2].pxlData, newR, newG, newB);
 
     tBuff[tBuffOffset][3].y = y + 1;
     tBuff[tBuffOffset][3].x = xInt - dir;
+    updatePixel(&tBuff[tBuffOffset][3].pxlData, newR, newG, newB); */
+
+    tBuff[tBuffOffset][2].y = y;
+    tBuff[tBuffOffset][2].x = xInt;
+    updatePixel(&tBuff[tBuffOffset][2].pxlData, newR, newG, newB);
+
+    tBuff[tBuffOffset][3].y = y + 1;
+    tBuff[tBuffOffset][3].x = xInt;
     updatePixel(&tBuff[tBuffOffset][3].pxlData, newR, newG, newB);
 
     pixelData forwardPix = *(*(pxlMtrx + y) + xInt + dir);
 
-    newR = uinvslerp(forwardPix.r, UINT8_MAX, fract);
-    newG = uinvslerp(0, forwardPix.g, (1.0f - fract));
-    newB = uinvslerp(0, forwardPix.b, (1.0f - fract));
+    newR = ulerp(forwardPix.r, UINT8_MAX, fract);
+    newG = ulerp(0, forwardPix.g, (1.0f - fract));
+    newB = ulerp(0, forwardPix.b, (1.0f - fract));
 
     // Forward Pixels (future ones)
     tBuff[tBuffOffset][4].y = y;
@@ -292,7 +295,7 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
 
         // printf("drawing buffer pixels\n");
         for (uint8_t i = 0; i < tNodeLength; i++)
-            for (uint8_t j = 0; j < 6; j++)
+            for (uint8_t j = 2; j < 6; j++)
             {
                 SDL_FRect pxl = {(float)tBuff[i][j].x, (float)tBuff[i][j].y, 1.0f, 1.0f};
                 pixelData trainPxl = tBuff[i][j].pxlData;

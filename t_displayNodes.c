@@ -159,6 +159,15 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
         }
 
     *tNodeLength = nodeLen;
+
+    for (size_t i = 0; i < nodeLen; i++)
+    {
+        printf("Train id: %d | ", (tNodes + i)->id);
+        printf("direction: %d |", (tNodes + i)->dir);
+        printf("station: %d ", (tNodes + i)->nextStop);
+        printf("| x coord: %f ", (tNodes + i)->x);
+        printf("| speed: %f\n", (tNodes + i)->speed);
+    }
 }
 
 void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, float deltaTime)
@@ -185,4 +194,21 @@ void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, float deltaTime
 
         *(tNodes + i) = tNode;
     }
+}
+
+void testNodeDisplay(trainNode *tNodes, uint8_t *tNodeLen)
+{
+    tNodes[0].id = 1;
+    tNodes[0].dir = -1;
+    tNodes[0].nextStop = 3;
+    tNodes[0].x = 123;
+    tNodes[0].speed = -0.5f;
+
+    tNodes[1].id = 2;
+    tNodes[1].dir = 1;
+    tNodes[1].nextStop = 124;
+    tNodes[1].x = 4;
+    tNodes[1].speed = 0.5f;
+
+    *tNodeLen = 2;
 }

@@ -20,20 +20,11 @@ int main()
     bool status = t_nodes_init(&tNodes) && t_rend_init(&window, &renderer, &imgData, &tBuffer);
 
     // Collect initial data
-    tData = requestTrains(&tDataLen);
-    updateTrainNode(tNodes, tData, &tNodeLen, tDataLen);
+        tData = requestTrains(&tDataLen);
+        updateTrainNode(tNodes, tData, &tNodeLen, tDataLen);
 
-    if (tData)
-        free(tData);
-
-    for (size_t i = 0; i < tNodeLen; i++)
-    {
-        printf("Train id: %d | ", (tNodes + i)->id);
-        printf("direction: %d |", (tNodes + i)->dir);
-        printf("station: %d ", (tNodes + i)->nextStop);
-        printf("| x coord: %f ", (tNodes + i)->x);
-        printf("| speed: %f\n", (tNodes + i)->speed);
-    }
+        if (tData)
+            free(tData);
 
     uint64_t previousTick = 0;
     uint64_t requestRefreshTime = 0;
@@ -52,20 +43,10 @@ int main()
 
             if (tData)
                 free(tData);
-
-            for (size_t i = 0; i < tNodeLen; i++)
-            {
-                printf("Train id: %d | ", (tNodes + i)->id);
-                printf("direction: %d |", (tNodes + i)->dir);
-                printf("station: %d ", (tNodes + i)->nextStop);
-                printf("| x coord: %f ", (tNodes + i)->x);
-                printf("| speed: %f\n", (tNodes + i)->speed);
-            }
         }
 
         updateTrainPosition(tNodes, tNodeLen, delta);
 
-        // printf("tnodeoffset before loop: %d\n", tNodeOffset);
         status = t_rend_event() && t_rend_drawPixels(&imgData, renderer, tNodes, tNodeLen, tBuffer);
         // printf("finished a cycle\n");
         // status = false;
@@ -73,6 +54,6 @@ int main()
 
     t_data_quit();
     t_nodes_quit(tNodes);
-    t_rend_quit(window, renderer, &imgData);
+    t_rend_quit(window, renderer, &imgData, &tBuffer);
     return 0;
 }

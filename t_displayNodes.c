@@ -87,7 +87,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
 {
     // This only works under the assumption both are sorted in numerical order of IDs
 
-    // printf("updating train nodes\n");
+    printf("updating train nodes\n");
 
     assert(tNodes || tNodeLength);
 

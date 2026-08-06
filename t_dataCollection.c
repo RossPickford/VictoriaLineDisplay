@@ -3,29 +3,31 @@
 #define MODULE_NAME "trainDataTest"
 #define FUNC_NAME "requestTrainData"
 
+#define DATA_ARENA_SIZE 50
+
 // #define MODULE_NAME "request"
 // #define FUNC_NAME "getTrains"
 
-void t_data_init()
+void t_data_init(TrainData **tData)
 {
     Py_Initialize();
+
+    *tData = (TrainData *)malloc(sizeof(TrainData) * DATA_ARENA_SIZE);
 }
 
-void t_data_quit()
+void t_data_quit(TrainData **tData)
 {
     if (Py_FinalizeEx() < 0)
         ;
+
+    free(*tData);
     // return 120;
 }
 
 int64_t getItem(PyObject *data, Py_ssize_t index)
 {
     PyObject *pItem = PyList_GetItem(data, index);
-    if (pItem == NULL)
-    {
-        printf("item inside item list not found at index: %lld\n", index);
-        return 0;
-    }
+    assert(pItem);
 
     int64_t item = PyLong_AsLong(pItem);
     Py_DECREF(pItem);
@@ -39,10 +41,11 @@ int64_t getItem(PyObject *data, Py_ssize_t index)
     return item;
 }
 
-// Make sure to free the data afterwards
-TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
+void requestTrains(TrainData *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
 {
-    TrainData *tData;
+    printf("requesting Data\n");
+
+    assert(tData);
     *tDataLen = 0;
 
     PyObject *pName, *pModule, *pFunc;
@@ -57,7 +60,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
     {
         PyErr_Print();
         fprintf(stderr, "Failed to load\n");
-        return NULL;
+        return;
     }
 
     pFunc = PyObject_GetAttrString(pModule, FUNC_NAME);
@@ -69,11 +72,11 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
     }
 
     pValue = PyObject_CallObject(pFunc, NULL);
-    if (pValue == NULL || !PyList_Check(pValue))
+    if (!pValue || !PyList_Check(pValue))
     {
         Py_DECREF(pFunc);
         Py_DECREF(pModule);
-        if (pValue == NULL)
+        if (!pValue)
         {
             PyErr_Print();
             fprintf(stderr, "Call failed\n");
@@ -81,26 +84,17 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
         else
             printf("Object not a list\n");
 
-        return NULL;
+        return;
     }
 
     *tDataLen = (uint8_t)PyList_Size(pValue);
-    tData = (TrainData *)malloc(sizeof(TrainData) * *tDataLen);
-    if (!tData)
-    {
-        Py_DECREF(pFunc);
-        Py_DECREF(pModule);
-        Py_DECREF(pValue);
-        fprintf(stderr, "failed to allocate memory\n");
-        return NULL;
-    }
-
-    printf("Length of list: %lld\n", *tDataLen);
+    assert(*tDataLen <= DATA_ARENA_SIZE);
+    printf("Length of list: %u\n", *tDataLen);
 
     for (Py_ssize_t i = 0; i < *tDataLen; i++)
     {
         PyObject *train = PyList_GetItem(pValue, i);
-        if (train == NULL)
+        if (!train)
         {
             printf("key not found at index: %lld\n", i);
             continue;
@@ -112,7 +106,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
             continue;
         }
 
-        Py_ssize_t itemLen = PyList_Size(train);
+        // Py_ssize_t itemLen = PyList_Size(train);
         // printf("Length of internal array: %lld\n", itemLen);
 
         (tData + i)->id = getItem(train, 0);
@@ -124,6 +118,8 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
         (tData + i)->timeToStation = getItem(train, 3);
         (tData + i)->state = getItem(train, 4);
     }
+
+    printf("Now sorting Data\n");
 
     // sort the trains into numerical order of IDs
 
@@ -149,6 +145,4 @@ TrainData *requestTrains(uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize(
         printf("%s station: %d", (tData + i)->state == 1 ? "next" : "current", (tData + i)->nextStation);
         printf("| time to station: %d\n", (tData + i)->timeToStation);
     } */
-
-    return tData;
 }

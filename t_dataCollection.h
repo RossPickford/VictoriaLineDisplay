@@ -18,8 +18,8 @@ typedef struct TrainData
     uint8_t state;
 } TrainData;
 
-void t_data_init();
-void t_data_quit();
-TrainData *requestTrains(uint8_t *tDataLen);
+void t_data_init(TrainData ** tData);
+void t_data_quit(TrainData **tData);
+void requestTrains(TrainData *tData, uint8_t *tDataLen);
 
 

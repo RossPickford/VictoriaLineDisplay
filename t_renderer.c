@@ -207,24 +207,21 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
         fract = 1.0f - fract;
     }
 
-    // pixelDataExtended *buffPixel =
-    // for (size_t )
-
-    /* // Front pixels
+    // Front pixels
     tBuff[tBuffOffset][0].y = y;
     tBuff[tBuffOffset][0].x = xInt;
     updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
 
     tBuff[tBuffOffset][1].y = y + 1;
     tBuff[tBuffOffset][1].x = xInt;
-    updatePixel(&tBuff[tBuffOffset][1].pxlData, UINT8_MAX, 0, 0); */
+    updatePixel(&tBuff[tBuffOffset][1].pxlData, UINT8_MAX, 0, 0);
 
     // pixelData backPix = *(*(pxlMtrx + y) + xInt - dir);
-    pixelData backPix = *(*(pxlMtrx + y) + xInt);
+    // pixelData backPix = *(*(pxlMtrx + y) + xInt);
 
-    uint8_t newR = ulerp(backPix.r, UINT8_MAX, (1.0f - fract));
+    /* uint8_t newR = ulerp(backPix.r, UINT8_MAX, (1.0f - fract));
     uint8_t newG = ulerp(0, backPix.g, fract);
-    uint8_t newB = ulerp(0, backPix.b, fract);
+    uint8_t newB = ulerp(0, backPix.b, fract); */
 
     // Back pixels
     /* tBuff[tBuffOffset][2].y = y;
@@ -235,7 +232,7 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
     tBuff[tBuffOffset][3].x = xInt - dir;
     updatePixel(&tBuff[tBuffOffset][3].pxlData, newR, newG, newB); */
 
-    tBuff[tBuffOffset][2].y = y;
+    /* tBuff[tBuffOffset][2].y = y;
     tBuff[tBuffOffset][2].x = xInt;
     updatePixel(&tBuff[tBuffOffset][2].pxlData, newR, newG, newB);
 
@@ -256,7 +253,7 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
 
     tBuff[tBuffOffset][5].y = y + 1;
     tBuff[tBuffOffset][5].x = xInt + dir;
-    updatePixel(&tBuff[tBuffOffset][5].pxlData, newR, newG, newB);
+    updatePixel(&tBuff[tBuffOffset][5].pxlData, newR, newG, newB); */
 }
 
 bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, int16_t tNodeLength, pixelDataExtended **tBuff)
@@ -295,7 +292,7 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
 
         // printf("drawing buffer pixels\n");
         for (uint8_t i = 0; i < tNodeLength; i++)
-            for (uint8_t j = 2; j < 6; j++)
+            for (uint8_t j = 0; j < 2; j++)
             {
                 SDL_FRect pxl = {(float)tBuff[i][j].x, (float)tBuff[i][j].y, 1.0f, 1.0f};
                 pixelData trainPxl = tBuff[i][j].pxlData;

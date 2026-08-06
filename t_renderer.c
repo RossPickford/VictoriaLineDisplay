@@ -117,7 +117,7 @@ bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgDat
         return APP_END;
     }
 
-    if (!SDL_CreateWindowAndRenderer("VL Display", imgData->width, imgData->height, SDL_WINDOW_FULLSCREEN, window, renderer))
+    if (!SDL_CreateWindowAndRenderer("VL Display", imgData->width, imgData->height, SDL_WINDOW_RESIZABLE, window, renderer))
     {
         SDL_Log("Failed to create window and renderer: %s", SDL_GetError());
         return APP_END;

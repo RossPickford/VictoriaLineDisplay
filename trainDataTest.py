@@ -128,7 +128,7 @@ def requestTrainData():
             station = "King's Cross St. Pancras"
 
 
-        if station != station_name and state != 0:
+        if station != station_name and state != 0 and "At" not in location:
             print(f" {id} station: {station} | current station: {station_name}")
             continue
 

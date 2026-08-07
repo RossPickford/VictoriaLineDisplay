@@ -2,7 +2,7 @@
 
 #define REQUEST_TIME 30000
 
-int main()
+int main(void)
 {
     TrainData *tData = NULL;
     uint8_t tDataLen = 0;
@@ -28,7 +28,7 @@ int main()
     while (status)
     {
         uint64_t currentTick = SDL_GetTicks();
-        double delta = (double)(currentTick - previousTick) / 1000.0f;
+        float delta = (float)(currentTick - previousTick) / 1000.0f;
         requestRefreshTime += currentTick - previousTick;
         previousTick = currentTick;
 

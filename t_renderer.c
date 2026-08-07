@@ -117,7 +117,7 @@ bool t_rend_init(SDL_Window **window, SDL_Renderer **renderer, imageData *imgDat
         return APP_END;
     }
 
-    if (!SDL_CreateWindowAndRenderer("VL Display", imgData->width, imgData->height, SDL_WINDOW_RESIZABLE, window, renderer))
+    if (!SDL_CreateWindowAndRenderer("VL Display", 10 * imgData->width, 10 * imgData->height, SDL_WINDOW_RESIZABLE, window, renderer))
     {
         SDL_Log("Failed to create window and renderer: %s", SDL_GetError());
         return APP_END;
@@ -256,7 +256,7 @@ void drawTrainNode(pixelData **pxlMtrx, float x, int8_t dir, pixelDataExtended *
     updatePixel(&tBuff[tBuffOffset][5].pxlData, newR, newG, newB); */
 }
 
-bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, int16_t tNodeLength, pixelDataExtended **tBuff)
+bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tNodes, uint8_t tNodeLength, pixelDataExtended **tBuff)
 {
     // printf("rendering\n");
 
@@ -284,8 +284,6 @@ bool t_rend_drawPixels(imageData *imgData, SDL_Renderer *renderer, trainNode *tN
     // printf("creating and drawing train pixels\n");
     if (tNodeLength > 0 && tNodes)
     {
-        uint8_t tBuffOffset = 0;
-
         // printf("filling train buffer\n");
         for (size_t i = 0; i < tNodeLength; i++) // Fill train buffer with node data
             drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir, tBuff, i);

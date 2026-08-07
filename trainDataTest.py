@@ -54,9 +54,10 @@ API_KEY = "580efc09100e43b6976feaefb4e33f12"
 base_url = "https://api.tfl.gov.uk/Line/victoria/Arrivals/"
 params = {"app_key": API_KEY}
 
-totalIds = {}
 
 def requestTrainData():
+    print("Requesting data using Python")
+    totalIds = {}
     totalTime_request = time.time()
     request = get(base_url, params=params)
     data = request.json()
@@ -177,13 +178,10 @@ def requestTrainData():
             print(f"{id} at {loc} - not in train_data")
 
     list_data = []
-    print("=======================================================")
+    # print("=======================================================")
     for id, data in train_data.items():
-        print(f"{id} | direction: {data[0]} | station: {data[1]} | location: {data[4]} | time to station: {data[2]}")
-
         list_data.append([id, data[0], data[1], data[2], data[3]])
+        # print(f"{id} | direction: {data[0]} | station: {data[1]} | location: {data[4]} | time to station: {data[2]}")
 
-    test_list = []
-    test_list.append([1, 1, 3, 4, 5])
-    test_list.append([2, -1, 5, 6, 8])
+
     return list_data

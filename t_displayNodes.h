@@ -6,17 +6,16 @@
 
 typedef struct trainNode
 {
+    float x;
+    float speed;
+    int16_t id;
     uint8_t misses;
     uint8_t nextStop;
     int8_t dir;
-    int16_t id;
-    float x;
-    float speed;
 } trainNode;
 
 bool t_nodes_init(trainNode **tNodes);
 void t_nodes_quit(trainNode *tNodes);
 void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, uint8_t tDataLength);
 void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, float deltaTime);
-trainNode *getTrainNodes();
 void testNodeDisplay(trainNode *tNodes, uint8_t *tNodeLen);

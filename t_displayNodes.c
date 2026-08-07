@@ -160,20 +160,19 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
 
     *tNodeLength = nodeLen;
 
-    for (size_t i = 0; i < nodeLen; i++)
+/*     for (size_t i = 0; i < nodeLen; i++)
     {
         printf("Train id: %d | ", (tNodes + i)->id);
         printf("direction: %d |", (tNodes + i)->dir);
         printf("station: %d ", (tNodes + i)->nextStop);
         printf("| x coord: %f ", (tNodes + i)->x);
         printf("| speed: %f\n", (tNodes + i)->speed);
-    }
+    } */
 }
 
 void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, float deltaTime)
 {
     // printf("updating Pos\n");
-
     if (tNodeLength == 0 || deltaTime == 0.0f || !tNodes)
         return;
 

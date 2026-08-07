@@ -1,3 +1,5 @@
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 #include "t_dataCollection.h"
 
 #define MODULE_NAME "trainDataTest"
@@ -52,8 +54,10 @@ void requestTrains(TrainData *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py
     PyObject *pValue;
 
     pName = PyUnicode_DecodeFSDefault(MODULE_NAME);
+    printf("retrieved name\n");
 
     pModule = PyImport_Import(pName);
+    printf("retrieved module\n");
     Py_DECREF(pName);
 
     if (!pModule)
@@ -65,13 +69,15 @@ void requestTrains(TrainData *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py
 
     pFunc = PyObject_GetAttrString(pModule, FUNC_NAME);
 
-    if (!pFunc && !PyCallable_Check(pFunc))
+    if (!pFunc || !PyCallable_Check(pFunc))
     {
         PyErr_Print();
         fprintf(stderr, "Cannot find function\n");
     }
+    printf("retrieved funciton\n");
 
     pValue = PyObject_CallObject(pFunc, NULL);
+    printf("retrieved value/ called function\n");
     if (!pValue || !PyList_Check(pValue))
     {
         Py_DECREF(pFunc);
@@ -109,21 +115,21 @@ void requestTrains(TrainData *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py
         // Py_ssize_t itemLen = PyList_Size(train);
         // printf("Length of internal array: %lld\n", itemLen);
 
-        (tData + i)->id = getItem(train, 0);
+        (tData + i)->id = (uint16_t)getItem(train, 0);
         assert((tData + i)->id >= 0);
-        (tData + i)->direction = getItem(train, 1);
+        (tData + i)->direction = (int8_t)getItem(train, 1);
         assert((tData + i)->direction == -1 || (tData + i)->direction == 1);
-        (tData + i)->nextStation = getItem(train, 2);
+        (tData + i)->nextStation = (uint8_t)getItem(train, 2);
         assert((tData + i)->nextStation >= 0 || (tData + i)->nextStation < 16);
-        (tData + i)->timeToStation = getItem(train, 3);
-        (tData + i)->state = getItem(train, 4);
+        (tData + i)->timeToStation = (uint8_t)getItem(train, 3);
+        (tData + i)->state = (uint8_t)getItem(train, 4);
     }
 
     printf("Now sorting Data\n");
 
     // sort the trains into numerical order of IDs
 
-    for (size_t i = 0; i < *tDataLen - 1; i++)
+    for (size_t i = 0; i < (size_t)*tDataLen - 1; i++)
         for (size_t j = i + 1; j < *tDataLen; j++)
         {
             if ((tData + i)->id > (tData + j)->id)

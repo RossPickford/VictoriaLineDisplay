@@ -2,7 +2,7 @@
 #include <math.h>
 
 #define WALTHAMSTOW_BOUND 4
-#define BRIXTON_BOUND 123
+#define BRIXTON_BOUND 124
 
 #define STATION_GAP 6
 
@@ -35,7 +35,7 @@ uint8_t MissingNodeDataCheck(trainNode *tNodes, uint8_t nodeIndex, uint8_t *node
     trainNode tNode = *(tNodes + nodeIndex);
     // printf("node missing data - %u\n", tNode.misses);
 
-    if (tNode.misses >= 3)
+    if (tNode.misses >= 1)
     {
         // printf("t_displayNodes: Train %d did not receive data after 3 requests - removing node\n", tNode.id);
 
@@ -69,7 +69,8 @@ void insertNewNode(trainNode *tNode, TrainData tData)
     tNode->id = tData.id;
     tNode->dir = tData.direction;
     size_t dir = (tNode->dir + 1) / 2;
-    tNode->nextStop = tStops_pos[dir][tData.nextStation];
+    // tNode->nextStop = tStops_pos[dir][tData.nextStation];
+    tNode->nextStop = tStops_pos[0][tData.nextStation]; // single lane stops
     tNode->x = (((float)tData.timeToStation / (float)tStops_times[dir][tData.nextStation]) * STATION_GAP * (float)tNode->dir * -1.0f) + (float)tNode->nextStop;
 
     if (isnan(tNode->x) || (((float)tNode->nextStop - tNode->x) * (float)tNode->dir) < 0.0f)
@@ -113,7 +114,8 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
             tNode.dir = tInfo.direction;
             size_t dir = (tNode.dir + 1) / 2;
             assert(dir == 0 || dir == 1);
-            tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
+            // tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
+            tNode.nextStop = tStops_pos[0][tInfo.nextStation]; // single lane stops
             tNode.speed = getSpeedf(tNode, (float)tInfo.timeToStation);
             tNode.misses = 0;
         }

@@ -11,7 +11,8 @@
 
 bool extractPixelDataFromFile(imageData *imgData)
 {
-    FILE *image = fopen("./media/background_128x32.bmp", "rb");
+    // FILE *image = fopen("./media/background_128x32.bmp", "rb");
+    FILE *image = fopen("./media/background_128x32_single.bmp", "rb");
     uint8_t header[14];
     uint8_t DIBHeader[40];
 
@@ -144,6 +145,9 @@ bool t_rend_event()
     while (SDL_PollEvent(&event))
     {
         if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_ESCAPE)
+            return APP_END;
+
+        if (event.type == SDL_EVENT_QUIT)
             return APP_END;
     }
 

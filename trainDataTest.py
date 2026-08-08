@@ -30,7 +30,7 @@ from sys import path
 import link
 path.append(link.getRequestsAddress())
 
-from requests import get
+from requests import get, Timeout
 import nextStation
 
 def getStationFromLocation(location):
@@ -59,7 +59,14 @@ def requestTrainData():
     print("Requesting data using Python")
     totalIds = {}
     totalTime_request = time.time()
-    request = get(base_url, params=params)
+    
+    try:
+        request = get(base_url, params=params, timeout=10)
+    except Timeout:
+        print("request timed out")
+        return []
+    
+    print("recieved request")
     data = request.json()
     totalTime_request = time.time() - totalTime_request
 
@@ -183,5 +190,5 @@ def requestTrainData():
         list_data.append([id, data[0], data[1], data[2], data[3]])
         # print(f"{id} | direction: {data[0]} | station: {data[1]} | location: {data[4]} | time to station: {data[2]}")
 
-
+    print("returning data from Python")
     return list_data

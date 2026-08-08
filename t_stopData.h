@@ -4,6 +4,25 @@
 
 static uint8_t tStops_pos[2][16] = {
     {
+        // Single Lane Stops //
+        4,   // Walthamstow
+        12,  // Blackhorse road
+        20,  // Tottenham Hale
+        28,  // Seven Sisters
+        36,  // Finsbury Park
+        44,  // Highbury & Islington
+        52,  // Kings Cross st. Pancras
+        60,  // Euston
+        68,  // Warren Street
+        76,  // Oxford Circus
+        84,  // Green Park
+        92,  // Victoria
+        100,  // Pimlico
+        108, // Vauxhall
+        116, // Stockwell
+        124, // Brixton
+    },
+    /* {
         // Northbound //
         3,   // Walthamstow
         11,  // Blackhorse road
@@ -40,7 +59,8 @@ static uint8_t tStops_pos[2][16] = {
         108, // Vauxhall
         116, // Stockwell
         124, // Brixton
-    }};
+    }*/
+};
 
 static uint8_t tStops_times[2][16] = {
     {

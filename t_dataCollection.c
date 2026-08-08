@@ -14,6 +14,10 @@ void t_data_init(TrainData **tData)
 {
     Py_Initialize();
 
+    // FILE *requestsModule = fopen("addRequestsModule.py", "rb");
+    // PyRun_SimpleFile(requestsModule, "addRequestsModule");
+    // fclose(requestsModule);
+
     *tData = (TrainData *)malloc(sizeof(TrainData) * DATA_ARENA_SIZE);
 }
 
@@ -74,7 +78,7 @@ void requestTrains(TrainData *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py
         PyErr_Print();
         fprintf(stderr, "Cannot find function\n");
     }
-    printf("retrieved funciton\n");
+    printf("retrieved function\n");
 
     pValue = PyObject_CallObject(pFunc, NULL);
     printf("retrieved value/ called function\n");

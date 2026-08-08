@@ -1,0 +1,8 @@
+- I should removed trains that don't show up in the next data request immediatly instead of 3 chances (more to test out)
+
+- move the train data request to another thread so that there isn't a massive pause and then spike in movement
+
+
+
+- run a python script that runs the request script and see if it eventually crashes -- IN MOTION
+

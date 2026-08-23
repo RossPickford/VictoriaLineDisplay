@@ -1,0 +1,215 @@
+#include "t_displayNodes.h"
+#include <math.h>
+
+#define WALTHAMSTOW_BOUND 4
+#define BRIXTON_BOUND 124
+
+#define STATION_GAP 6
+
+#define TNODE_ARENA_SIZE 50
+
+bool t_nodes_init(trainNode **tNodes)
+{
+    *tNodes = (trainNode *)SDL_malloc(sizeof(trainNode) * TNODE_ARENA_SIZE);
+
+    if (!tNodes)
+    {
+        printf("failed to allocate memory for train nodes\n");
+        return false;
+    }
+
+    for (size_t i = 0; i < TNODE_ARENA_SIZE; i++)
+        (*tNodes + i)->misses = 0;
+
+    return true;
+}
+
+void t_nodes_quit(trainNode *tNodes)
+{
+    SDL_free(tNodes);
+}
+
+uint8_t MissingNodeDataCheck(trainNode *tNodes, uint8_t nodeIndex, uint8_t *nodeLen)
+{
+    (tNodes + nodeIndex)->misses++;
+    trainNode tNode = *(tNodes + nodeIndex);
+    // printf("node missing data - %u\n", tNode.misses);
+
+    if (tNode.misses >= 1)
+    {
+        // printf("t_displayNodes: Train %d did not receive data after 3 requests - removing node\n", tNode.id);
+
+        (*nodeLen)--;
+        for (size_t i = nodeIndex; i < *nodeLen; i++)
+            *(tNodes + i) = *(tNodes + i + 1);
+
+        return 0;
+    }
+    else
+        return 1;
+}
+
+float getSpeedf(trainNode tNode, float time)
+{
+    float speed = time == 0 ? 0.0f : ((float)tNode.nextStop - tNode.x) / time;
+
+    if (speed > 1.0f)
+        speed = 0.9f;
+    else if (speed < -1.0f)
+        speed = -0.9f;
+
+    if ((speed < 0 && tNode.dir > 0) || ((speed > 0 && tNode.dir < 0))) // check if direction of speed matches the train's direction.
+        speed *= -1.0f;
+
+    return speed;
+}
+
+void insertNewNode(trainNode *tNode, TrainData tData)
+{
+    tNode->id = tData.id;
+    tNode->dir = tData.direction;
+    size_t dir = (tNode->dir + 1) / 2;
+    // tNode->nextStop = tStops_pos[dir][tData.nextStation];
+    tNode->nextStop = tStops_pos[0][tData.nextStation]; // single lane stops
+    tNode->x = (((float)tData.timeToStation / (float)tStops_times[dir][tData.nextStation]) * STATION_GAP * (float)tNode->dir * -1.0f) + (float)tNode->nextStop;
+
+    if (isnan(tNode->x) || (((float)tNode->nextStop - tNode->x) * (float)tNode->dir) < 0.0f)
+        tNode->x = (float)tNode->nextStop;
+
+    if (tNode->x < WALTHAMSTOW_BOUND || tNode->x > BRIXTON_BOUND)
+        tNode->x = (float)tNode->nextStop;
+
+    tNode->x = (float)((int64_t)tNode->x);
+
+    tNode->speed = getSpeedf(*tNode, (float)tData.timeToStation);
+}
+
+void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, uint8_t tDataLength)
+{
+    // This only works under the assumption both are sorted in numerical order of IDs
+
+    printf("updating train nodes\n");
+
+    assert(tNodes || tNodeLength);
+
+    if (!tData)
+    {
+        for (size_t i = 0; i < *tNodeLength; i += MissingNodeDataCheck(tNodes, i, tNodeLength))
+            ;
+        return;
+    }
+
+    uint8_t nodeLen = *tNodeLength; // saving my sanity in the stack
+    uint8_t inode = 0, idata = 0;
+
+    printf("node length: %u || data length: %u\n", *tNodeLength, tDataLength);
+    while (inode < nodeLen && idata < tDataLength)
+    {
+        trainNode tNode = *(tNodes + inode);
+        TrainData tInfo = *(tData + idata);
+        // printf("tNodes[%u]: %u | tData[%u]: %u\n", inode, tNode.id, idata, tInfo.id);
+
+        if (tNode.id == tInfo.id) // There is a match in data IDs
+        {
+            tNode.dir = tInfo.direction;
+            size_t dir = (tNode.dir + 1) / 2;
+            assert(dir == 0 || dir == 1);
+            // tNode.nextStop = tStops_pos[dir][tInfo.nextStation];
+            tNode.nextStop = tStops_pos[0][tInfo.nextStation]; // single lane stops
+            tNode.speed = getSpeedf(tNode, (float)tInfo.timeToStation);
+            tNode.misses = 0;
+        }
+        else if (tNode.id < tInfo.id) // There is no data for current node
+        {
+            inode += MissingNodeDataCheck(tNodes, inode, &nodeLen);
+            continue;
+        }
+        else if (nodeLen < TNODE_ARENA_SIZE) // Insert a new node into the current position
+        {
+            // printf("inserting new node\n");
+
+            for (size_t i = nodeLen++; i > inode; i--)
+                *(tNodes + i) = *(tNodes + i - 1);
+
+            insertNewNode(&tNode, tInfo);
+        }
+        else
+        {
+            printf("Cannot assign another train node due to reaching Arena max - %u\n", nodeLen);
+            break;
+        }
+
+        *(tNodes + inode) = tNode;
+        if (inode < nodeLen)
+            inode++;
+        if (idata < tDataLength)
+            idata++;
+    }
+
+    if (inode < nodeLen)
+        while (inode < nodeLen)
+            inode += MissingNodeDataCheck(tNodes, inode, &nodeLen);
+
+    // If there are no nodes, need to fill it with new data
+    if (idata < tDataLength)
+        while (idata < tDataLength)
+        {
+            assert(nodeLen < TNODE_ARENA_SIZE);
+            nodeLen++;
+
+            insertNewNode((tNodes + inode++), *(tData + idata++));
+        }
+
+    *tNodeLength = nodeLen;
+
+/*     for (size_t i = 0; i < nodeLen; i++)
+    {
+        printf("Train id: %d | ", (tNodes + i)->id);
+        printf("direction: %d |", (tNodes + i)->dir);
+        printf("station: %d ", (tNodes + i)->nextStop);
+        printf("| x coord: %f ", (tNodes + i)->x);
+        printf("| speed: %f\n", (tNodes + i)->speed);
+    } */
+}
+
+void updateTrainPosition(trainNode *tNodes, uint8_t tNodeLength, float deltaTime)
+{
+    // printf("updating Pos\n");
+    if (tNodeLength == 0 || deltaTime == 0.0f || !tNodes)
+        return;
+
+    for (size_t i = 0; i < tNodeLength; i++)
+    {
+        trainNode tNode = *(tNodes + i);
+        float xDelta = deltaTime * tNode.speed /* * (tNodes + i)->dir */;
+        assert(xDelta * tNode.dir >= 0.0f);
+        tNode.x += xDelta;
+
+        if (tNode.dir == NORTHBOUND && tNode.x < tNode.nextStop)
+        {
+            tNode.x = (float)tNode.nextStop;
+            tNode.speed = 0.0f;
+        }
+        else if (tNode.dir == SOUTHBOUND && tNode.x > tNode.nextStop)
+            tNode.x = (float)tNode.nextStop;
+
+        *(tNodes + i) = tNode;
+    }
+}
+
+void testNodeDisplay(trainNode *tNodes, uint8_t *tNodeLen)
+{
+    tNodes[0].id = 1;
+    tNodes[0].dir = -1;
+    tNodes[0].nextStop = 3;
+    tNodes[0].x = 123;
+    tNodes[0].speed = -0.5f;
+
+    tNodes[1].id = 2;
+    tNodes[1].dir = 1;
+    tNodes[1].nextStop = 124;
+    tNodes[1].x = 4;
+    tNodes[1].speed = 0.5f;
+
+    *tNodeLen = 2;
+}

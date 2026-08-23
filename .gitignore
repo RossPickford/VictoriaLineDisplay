@@ -12,11 +12,15 @@ __pycache__/
 .vs/
 .vscode/
 
+# Visual Studio build project Settings
+BuildProject/
+
 # Specific Addresses to Ignore
 link.py
 
 # Compile file - independant for each user
 compile.bat
+compileImg.bat
 
 # Distribution / packaging
 .Python

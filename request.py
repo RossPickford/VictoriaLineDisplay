@@ -1,40 +1,48 @@
 import time
-start = time.time()
+totalTime_init = time.time()
 
-station_id_lookup = { "Stockwell" : "940GZZLUSKW",
-                     "Vauxhall" : "940GZZLUVXL",
-                     "Pimlico" : "940GZZLUPCO",
-                     "Victoria" : "940GZZLUVIC",
-                     "Green Park" : "940GZZLUGPK",
-                     "Oxford Circus" : "940GZZLUOXC",
-                     "Warren Street" : "940GZZLUWRR",
-                     "Euston" : "940GZZLUEUS",
-                     "Kings Cross St. Pancras" : "940GZZLUKSX",
-                     "Kings Cross St. P" : "940GZZLUKSX",
-                     "Highbury & Islington" : "940GZZLUHAI",
-                     "Highbury & Isl" : "940GZZLUHAI",
-                     "Finsbury Park" : "940GZZLUFPK",
-                     "Seven Sisters" : "940GZZLUSVS",
-                     "Tottenham Hale" : "940GZZLUTMH",
-                     "Blackhorse Road" : "940GZZLUBLR"}
+station_ids = { "Brixton" : "940GZZLUBXN",
+                "Stockwell" : "940GZZLUSKW",
+                "Vauxhall" : "940GZZLUVXL",
+                "Pimlico" : "940GZZLUPCO",
+                "Victoria" : "940GZZLUVIC",
+                "Green Park" : "940GZZLUGPK",
+                "Oxford Circus" : "940GZZLUOXC",
+                "Warren Street" : "940GZZLUWRR",
+                "Euston" : "940GZZLUEUS",
+                "Kings Cross St. Pancras" : "940GZZLUKSX",
+                "Highbury & Islington" : "940GZZLUHAI",
+                "Finsbury Park" : "940GZZLUFPK",
+                "Seven Sisters" : "940GZZLUSVS",
+                "Tottenham Hale" : "940GZZLUTMH",
+                "Blackhorse Road" : "940GZZLUBLR",
+                "Walthamstow Central" : "940GZZLUWWL"}
 
-class TrainData:
-    def __init__(self, nextStation, timeToStation, state):
-        self.nextStation = nextStation
-        self.timeToStation = timeToStation
-        self.state = state
+station_index = { "Brixton" : 15,
+                "Stockwell" : 14,
+                "Vauxhall" : 13,
+                "Pimlico" : 12,
+                "Victoria" : 11,
+                "Green Park" : 10,
+                "Oxford Circus" : 9,
+                "Warren Street" : 8,
+                "Euston" : 7,
+                "Kings Cross St. Pancras" : 6,
+                "Highbury & Islington" : 5,
+                "Finsbury Park" : 4,
+                "Seven Sisters" : 3,
+                "Tottenham Hale" : 2,
+                "Blackhorse Road" : 1,
+                "Walthamstow Central" : 0}
 
 import subprocess
-# subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
+subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/", "-o", "trains.json"])
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN", "-o", "southbound.json"])
 # subprocess.run(["curl", "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUWWL", "-o", "northbound.json"])
 
 from sys import path
 import link
 path.append(link.getRequestsAddress())
-
-train_data = {}
-train_list = []
 
 from requests import get
 import nextStation
@@ -58,82 +66,125 @@ def getStationFromLocation(location):
 
 API_KEY = "580efc09100e43b6976feaefb4e33f12"
 base_url = "https://api.tfl.gov.uk/Line/victoria/Arrivals/"
-northbound_url = "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUWWL"
-southbound_url = "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUBXN"
 params = {"app_key": API_KEY}
 
-northbound_response = get(northbound_url, params=params)
-northbound_data = northbound_response.json()
+totalTime_init = time.time() - totalTime_init
+print(f"\nPre-initialisation took {totalTime_init} seconds")
 
-southbound_response = get(southbound_url, params=params)
-southbound_data = southbound_response.json()
+train_ids = []
 
-north_trains = {}
-south_trains = {}
-all_data = [[northbound_data, north_trains], [southbound_data, south_trains]]
+def getTrains():
+    train_data = {}
+    totalTime_trainDataCollection = 0
+    totalTime_request = 0
+    count = 0 #used to track where in the loop we are
+    for station_name, stop_id in station_ids.items():
+        request_start = time.time()
+
+        url = base_url + stop_id
+        request = get(url, params=params)
+        data = request.json()
+
+        totalTime_request += time.time() - request_start
+
+        temp_trainData = {}
+        for train in data:
+            dataCollection_start = time.time()
+            id = train.get("vehicleId", "No vehicle Id")
+            if not id.isdigit():
+                print("Invalid train id")
+                continue
+            if id in train_data.keys():
+                continue
+
+            if id not in train_ids:
+                train_ids.append(id)
+
+            location = train.get("currentLocation", "Location unknown")
+            station = location            
+            timeToStation = 0
+            state = 0
+            if "Between" in location:
+                station = getStationFromLocation(location)
+                state = 1
+                timeToStation = train.get("timeToStation", "No time given")
+
+            elif "Approaching" in location:
+                station = location.replace("Approaching ", "")
+                state = 1
+                timeToStation = train.get("timeToStation", "No time given")
+                timeToStation = int(timeToStation) if timeToStation != "No time given" else -1
+
+            elif "At Platform" in location:
+                station = station_name
+                state = 2
+
+            elif "At" in location:
+                station = location.replace("At ", "")
+                state = 2
+
+            elif "Departing" in location or "Departed" in location or "Left" in location: 
+                destination = train.get("towards", "no destination")
+                a = 1 if destination == "Brixton" else -1
+                previousStation = list(station_ids.keys())[count + a]
+                # print(f"{id} | {destination} : {location} : {previousStation} : {station_name}")
+                if previousStation in location:
+                    station = station_name
+                    state = 1
+                    timeToStation = train.get("timeToStation", "No time given")
+                else:
+                    continue
+
+            elif "Area" in location and "Brixton" in location:
+                station = "Brixton"
+                state = 1
+
+            else:
+                print(f"Unknown Location Value: {location} for train: {id} at {station_name}")
+
+            if station == "Highbury & Isl":
+                station = "Highbury & Islington"
+            elif station == "Kings Cross St. P":
+                station = "Kings Cross St. Pancras"
+
+            if station != station_name:
+                continue
+
+            direction = train.get("towards","No direction")
+
+            direction = -1 if direction == "Walthamstow Central" else 1
+            id_int = int(id)
+            time_int = int(timeToStation)
+
+            if id_int not in temp_trainData.keys():
+                temp_trainData.update({id_int : [direction, station_index[station], time_int, state]})
+            elif temp_trainData[id_int][1] != station_index[station]:
+                print(f"Error 01: Different Location for train {id_int} - saved Station {temp_trainData[id_int][1]} | new station {station}")
+            elif time_int < temp_trainData[id_int][2]: 
+                    temp_trainData[id_int][2] = time_int
+
+            totalTime_trainDataCollection += time.time() - dataCollection_start
+
+        train_data.update(temp_trainData)
+        count += 1
+
+    print(f"Requests took {totalTime_request} seconds")
+    print(f"Data collection took {totalTime_trainDataCollection} seconds\n")
+    # print("\n==============Trains==============\n")
+
+    list_data = []
+    for id, loc in train_data.items():
+        list_data.append([id, loc[0], loc[1], loc[2], loc[3]])
+        # print(f"ID: {id} | {loc[0]} | {"next" if loc[3] == "moving" else "current"} Stop: {loc[1]} | time to: {loc[2]}")
+
+    for id in train_ids:
+        print(id)
+    print(len(train_ids))
+    
+    return list_data
 
 
-for data in all_data:
-    for train in data[0]:
-        id = train.get("vehicleId", "No vehicle Id")
-        if not id.isdigit():
-            continue
 
-        location = train.get("currentLocation", "Location unknown")
-        station = location            
-        timeToStation = 0
-        state = "None"
-        if "Between" in location:
-            station = getStationFromLocation(location)
-            state = "moving"
-        elif "Approaching" in location:
-            station = location.replace("Approaching ", "")
-            state = "moving"
-        elif "At Platform" in location:
-            station = (train.get("stationName", "no station available")).replace(" Underground Station", "")
-            state = "idle"
-        elif "At" in location:
-            station = location.replace("At ", "")
-            state = "idle"
-
-        station_url = base_url
-        if state == "moving" and station in station_id_lookup.keys():
-            timeToStation = 100000
-            station_url += station_id_lookup[station]
-            station_url += "?direction="
-            station_url += "outbound" if data[0] == northbound_data else "inbound"
-            station_request = get(station_url, params=params)
-            station_data = station_request.json()
-            for s in station_data:
-                if id == s.get("vehicleId", "no id"):
-                    t = s.get("timeToStation", "No Time Given")
-                    if t < timeToStation:
-                        timeToStation = t
-        elif state == "moving" and (station == "Walthamstow Central" or station == "Brixton"):
-            timeToStation = train.get("timeToStation", "No Time Given")
-            
-        if id not in data[1]:
-            data[1].update({id : TrainData(station, timeToStation, state)})
-        elif data[1][id].nextStation != station:
-            print(f"Error 01: Different Location for train {id}")
-        elif timeToStation < data[1][id].timeToStation: 
-                data[1][id].timeToStation = timeToStation
-
-
-import trainTimes
-
-print("Northbound Trains")
-for id, loc in north_trains.items():
-        print(f"ID: {id} | {"next" if loc.state == "moving" else "current"} Stop: {loc.nextStation} | time to: {loc.timeToStation} / {trainTimes.getStationTime("northbound", loc.nextStation)}")
-
-print("Southbound Trains")
-for id, loc in south_trains.items():
-     print(f"ID: {id} | {"next" if loc.state == "moving" else "current"} Stop: {loc.nextStation} | time to: {loc.timeToStation} / {trainTimes.getStationTime("southbound", loc.nextStation)}")
-
-end = time.time()
-
-print(f"Program took {end - start} seconds to run")
-
-
+getTrains()
 
     

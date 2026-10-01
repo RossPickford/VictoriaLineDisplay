@@ -3,27 +3,40 @@
 
 #define DATA_ARENA_SIZE 50
 
-t_data_init(TrainData **tData)
+static char readBuff[1024];
+
+void t_data_init(TrainData **tData)
 {
     *tData = (TrainData *)malloc(sizeof(TrainData) * DATA_ARENA_SIZE);
 }
 
-t_data_quit(TrainData **tData)
+void t_data_quit(TrainData **tData)
 {
     free(*tData);
 }
 
-requestTains(TrainData *tData, uint8_t *tDataLen)
+void requestTrains(TrainData *tData, uint8_t *tDataLen)
 {
-    system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
+    system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt");
 
-    FILE *trains = fopen("northbound.json", "r");
+    FILE *trains = fopen("trains.txt", "rb");
 
     if (!trains)
     {
         printf("failed to open files");
-        return -1;
+        return;
+    }
+
+    while (fgets(readBuff, sizeof(readBuff), trains))
+    {
+        printf("%s", readBuff);
     }
 
     fclose(trains);
+}
+
+int main(void)
+{
+    requestTrains(NULL, NULL);
+    return 0;
 }

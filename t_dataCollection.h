@@ -48,6 +48,15 @@ typedef struct TrainData
      * 1 represents a moving train and 0 represents a stationary train
      */
     uint8_t state;
+
+    /**
+     * This is a variable represents the perspective of the station that the data is being looked through.
+     * This is used to compare with the next station when collecting the train data. They must be the same
+     * station for the Time to Station value to be accurate.
+     * 
+     * This should not be accessed outside of train data collection.
+     */
+    uint8_t stationName;
     
 } TrainData;
 

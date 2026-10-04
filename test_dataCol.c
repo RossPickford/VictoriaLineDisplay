@@ -14,7 +14,7 @@ void t_data_quit()
     // return 120;
 }
 
-uint8_t isCopy(uint16_t id, uint8_t index, TrainData *t, uint8_t tDataLen)
+uint8_t isCopy(uint16_t id, uint8_t index, train_object *t, uint8_t tDataLen)
 {
     for (uint8_t i = 0; i < tDataLen; i++)
         if (id == (t + i)->id && i != index)
@@ -120,7 +120,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
 } */
 
 int count = 0;
-TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
+train_object *requestTrains(uint8_t *tDataLen) // add a new node each time
 {
     // printf("requesting trains\n");
     
@@ -135,7 +135,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
     uint8_t len = 1;
     srand(time(NULL));
 
-    TrainData *t = (TrainData *)malloc(sizeof(TrainData) * len);
+    train_object *t = (train_object *)malloc(sizeof(train_object) * len);
     if (!t)
         printf("could not allocate memory for train data");
 
@@ -150,7 +150,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
         {
             if ((t + i)->id > (t + j)->id)
             {
-                TrainData tempData = *(t + i);
+                train_object tempData = *(t + i);
                 *(t + i) = *(t + j);
                 *(t + j) = tempData;
             }

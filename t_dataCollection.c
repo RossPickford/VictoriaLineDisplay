@@ -10,7 +10,7 @@
 // #define MODULE_NAME "request"
 // #define FUNC_NAME "getTrains"
 
-void t_data_init(TrainData **tData)
+void t_data_init(train_object **tData)
 {
     Py_Initialize();
 
@@ -18,10 +18,10 @@ void t_data_init(TrainData **tData)
     // PyRun_SimpleFile(requestsModule, "addRequestsModule");
     // fclose(requestsModule);
 
-    *tData = (TrainData *)malloc(sizeof(TrainData) * DATA_ARENA_SIZE);
+    *tData = (train_object *)malloc(sizeof(train_object) * DATA_ARENA_SIZE);
 }
 
-void t_data_quit(TrainData **tData)
+void t_data_quit(train_object **tData)
 {
     if (Py_FinalizeEx() < 0)
         ;
@@ -47,7 +47,7 @@ int64_t getItem(PyObject *data, Py_ssize_t index)
     return item;
 }
 
-void requestTrains(TrainData *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
+void requestTrains(train_object *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
 {
     printf("requesting Data\n");
 
@@ -138,7 +138,7 @@ void requestTrains(TrainData *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py
         {
             if ((tData + i)->id > (tData + j)->id)
             {
-                TrainData tempData = *(tData + i);
+                train_object tempData = *(tData + i);
                 *(tData + i) = *(tData + j);
                 *(tData + j) = tempData;
             }

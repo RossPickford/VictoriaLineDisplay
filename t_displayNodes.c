@@ -64,7 +64,7 @@ float getSpeedf(trainNode tNode, float time)
     return speed;
 }
 
-void insertNewNode(trainNode *tNode, TrainData tData)
+void insertNewNode(trainNode *tNode, train_object tData)
 {
     tNode->id = tData.id;
     tNode->dir = tData.direction;
@@ -84,7 +84,7 @@ void insertNewNode(trainNode *tNode, TrainData tData)
     tNode->speed = getSpeedf(*tNode, (float)tData.timeToStation);
 }
 
-void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, uint8_t tDataLength)
+void updateTrainNode(trainNode *tNodes, train_object *tData, uint8_t *tNodeLength, uint8_t tDataLength)
 {
     // This only works under the assumption both are sorted in numerical order of IDs
 
@@ -106,7 +106,7 @@ void updateTrainNode(trainNode *tNodes, TrainData *tData, uint8_t *tNodeLength, 
     while (inode < nodeLen && idata < tDataLength)
     {
         trainNode tNode = *(tNodes + inode);
-        TrainData tInfo = *(tData + idata);
+        train_object tInfo = *(tData + idata);
         // printf("tNodes[%u]: %u | tData[%u]: %u\n", inode, tNode.id, idata, tInfo.id);
 
         if (tNode.id == tInfo.id) // There is a match in data IDs

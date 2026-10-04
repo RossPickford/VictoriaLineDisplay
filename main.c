@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    TrainData *tData = NULL;
+    train_object *tData = NULL;
     uint8_t tDataLen = 0;
 
     trainNode *tNodes = NULL;

@@ -4,12 +4,13 @@
 #include "t_dataCollection.h"
 
 #define DATA_ARENA_SIZE 50
+#define KEY_VALUE_BUFF_SIZE 32
 #define STREAM_BUFF_SIZE 300000
 
 static char stream[STREAM_BUFF_SIZE];
 
-static char k_buff[32];
-static char v_buff[32];
+static char k_buff[KEY_VALUE_BUFF_SIZE];
+static char v_buff[KEY_VALUE_BUFF_SIZE];
 
 void t_data_init(t_data *tdata)
 {
@@ -19,12 +20,16 @@ void t_data_init(t_data *tdata)
 
 void t_data_quit(t_data *tdata) { free(tdata->data); }
 
-uint8_t strComp(char *str1, char *str2, size_t len)
+/**
+ * Compare strings to a certain length. If the given length is larger than either string's length then it returns a false
+ */
+uint8_t strComp(String str1, String str2, size_t len)
 {
-    assert(len < sizeof(str1) && len < sizeof(str2));
+    if (len > str1.len && len > str2.len)
+        return 0;
 
     for (size_t i = 0; i < len; i++)
-        if (str1[i] != str2[i])
+        if (str1.data[i] != str2.data[i])
             return 0;
 
     return 1;
@@ -38,6 +43,7 @@ int is_data_null(train_object data)
 void requestTrains(t_data *tdata)
 {
     system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt");
+    system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
 
     FILE *trains = fopen("trains.txt", "rb");
 
@@ -100,10 +106,13 @@ void requestTrains(t_data *tdata)
              */
             while (*stream_pos != '"')
             {
-                assert(k_str.len < sizeof(k_str.data));
+                assert(k_str.len < KEY_VALUE_BUFF_SIZE);
                 k_str.data[k_str.len++] = *stream_pos++;
             }
 
+            /**
+             * Switch determines if key is one of specific keys with the necessary train data
+             */
             switch (k_str.data[0])
             {
             default:
@@ -119,10 +128,11 @@ void requestTrains(t_data *tdata)
                 k_type = KT_CURRENTLOCATION;
                 break;
             case 't':
-                char *timeTo = "timeToS";
+                char *timeto_literal = "timeToS";
+                String timeto = {sizeof(timeto_literal) - 1, timeto_literal};
                 if (k_str.data[1] == 'o')
                     k_type = KT_TOWARDS;
-                else if (strComp(k_str.data, timeTo, sizeof(timeTo) - 1))
+                else if (strComp(k_str, timeto, timeto.len))
                     k_type = KT_TIMETOSTATION;
                 break;
             }
@@ -138,12 +148,21 @@ void requestTrains(t_data *tdata)
 
             ++stream_pos;
 
+            /**
+             * If the key and it's respective value are found to be unnecassary, this will cycle through until the next key.
+             */
             if (k_type == KT_NONE)
             {
-                while (*stream_pos != ',')
+                for (; *stream_pos != ',' && *stream_pos != '}'; stream_pos++)
                 {
-                    if (*stream_pos++ == '"')
+                    if (*stream_pos == '"')
+                    {
+                        ++stream_pos;
                         while (*stream_pos++ != '"')
+                            ;
+                    }
+                    else if (*stream_pos == '{')
+                        while (*++stream_pos != '}')
                             ;
                 }
             }
@@ -161,6 +180,10 @@ void requestTrains(t_data *tdata)
 
                     ++stream_pos;
 
+                    /**
+                     * Store the value into value buffer - 
+                     * whilst moving stream_pos to the end of the key-value pair (i.e. comma ',')
+                     *  */ 
                     while (*stream_pos != '"')
                         v_str.data[v_str.len++] = *stream_pos++;
 
@@ -175,17 +198,23 @@ void requestTrains(t_data *tdata)
                     }
 
                     /**
-                     * Convert numerical string into real numerical
+                     * Convert numerical string into integer
                      */
                     for (size_t i = 0; i < v_str.len; i++)
                         temp_data.id = (temp_data.id * 10u) + (v_str.data[i] - 48u);
 
                     break;
                 default:
-                    while (*stream_pos != ',')
+                    for (; *stream_pos != ',' && *stream_pos != '}'; stream_pos++)
                     {
-                        if (*stream_pos++ == '"')
+                        if (*stream_pos == '"')
+                        {
+                            ++stream_pos;
                             while (*stream_pos++ != '"')
+                                ;
+                        }
+                        else if (*stream_pos == '{')
+                            while (*++stream_pos != '}')
                                 ;
                     }
                 } // end of switch
@@ -201,6 +230,10 @@ void requestTrains(t_data *tdata)
                 ++stream_pos;
 
         } // end of key-value pair loop inside train object
+
+        // move to beginning of next train object or the end of the array
+        while (*stream_pos != '{' && *stream_pos != ']')
+            ++stream_pos;
 
         uint8_t train_exists = 0;
 
@@ -220,6 +253,8 @@ void requestTrains(t_data *tdata)
 
     for (size_t i = 0; i < tdata->len; i++)
         printf("id: %u\n", tdata->data[i].id);
+
+    printf("number of unique trains: %u", tdata->len);
 
     fclose(trains);
 }

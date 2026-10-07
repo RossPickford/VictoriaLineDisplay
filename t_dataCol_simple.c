@@ -270,7 +270,10 @@ void requestTrains(t_data* tdata) {
 
   }  // end of main train object array loop
 
-  for (size_t i = 0; i < tdata->len; i++) printf("id: %u\n", tdata->data[i].id);
+  for (size_t i = 0; i < tdata->len; i++) {
+    printf("id: %u\n station name: %u\n\n", tdata->data[i].id, tdata->data[i].stationName);
+
+  }
 
   printf("number of unique trains: %u", tdata->len);
 

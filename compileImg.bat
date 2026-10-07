@@ -1,1 +1,0 @@
-gcc imageProcess.c -o imgProc.exe -I "C:\ExternalLibraries\SDL\include" -L "c:\ExternalLibraries\SDL\lib" -lsdl3

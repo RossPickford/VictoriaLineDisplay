@@ -8,7 +8,7 @@
 #define SOUTHBOUND 1
 
 typedef enum station_name {
-  V_WALTHAMSTOW = 25,
+  V_WALTHAMSTOW = 0,
   V_BLACKHORSE = 1,
   V_TOTTENHAM = 2,
   V_SEVENSISTERS = 3,

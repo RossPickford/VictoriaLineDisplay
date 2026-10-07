@@ -39,7 +39,8 @@ int is_data_null(train_object data) {
 
 void requestTrains(t_data* tdata) {
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt");
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
+  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o
+  // trains.json");
 
   FILE* trains = fopen("trains.txt", "rb");
 
@@ -142,8 +143,7 @@ void requestTrains(t_data* tdata) {
       if (k_type == KT_NONE) {
         for (; *stream_pos != ',' && *stream_pos != '}'; stream_pos++) {
           if (*stream_pos == '"') {
-            ++stream_pos;
-            while (*stream_pos++ != '"');
+            while (*++stream_pos != '"');
           } else if (*stream_pos == '{')
             while (*++stream_pos != '}');
         }
@@ -196,6 +196,8 @@ void requestTrains(t_data* tdata) {
               v_str.data[v_str.len++] = *stream_pos++;
             }
 
+            ++stream_pos;
+
             switch (v_str.data[0]) {
               case 'T':
                 temp_data.stationName = V_TOTTENHAM;
@@ -234,12 +236,12 @@ void requestTrains(t_data* tdata) {
                     v_str.data[1] == 'e' ? V_SEVENSISTERS : V_STOCKWELL;
                 break;
             }
+            break;
 
           default:
             for (; *stream_pos != ',' && *stream_pos != '}'; stream_pos++) {
               if (*stream_pos == '"') {
-                ++stream_pos;
-                while (*stream_pos++ != '"');
+                while (*++stream_pos != '"');
               } else if (*stream_pos == '{')
                 while (*++stream_pos != '}');
             }
@@ -271,8 +273,8 @@ void requestTrains(t_data* tdata) {
   }  // end of main train object array loop
 
   for (size_t i = 0; i < tdata->len; i++) {
-    printf("id: %u\n station name: %u\n\n", tdata->data[i].id, tdata->data[i].stationName);
-
+    printf("id: %u\n station name: %u\n\n", tdata->data[i].id,
+           tdata->data[i].stationName);
   }
 
   printf("number of unique trains: %u", tdata->len);

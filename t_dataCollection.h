@@ -7,6 +7,25 @@
 #define NORTHBOUND -1
 #define SOUTHBOUND 1
 
+typedef enum station_name {
+  V_WALTHAMSTOW = 0,
+  V_BLACKHORSE = 1,
+  V_TOTTENHAM = 2,
+  V_SEVENSISTERS = 3,
+  V_FINSBURYPARK = 4,
+  V_HIGHBURY = 5,
+  V_KINGSCROSS = 6,
+  V_EUSTON = 7,
+  V_WARRENSTREET = 8,
+  V_OXFORDCIRCUS = 9,
+  V_GREENPARK = 10,
+  V_VICTORIA = 11,
+  V_PIMLICO = 12,
+  V_VAUXHALL = 13,
+  V_STOCKWELL = 14,
+  V_BRIXTON = 15
+} station_name;
+
 typedef struct train_object {
   /**
    * vehicle id of the train - it is unique to each train
@@ -49,14 +68,14 @@ typedef struct train_object {
   uint8_t state;
 
   /**
-   * This is a variable represents the perspective of the station that the data
+   * This is an eum that represents the perspective of the station the data
    * is being looked through. This is used to compare with the next station when
    * collecting the train data. They must be the same station for the Time to
    * Station value to be accurate.
    *
    * This should not be accessed outside of train data collection.
    */
-  uint8_t stationName;
+  station_name stationName;
 
 } train_object;
 

@@ -237,7 +237,34 @@ void requestTrains(t_data* tdata) {
                 break;
             }
             break;
+          case KT_TOWARDS:
+            if (*stream_pos != '"') {
+              fprintf(stderr, "expected key string, instead recieved %c",
+                      *stream_pos);
+              return;
+            }
 
+            ++stream_pos;
+
+            while (*stream_pos != '"') {
+              v_str.data[v_str.len++] = *stream_pos++;
+            }
+
+            ++stream_pos;
+
+            switch (v_str.data[0]) {
+              case 'B':
+                temp_data.direction = 1;
+                break;
+              case 'W':
+              case 'S':
+                temp_data.direction = -1;
+                break;
+              default:
+                fprintf(stderr, "unknown destination: %s\n", v_str.data);
+                break;
+            }
+            break;
           default:
             for (; *stream_pos != ',' && *stream_pos != '}'; stream_pos++) {
               if (*stream_pos == '"') {
@@ -273,8 +300,8 @@ void requestTrains(t_data* tdata) {
   }  // end of main train object array loop
 
   for (size_t i = 0; i < tdata->len; i++) {
-    printf("id: %u\n station name: %u\n\n", tdata->data[i].id,
-           tdata->data[i].stationName);
+    printf("id: %u\n station name: %u\n direction: %d\n\n", tdata->data[i].id,
+           tdata->data[i].stationName, tdata->data[i].direction);
   }
 
   printf("number of unique trains: %u", tdata->len);

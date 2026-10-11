@@ -64,6 +64,13 @@ typedef struct train_object {
   station_name nextStation;
 
   /**
+   * This is a simple bool that if true will change the nextStation variable
+   * to the next station over - this is due to the key 'currentLocation' being
+   * before 'Towards' and to get the next station over, you need to know the direction.
+   */
+  uint8_t alterStation;
+
+  /**
    * State describes whether the train is moving or stationary
    * 1 represents a moving train and 0 represents a stationary train
    */

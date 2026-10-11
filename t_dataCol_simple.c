@@ -12,8 +12,7 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 
 void requestTrains(t_data* tdata) {
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt");
-  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o
-  // trains.json");
+  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
 
   FILE* trains = fopen("trains.txt", "rb");
 
@@ -160,6 +159,14 @@ void requestTrains(t_data* tdata) {
                 fprintf(stderr, "unknown destination: %s\n", vstr.data);
                 break;
             }
+
+            // change the next station to the correct one based on direction
+            tempdata.nextStation += tempdata.direction * tempdata.alterStation;
+            if (tempdata.nextStation < V_WALTHAMSTOW ||
+                tempdata.nextStation > V_BRIXTON) {
+              fprintf(stderr, "invalid station value\n");
+              return;
+            }
             break;
           case KT_TIMETOSTATION:
             if (*streampos < 0x30 || *streampos > 0x39) {
@@ -192,13 +199,9 @@ void requestTrains(t_data* tdata) {
               case 'D':
                 size_t index = vstr.data[8] == ' ' ? 9 : 10;
                 tempdata.nextStation =
-                    (station_name)(getstationfromstring(vstr, 8) -
-                                   tempdata.direction);
-                if (tempdata.nextStation < V_WALTHAMSTOW ||
-                    tempdata.nextStation > V_BRIXTON) {
-                  fprintf(stderr, "invalid station value\n");
-                  return;
-                }
+                    (station_name)getstationfromstring(vstr, 8);
+
+                tempdata.alterStation = 1;
                 break;
                 /**
                  * If the value begins with 'Left'
@@ -221,7 +224,7 @@ void requestTrains(t_data* tdata) {
                 break;
               /**
                * This is either 'Brixton Area' or ' Between X and Y'
-               * To get the correct station, the direction is subtracted from
+               * To get the correct station, the direction is added from
                * the station result to get the actual station the train is
                * heading to
                */
@@ -236,13 +239,8 @@ void requestTrains(t_data* tdata) {
                 }
 
                 tempdata.nextStation =
-                    (station_name)(getstationfromstring(vstr, 8) -
-                                   tempdata.direction);
-                if (tempdata.nextStation < V_WALTHAMSTOW ||
-                    tempdata.nextStation > V_BRIXTON) {
-                  fprintf(stderr, "invalid station value\n");
-                  return;
-                }
+                    (station_name)getstationfromstring(vstr, 8);
+                tempdata.alterStation = 1;
                 break;
               default:
                 fprintf(stderr, "unknown current location\n");

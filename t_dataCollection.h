@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #pragma once
 
@@ -8,22 +9,23 @@
 #define SOUTHBOUND 1
 
 typedef enum station_name {
-  V_WALTHAMSTOW = 0,
-  V_BLACKHORSE = 1,
-  V_TOTTENHAM = 2,
-  V_SEVENSISTERS = 3,
-  V_FINSBURYPARK = 4,
-  V_HIGHBURY = 5,
-  V_KINGSCROSS = 6,
-  V_EUSTON = 7,
-  V_WARRENSTREET = 8,
-  V_OXFORDCIRCUS = 9,
-  V_GREENPARK = 10,
-  V_VICTORIA = 11,
-  V_PIMLICO = 12,
-  V_VAUXHALL = 13,
-  V_STOCKWELL = 14,
-  V_BRIXTON = 15
+  V_NONE = 0,
+  V_WALTHAMSTOW = 1,
+  V_BLACKHORSE = 2,
+  V_TOTTENHAM = 3,
+  V_SEVENSISTERS = 4,
+  V_FINSBURYPARK = 5,
+  V_HIGHBURY = 6,
+  V_KINGSCROSS = 7,
+  V_EUSTON = 8,
+  V_WARRENSTREET = 9,
+  V_OXFORDCIRCUS = 10,
+  V_GREENPARK = 11,
+  V_VICTORIA = 12,
+  V_PIMLICO = 13,
+  V_VAUXHALL = 14,
+  V_STOCKWELL = 15,
+  V_BRIXTON = 16
 } station_name;
 
 typedef struct train_object {
@@ -59,7 +61,7 @@ typedef struct train_object {
    * This variable represents the ordered numerical representation of each
    * station from 0 (Walthamstow Central) - 15 (Brixton).
    */
-  uint8_t nextStation;
+  station_name nextStation;
 
   /**
    * State describes whether the train is moving or stationary
@@ -99,9 +101,8 @@ typedef struct String {
   char* data;
 } String;
 
-// void t_data_init(train_object ** tData);
-// void t_data_quit(train_object **tData);
-// void requestTrains(train_object *tData, uint8_t *tDataLen);
 void t_data_init(t_data* tdata);
 void t_data_quit(t_data* tdata);
 void requestTrains(t_data* tdata);
+int isobjectempty(train_object data);
+char *getstationliteral(station_name station);

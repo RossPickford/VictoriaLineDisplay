@@ -10,7 +10,12 @@ static char stream[STREAM_BUFF_SIZE];
 static char k_buff[KEY_VALUE_BUFF_SIZE];
 static char v_buff[KEY_VALUE_BUFF_SIZE];
 
+static uint8_t traintotal = 0;
+
 void requestTrains(t_data* tdata) {
+  memset(tdata->data, 0, sizeof(train_object) * tdata->len);
+  tdata->len = 0;
+
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt");
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
 
@@ -162,11 +167,13 @@ void requestTrains(t_data* tdata) {
 
             // change the next station to the correct one based on direction
             tempdata.nextStation += tempdata.direction * tempdata.alterStation;
+
             if (tempdata.nextStation < V_WALTHAMSTOW ||
                 tempdata.nextStation > V_BRIXTON) {
               fprintf(stderr, "invalid station value\n");
               return;
             }
+
             break;
           case KT_TIMETOSTATION:
             if (*streampos < 0x30 || *streampos > 0x39) {
@@ -197,9 +204,11 @@ void requestTrains(t_data* tdata) {
                * begins with
                */
               case 'D':
-                size_t index = vstr.data[8] == ' ' ? 9 : 10;
+                // if the 9th byte in the value is ' ' then the first word must
+                // be 'Departed'
+                index = vstr.data[8] == ' ' ? 9 : 10;
                 tempdata.nextStation =
-                    (station_name)getstationfromstring(vstr, 8);
+                    (station_name)getstationfromstring(vstr, index);
 
                 tempdata.alterStation = 1;
                 break;
@@ -221,6 +230,11 @@ void requestTrains(t_data* tdata) {
                 if (tempdata.nextStation == V_PIMLICO &&
                     vstr.data[index + 1] == 'l')
                   tempdata.nextStation = tempdata.stationName;
+
+                if (index == 3) {  // if the current locatain is 'At', then the
+                                   // train is at a stop
+                  tempdata.timeToStation = 0;
+                }
                 break;
               /**
                * This is either 'Brixton Area' or ' Between X and Y'
@@ -269,18 +283,42 @@ void requestTrains(t_data* tdata) {
     // move to beginning of next train object or the end of the array
     while (*streampos != '{' && *streampos != ']') ++streampos;
 
+    // Adding the train information to the main arena of train data
     uint8_t train_exists = 0;
+    size_t itrain = 0;
 
     for (size_t i = 0; i < tdata->len; i++)
-      if (tdata->data[i].id == tempdata.id) train_exists = 1;
+      if (tdata->data[i].id == tempdata.id) {
+        train_exists = 1;
+        itrain = i;
+      }
 
-    if (train_exists) {
-    } else if (!isobjectempty(tempdata)) {
+    /**
+     *  if train is already in the main arena, only change the time to if it is
+     * less than the currently saved time to.
+     */
+    if (train_exists &&
+        tempdata.timeToStation < tdata->data[itrain].timeToStation) {
+      tdata->data[itrain].timeToStation = tempdata.timeToStation;
+    } else if (!isobjectempty(tempdata) &&
+               tempdata.stationName == tempdata.nextStation) {
       tdata->data[tdata->len++] = tempdata;
+      traintotal++;
     }
 
-  }  // end of main train object array loop
+  }  // end of main train object array loop =======
 
+  // sort trains into order of ids
+  for (size_t i = 0; i < tdata->len - 1; i++)
+    for (size_t j = i + 1; j < tdata->len; j++) {
+      if (tdata->data[i].id > tdata->data[j].id) {
+        train_object tempdata = tdata->data[i];
+        tdata->data[i] = tdata->data[j];
+        tdata->data[j] = tempdata;
+      }
+    }
+
+  // print details about incoming train data - mostly for debugging purposes
   for (size_t i = 0; i < tdata->len; i++) {
     printf(
         "id: %u\n station name: %s\n direction: %d\n next station: %s\n time "
@@ -291,6 +329,7 @@ void requestTrains(t_data* tdata) {
   }
 
   printf("number of unique trains: %u\n", tdata->len);
+  printf("total number of trains by ID: %u\n", traintotal);
 
   fclose(trains);
 }
@@ -417,6 +456,7 @@ int main(void) {
   tdata.len = 0;
   t_data_init(&tdata);
   requestTrains(&tdata);
+  t_data_quit(&tdata);
   return 0;
 }
 

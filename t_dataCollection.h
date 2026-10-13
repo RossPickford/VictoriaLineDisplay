@@ -48,7 +48,7 @@ typedef struct train_object {
    * If the 'current location' field states that a train is 'at' a station -
    * then this variable can be set to 0
    */
-  uint8_t timeToStation;
+  uint16_t timeToStation;
 
   /**
    * the station the train is approaching

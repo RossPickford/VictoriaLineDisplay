@@ -8,6 +8,9 @@
 #define NORTHBOUND -1
 #define SOUTHBOUND 1
 
+#define TRAIN_NEW 0
+#define TRAIN_EXISTS 1
+
 typedef enum station_name {
   V_NONE = 0,
   V_WALTHAMSTOW = 1,
@@ -59,7 +62,7 @@ typedef struct train_object {
    * required to get the next station name
    *
    * This variable represents the ordered numerical representation of each
-   * station from 0 (Walthamstow Central) - 15 (Brixton).
+   * station from 1 (Walthamstow Central) - 16 (Brixton).
    */
   station_name nextStation;
 
@@ -71,10 +74,10 @@ typedef struct train_object {
   uint8_t alterStation;
 
   /**
-   * State describes whether the train is moving or stationary
-   * 1 represents a moving train and 0 represents a stationary train
+   * Status describes whether the train is new to the data pool or already exists.
+   * 1 represents an existing train and 0 represents a new train
    */
-  uint8_t state;
+  uint8_t status;
 
   /**
    * This is an eum that represents the perspective of the station the data
@@ -86,22 +89,28 @@ typedef struct train_object {
    */
   station_name stationName;
 
+  /**
+   * This is a bool that represents whether an existing train has had new data collected - if not
+   * then it will be removed from the array
+   */
+  uint8_t dataCollected;
+
+  /**
+   * The X position of the train on the actual LED screen
+   */
+  float x;
+
+  /**
+   * The calculated speed of the train - used to change the train's displayed position
+   */
+  float speed;
+
 } train_object;
 
 typedef struct t_data {
   size_t len;
   train_object* data;
 } t_data;
-
-typedef enum KeyType {
-  KT_NONE,
-  KT_ID,
-  KT_STATIONNAME,
-  KT_TIMETOSTATION,
-  KT_CURRENTLOCATION,
-  KT_TOWARDS,
-  KT_LIMBO
-} KeyType;
 
 typedef struct String {
   size_t len;
@@ -113,3 +122,4 @@ void t_data_quit(t_data* tdata);
 void requestTrains(t_data* tdata);
 int isobjectempty(train_object data);
 char *getstationliteral(station_name station);
+float getSpeedf(train_object train);

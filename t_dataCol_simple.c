@@ -1,9 +1,12 @@
 #include "t_dataCollection.h"
 #include "t_parse.h"
+#include "t_stopData.h"
 
 #define DATA_ARENA_SIZE 50
 #define KEY_VALUE_BUFF_SIZE 64
 #define STREAM_BUFF_SIZE 300000
+
+#define STATION_GAP 8
 
 static char stream[STREAM_BUFF_SIZE];
 
@@ -13,8 +16,15 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 static uint8_t traintotal = 0;
 
 void requestTrains(t_data* tdata) {
-  memset(tdata->data, 0, sizeof(train_object) * tdata->len);
-  tdata->len = 0;
+  // memset(tdata->data, 0, sizeof(train_object) * tdata->len);
+  // tdata->len = 0;
+
+  // reset whether data has been collected or not for next round of new train
+  // data
+  for (size_t i = 0; i < tdata->len; i++) {
+    tdata->data[i].dataCollected = 0;
+    tdata->data[i].status = TRAIN_EXISTS;
+  }
 
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt");
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json");
@@ -294,29 +304,61 @@ void requestTrains(t_data* tdata) {
       }
 
     /**
-     *  if train is already in the main arena, only change the time to if it is
-     * less than the currently saved time to.
+     * This will either change the time to variable to the lesser value,
+     * replace the
      */
     if (train_exists &&
-        tempdata.timeToStation < tdata->data[itrain].timeToStation) {
-      tdata->data[itrain].timeToStation = tempdata.timeToStation;
+        tempdata.nextStation == tdata->data[itrain].nextStation) {
+      tdata->data[itrain].dataCollected = 1;
+      if (tempdata.timeToStation < tdata->data[itrain].timeToStation) {
+        tdata->data[itrain].timeToStation = tempdata.timeToStation;
+      }
+    } else if (train_exists) {
+      tempdata.dataCollected = 1;
+      tdata->data[itrain] = tempdata;
     } else if (!isobjectempty(tempdata) &&
                tempdata.stationName == tempdata.nextStation) {
+      tempdata.dataCollected = 1;
       tdata->data[tdata->len++] = tempdata;
       traintotal++;
     }
 
   }  // end of main train object array loop =======
 
-  // sort trains into order of ids
-  for (size_t i = 0; i < tdata->len - 1; i++)
-    for (size_t j = i + 1; j < tdata->len; j++) {
-      if (tdata->data[i].id > tdata->data[j].id) {
-        train_object tempdata = tdata->data[i];
-        tdata->data[i] = tdata->data[j];
-        tdata->data[j] = tempdata;
-      }
+  for (size_t i = 0; i < tdata->len - 1; i++) {
+    // remove trains that had no new data recieved
+    if (!tdata->data[i].dataCollected) {
+      printf("train %u has been removed\n", tdata->data[i].id);
+      tdata->data[i] = tdata->data[--tdata->len];
+      continue;
     }
+
+    train_object train = tdata->data[i];
+
+    // The train already exists - update variables
+    if (train.status) {
+      if (!train.timeToStation) {
+        train.x = (float)tStops_pos[train.nextStation - 1];
+        train.speed = 0.0f;
+
+      } else {
+        train.speed = getSpeedf(train);
+      }
+    } else {
+      size_t dir = (train.direction + 1) / 2;
+      train.x = (float)tStops_pos[train.nextStation - 1];
+      train.x = train.timeToStation == 0
+                    ? train.x
+                    : (((float)train.timeToStation /
+                        (float)tStops_times[dir][train.nextStation - 1]) *
+                       STATION_GAP * (float)train.direction * -1.0f) +
+                          train.x;
+
+      train.speed = getSpeedf(train);
+    }
+
+    tdata->data[i] = train;
+  }
 
   // print details about incoming train data - mostly for debugging purposes
   for (size_t i = 0; i < tdata->len; i++) {
@@ -406,7 +448,7 @@ uint8_t strComp(String str1, String str2, size_t len) {
  */
 int isobjectempty(train_object data) {
   return data.id == 0 && data.direction == 0 && data.nextStation == 0 &&
-         data.state == 0 && data.stationName == 0 && data.timeToStation == 0;
+         data.status == 0 && data.stationName == 0 && data.timeToStation == 0;
 }
 
 char* getstationliteral(station_name station) {
@@ -446,6 +488,24 @@ char* getstationliteral(station_name station) {
     default:
       return "Unknown Station";
   }
+}
+
+float getSpeedf(train_object train) {
+  float speed = ((float)tStops_pos[train.nextStation - 1] - train.x) /
+                train.timeToStation;
+
+  /* if (speed > 1.0f)
+      speed = 0.9f;
+  else if (speed < -1.0f)
+      speed = -0.9f; */
+
+  if ((speed < 0 && train.direction > 0) ||
+      ((speed > 0 &&
+        train.direction <
+            0)))  // check if direction of speed matches the train's direction.
+    speed *= -1.0f;
+
+  return speed;
 }
 
 /**

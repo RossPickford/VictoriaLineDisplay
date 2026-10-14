@@ -126,7 +126,7 @@ void requestTrains(train_object *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS
         (tData + i)->nextStation = (uint8_t)getItem(train, 2);
         assert((tData + i)->nextStation >= 0 || (tData + i)->nextStation < 16);
         (tData + i)->timeToStation = (uint8_t)getItem(train, 3);
-        (tData + i)->state = (uint8_t)getItem(train, 4);
+        (tData + i)->status = (uint8_t)getItem(train, 4);
     }
 
     printf("Now sorting Data\n");

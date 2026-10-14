@@ -48,7 +48,7 @@ uint8_t isCopy(uint16_t id, uint8_t index, train_object *t, uint8_t tDataLen)
         (t + i)->nextStation = tStops_pos[x][y];
 
         (t + i)->timeToStation = ((rand() % 2) * 101);
-        (t + i)->state = 0;
+        (t + i)->status = 0;
     }
 
     for (size_t i = 0; i < len - 1; i++)
@@ -93,7 +93,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
         (t + i)->direction = ((rand() % 2) * 2) - 1;
         (t + i)->nextStation = rand() % 16;
         (t + i)->timeToStation = rand() % 50;
-        (t + i)->state = 0;
+        (t + i)->status = 0;
     }
 
     for (size_t i = 0; i < len - 1; i++)
@@ -143,7 +143,7 @@ train_object *requestTrains(uint8_t *tDataLen) // add a new node each time
     t->direction = ((rand() % 2) * 2) - 1;
     t->nextStation = rand() % 16;
     t->timeToStation = rand() % 50;
-    t->state = 0;
+    t->status = 0;
 
     for (size_t i = 0; i < len - 1; i++)
         for (size_t j = i + 1; j < len; j++)

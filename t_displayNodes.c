@@ -4,7 +4,7 @@
 #define WALTHAMSTOW_BOUND 4
 #define BRIXTON_BOUND 124
 
-#define STATION_GAP 6
+#define STATION_GAP 8
 
 #define TNODE_ARENA_SIZE 50
 

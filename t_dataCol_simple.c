@@ -1,6 +1,7 @@
 #include "t_dataCollection.h"
 #include "t_parse.h"
 #include "t_stopData.h"
+#include <time.h>
 
 #define DATA_ARENA_SIZE 50
 #define KEY_VALUE_BUFF_SIZE 64
@@ -16,11 +17,11 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 static uint8_t traintotal = 0;
 
 void requestTrains(t_data* tdata) {
-  // memset(tdata->data, 0, sizeof(train_object) * tdata->len);
-  // tdata->len = 0;
-
-  // reset whether data has been collected or not for next round of new train
-  // data
+  /**
+   * This resets the dataCollected variable for the current train pool,
+   * as well as labelling them as existing before processing the incoming
+   * train data stream.
+   * */
   for (size_t i = 0; i < tdata->len; i++) {
     tdata->data[i].dataCollected = 0;
     tdata->data[i].status = TRAIN_EXISTS;
@@ -48,7 +49,7 @@ void requestTrains(t_data* tdata) {
   }
 
   /**
-   * Looping through each train object
+   * Looping through each train object in the incoming stream
    */
   while (*streampos != ']') {
     if (*streampos != '{') {
@@ -163,12 +164,15 @@ void requestTrains(t_data* tdata) {
             getstringvalue(&streampos, &vstr);
 
             switch (vstr.data[0]) {
-              case 'B':
+              case 'B':  // Brixton
                 tempdata.direction = 1;
                 break;
-              case 'W':
-              case 'S':
+              case 'W':  // Walthamstow Central
+              case 'S':  // Seven Sisters
                 tempdata.direction = -1;
+                break;
+              case 'C':  // Check Front of Train - i.e. ignore this data
+                tempdata.direction = 0;
                 break;
               default:
                 fprintf(stderr, "unknown destination: %s\n", vstr.data);
@@ -304,28 +308,33 @@ void requestTrains(t_data* tdata) {
       }
 
     /**
-     * This will either change the time to variable to the lesser value,
-     * replace the
+     * This will either change the timeTo variable if the train exists
+     * in the current train pool and the incoming data and the existing
+     * train's current station match.
+     * If the stations don't match, then replace the existing train's data
+     * with the new incoming one.
+     * Otherwise, if the train does not exist in the current pool, add it
      */
-    if (train_exists &&
-        tempdata.nextStation == tdata->data[itrain].nextStation) {
+    if (tempdata.direction == 0) {  // ignore the data if direction is 0
+    } else if (train_exists &&
+               tempdata.nextStation == tdata->data[itrain].nextStation) {
       tdata->data[itrain].dataCollected = 1;
       if (tempdata.timeToStation < tdata->data[itrain].timeToStation) {
         tdata->data[itrain].timeToStation = tempdata.timeToStation;
       }
-    } else if (train_exists) {
+    } else if (tempdata.stationName == tempdata.nextStation) {
       tempdata.dataCollected = 1;
-      tdata->data[itrain] = tempdata;
-    } else if (!isobjectempty(tempdata) &&
-               tempdata.stationName == tempdata.nextStation) {
-      tempdata.dataCollected = 1;
-      tdata->data[tdata->len++] = tempdata;
-      traintotal++;
+      if (train_exists) {
+        tdata->data[itrain] = tempdata;
+      } else if (!isobjectempty(tempdata)) {
+        tdata->data[tdata->len++] = tempdata;
+        traintotal++;
+      }
     }
 
   }  // end of main train object array loop =======
 
-  for (size_t i = 0; i < tdata->len - 1; i++) {
+  for (size_t i = 0; i < tdata->len; i++) {
     // remove trains that had no new data recieved
     if (!tdata->data[i].dataCollected) {
       printf("train %u has been removed\n", tdata->data[i].id);
@@ -364,10 +373,10 @@ void requestTrains(t_data* tdata) {
   for (size_t i = 0; i < tdata->len; i++) {
     printf(
         "id: %u\n station name: %s\n direction: %d\n next station: %s\n time "
-        "to station: %u\n\n",
+        "to station: %u\n x pos: %f, speed %f\n\n",
         tdata->data[i].id, getstationliteral(tdata->data[i].stationName),
         tdata->data[i].direction, getstationliteral(tdata->data[i].nextStation),
-        tdata->data[i].timeToStation);
+        tdata->data[i].timeToStation, tdata->data[i].x, tdata->data[i].speed);
   }
 
   printf("number of unique trains: %u\n", tdata->len);
@@ -499,13 +508,32 @@ float getSpeedf(train_object train) {
   else if (speed < -1.0f)
       speed = -0.9f; */
 
+  // check if direction of speed matches the train's direction.
   if ((speed < 0 && train.direction > 0) ||
-      ((speed > 0 &&
-        train.direction <
-            0)))  // check if direction of speed matches the train's direction.
+      ((speed > 0 && train.direction < 0)))
     speed *= -1.0f;
 
   return speed;
+}
+
+void updateTrainPosition(t_data* tdata, float deltaTime) {
+  // printf("updating Pos\n");
+  if (tdata->len == 0 || deltaTime == 0.0f || !tdata->data) return;
+
+  for (size_t i = 0; i < tdata->len; i++) {
+    train_object train = *(tdata->data + i);
+    float xDelta = deltaTime * train.speed;
+    assert(xDelta * train.direction >= 0.0f);
+    train.x += xDelta;
+
+    if (train.direction == NORTHBOUND && train.x < train.nextStation) {
+      train.x = (float)train.nextStation;
+      train.speed = 0.0f;
+    } else if (train.direction == SOUTHBOUND && train.x > train.nextStation)
+      train.x = (float)train.nextStation;
+
+    *(tdata->data + i) = train;
+  }
 }
 
 /**
@@ -516,6 +544,7 @@ int main(void) {
   tdata.len = 0;
   t_data_init(&tdata);
   requestTrains(&tdata);
+  updateTrainPosition(&tdata, 0.01f);
   t_data_quit(&tdata);
   return 0;
 }

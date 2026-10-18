@@ -69,13 +69,14 @@ typedef struct train_object {
   /**
    * This is a simple bool that if true will change the nextStation variable
    * to the next station over - this is due to the key 'currentLocation' being
-   * before 'Towards' and to get the next station over, you need to know the direction.
+   * before 'Towards' and to get the next station over, you need to know the
+   * direction.
    */
   uint8_t alterStation;
 
   /**
-   * Status describes whether the train is new to the data pool or already exists.
-   * 1 represents an existing train and 0 represents a new train
+   * Status describes whether the train is new to the data pool or already
+   * exists. 1 represents an existing train and 0 represents a new train
    */
   uint8_t status;
 
@@ -90,8 +91,9 @@ typedef struct train_object {
   station_name stationName;
 
   /**
-   * This is a bool that represents whether an existing train has had new data collected - if not
-   * then it will be removed from the array
+   * This is a bool that represents whether an existing train has had new data
+   * collected from the most recent live stream - if not then it will be removed
+   * from the array
    */
   uint8_t dataCollected;
 
@@ -101,7 +103,8 @@ typedef struct train_object {
   float x;
 
   /**
-   * The calculated speed of the train - used to change the train's displayed position
+   * The calculated speed of the train - used to change the train's displayed
+   * position
    */
   float speed;
 
@@ -121,5 +124,6 @@ void t_data_init(t_data* tdata);
 void t_data_quit(t_data* tdata);
 void requestTrains(t_data* tdata);
 int isobjectempty(train_object data);
-char *getstationliteral(station_name station);
+char* getstationliteral(station_name station);
 float getSpeedf(train_object train);
+void updateTrainPosition(t_data* tdata, float deltaTime);

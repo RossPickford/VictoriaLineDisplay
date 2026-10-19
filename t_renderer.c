@@ -278,7 +278,7 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
 
       // Draw the pixel to screen
       SDL_FRect pxltop = {(float)xInt, y, 1.0f, 1.0f};
-      SDL_FRect pxlbtm = {(float)xInt, y - 1, 1.0f, 1.0f};
+      SDL_FRect pxlbtm = {(float)xInt, y + 1, 1.0f, 1.0f};
 
       SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
       SDL_RenderRect(renderer, &pxltop);

@@ -2,33 +2,37 @@
 #include <stdlib.h>
 #include <time.h>
 
-int main(void) {
-  system("./tx");
-  FILE* text = fopen("test.txt", "rb");
+int main(void)
+{
+  system("tx");
+  FILE *text = fopen("test.txt", "r+");
   char val = 0;
 
-  float deltatime = 0.0f;
-  float previoustime = 0.0f;
-
-  while (1) {
-    float curtime = ((float)clock() / (float)CLOCKS_PER_SEC);
+  clock_t deltatime = 0;
+  clock_t previoustime = 0;
+  while (1)
+  {
+    clock_t curtime = clock();
     deltatime += curtime - previoustime;
     previoustime = curtime;
 
-    if (deltatime > 5.0f) {
-      system("start ./tx");
-      deltatime -= 5.0f;
+    fgets(&val, 2, text);
+    fseek(text, 0, SEEK_SET);
+
+    if (!val && deltatime > (5 * CLOCKS_PER_SEC))
+    {
+      system("start tx");
+      printf("Calling tx with value: %u and time: %f\n", val, (float)curtime / (float)CLOCKS_PER_SEC);
+      deltatime = deltatime % 5;
     }
 
-    if (val) {
-      printf("value: %u\n", val);
-      FILE* temp = fopen("test.txt", "wb");
+    if (val)
+    {
+      printf("resetting by rx with value: %u and time: %f\n", val, (float)curtime / (float)CLOCKS_PER_SEC);
       char zero = 0;
-      fwrite(&zero, 1, 1, temp);
-      fclose(temp);
+      fwrite(&zero, 1, 1, text);
+      fseek(text, 0, SEEK_SET);
     }
-
-    fgets(&val, 1, text);
   }
 
   fclose(text);

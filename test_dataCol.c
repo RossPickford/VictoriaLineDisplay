@@ -120,7 +120,7 @@ TrainData *requestTrains(uint8_t *tDataLen) // add a new node each time
 } */
 
 int count = 0;
-train_object *requestTrains(uint8_t *tDataLen) // add a new node each time
+train_object *parseTrains(uint8_t *tDataLen) // add a new node each time
 {
     // printf("requesting trains\n");
     

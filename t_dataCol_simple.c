@@ -10,6 +10,8 @@
 
 #define STATION_GAP 8
 
+#define MAX_SPEED 1.0f
+
 static char stream[STREAM_BUFF_SIZE];
 
 static char k_buff[KEY_VALUE_BUFF_SIZE];
@@ -17,7 +19,8 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 
 static uint8_t traintotal = 0;
 
-void requestTrains(t_data* tdata) {
+void parseTrains(t_data* tdata) {
+
   /**
    * This resets the dataCollected variable for the current train pool,
    * as well as labelling them as existing before processing the incoming
@@ -28,7 +31,7 @@ void requestTrains(t_data* tdata) {
     tdata->data[i].status = TRAIN_EXISTS;
   }
 
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt &");
+  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt &");
   // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o
   // trains.json");
 
@@ -352,8 +355,8 @@ void requestTrains(t_data* tdata) {
     // The train already exists - update variables
     if (train.status && train.x != 0.0f) {
       if (!train.timeToStation) {
-        train.x = (float)tStops_pos[train.nextStation - 1];
-        train.speed = 0.0f;
+        // train.x = (float)tStops_pos[train.nextStation - 1];
+        train.speed = MAX_SPEED;
       } else {
         train.speed = getSpeedf(train);
       }
@@ -367,7 +370,7 @@ void requestTrains(t_data* tdata) {
                        STATION_GAP * (float)train.direction * -1.0f) +
                           train.x;
 
-      train.speed = train.timeToStation == 0 ? 0.0f : getSpeedf(train);
+      train.speed = train.timeToStation == 0 ? MAX_SPEED : getSpeedf(train);
     }
 
     if (train.x == 0.0f) {

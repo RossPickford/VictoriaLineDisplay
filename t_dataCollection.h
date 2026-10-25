@@ -122,7 +122,7 @@ typedef struct String {
 
 void t_data_init(t_data* tdata);
 void t_data_quit(t_data* tdata);
-void requestTrains(t_data* tdata);
+void parseTrains(t_data* tdata);
 int isobjectempty(train_object data);
 char* getstationliteral(station_name station);
 float getSpeedf(train_object train);

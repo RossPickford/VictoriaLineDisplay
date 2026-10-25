@@ -47,7 +47,7 @@ int64_t getItem(PyObject *data, Py_ssize_t index)
     return item;
 }
 
-void requestTrains(train_object *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
+void parseTrains(train_object *tData, uint8_t *tDataLen) // DO NOT CALL UNLESS Py_Initialize() HAS BEEN CALLED
 {
     printf("requesting Data\n");
 

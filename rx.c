@@ -5,7 +5,7 @@
 int main(void)
 {
   system("tx");
-  FILE *text = fopen("test.txt", "r+");
+  FILE *text = fopen("test.bin", "r+");
   char val = 0;
 
   clock_t deltatime = 0;

@@ -50,7 +50,7 @@ int main(void) {
     updateTrainPosition(&tdata, delta);
 
     status =
-        t_rend_event() && t_rend_drawPixels(&imgData, renderer, tdata, tBuffer);
+        t_rend_event() && t_rend_drawPixels(&imgData, renderer, tdata, tBuffer, delta);
     // printf("finished a cycle\n");
     // status = false;
   }

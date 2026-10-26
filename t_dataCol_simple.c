@@ -20,7 +20,6 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 static uint8_t traintotal = 0;
 
 void parseTrains(t_data* tdata) {
-
   /**
    * This resets the dataCollected variable for the current train pool,
    * as well as labelling them as existing before processing the incoming
@@ -31,8 +30,8 @@ void parseTrains(t_data* tdata) {
     tdata->data[i].status = TRAIN_EXISTS;
   }
 
-  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt &");
-  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o
+  // system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt
+  // &"); system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o
   // trains.json");
 
   FILE* trains = fopen("trains.txt", "rb");
@@ -342,12 +341,21 @@ void parseTrains(t_data* tdata) {
 
   }  // end of main train object array loop =======
 
+  /**
+   * Add to data misses for any trains that did not recieve updated data,
+   * and remove any tallied misses to trains that had misses but recieved data.
+   */
   for (size_t i = 0; i < tdata->len; i++) {
-    // remove trains that had no new data recieved
     if (!tdata->data[i].dataCollected) {
-      printf("train %u has been removed\n", tdata->data[i].id);
-      tdata->data[i] = tdata->data[--tdata->len];
-      continue;
+      tdata->data[i].dataMisses++;
+      if (tdata->data[i].dataMisses > 1) {
+        printf("train %u has been removed\n", tdata->data[i].id);
+        tdata->data[i] = tdata->data[--tdata->len];
+        traintotal--;
+        continue;
+      } else {
+        tdata->data[i].dataMisses = 0;
+      }
     }
 
     train_object train = tdata->data[i];
@@ -356,7 +364,7 @@ void parseTrains(t_data* tdata) {
     if (train.status && train.x != 0.0f) {
       if (!train.timeToStation) {
         // train.x = (float)tStops_pos[train.nextStation - 1];
-        train.speed = MAX_SPEED;
+        train.speed = MAX_SPEED * train.direction;
       } else {
         train.speed = getSpeedf(train);
       }
@@ -370,7 +378,8 @@ void parseTrains(t_data* tdata) {
                        STATION_GAP * (float)train.direction * -1.0f) +
                           train.x;
 
-      train.speed = train.timeToStation == 0 ? MAX_SPEED : getSpeedf(train);
+      train.speed = train.timeToStation == 0 ? (MAX_SPEED * train.direction)
+                                             : getSpeedf(train);
     }
 
     if (train.x == 0.0f) {
@@ -410,7 +419,8 @@ void getstringvalue(char** streampos, String* val) {
   ++(*streampos);
 
   while (**streampos != '"') {
-    assert(val->len <= KEY_VALUE_BUFF_SIZE); // ensure it doesn't go over the given buffer size
+    assert(val->len <= KEY_VALUE_BUFF_SIZE);  // ensure it doesn't go over the
+                                              // given buffer size
     val->data[val->len++] = *((*streampos)++);
   }
 
@@ -516,11 +526,6 @@ char* getstationliteral(station_name station) {
 float getSpeedf(train_object train) {
   float speed = ((float)tStops_pos[train.nextStation - 1] - train.x) /
                 train.timeToStation;
-
-  /* if (speed > 1.0f)
-      speed = 0.9f;
-  else if (speed < -1.0f)
-      speed = -0.9f; */
 
   // check if direction of speed matches the train's direction.
   if ((speed < 0 && train.direction > 0) ||

@@ -9,6 +9,8 @@
 #define ARENA_MAX 50
 #define NODE_PIXELS_MAX 6
 
+char sfps[10];
+
 bool extractPixelDataFromFile(imageData* imgData) {
   FILE* image = fopen("./media/background_128x32_single.bmp", "rb");
   uint8_t header[14];
@@ -178,38 +180,8 @@ uint8_t uinvslerp(uint8_t minVal, uint8_t maxVal, float t) {
   return minVal + (uint8_t)change;
 }
 
-void updatePixel(pixelData* pxl, uint8_t r, uint8_t g, uint8_t b) {
-  pxl->r = r;
-  pxl->g = g;
-  pxl->b = b;
-}
-
-void drawTrainNode(pixelData** pxlMtrx, float x, int8_t dir,
-                   pixelDataExtended** tBuff, uint8_t tBuffOffset) {
-  assert(x >= 0.0f && x <= 128.0f);
-  assert(!isnan(x));
-
-  uint64_t xInt = (uint64_t)x;
-  uint64_t y = dir == NORTHBOUND ? NORTHBOUND_Y : SOUTHBOUND_Y;
-
-  float fract = x - (float)xInt;
-  if (fract > 0.0f && dir == NORTHBOUND) {
-    xInt++;
-    fract = 1.0f - fract;
-  }
-
-  // Front pixels
-  tBuff[tBuffOffset][0].y = y;
-  tBuff[tBuffOffset][0].x = xInt;
-  updatePixel(&tBuff[tBuffOffset][0].pxlData, UINT8_MAX, 0, 0);
-
-  tBuff[tBuffOffset][1].y = y + 1;
-  tBuff[tBuffOffset][1].x = xInt;
-  updatePixel(&tBuff[tBuffOffset][1].pxlData, UINT8_MAX, 0, 0);
-}
-
 bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
-                       pixelDataExtended** tBuff) {
+                       pixelDataExtended** tBuff, float delta) {
   // printf("rendering\n");
 
   if (!imgData | !renderer) {
@@ -231,26 +203,6 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
                              SDL_ALPHA_OPAQUE);
       SDL_RenderFillRect(renderer, &pixel);
     }
-
-  // printf("creating and drawing train pixels\n");
-  /* if (tNodeLength > 0 && tNodes)
-  {
-      // printf("filling train buffer\n");
-      for (size_t i = 0; i < tNodeLength; i++) // Fill train buffer with node
-  data drawTrainNode(imgData->pixelData, (tNodes + i)->x, (tNodes + i)->dir,
-  tBuff, i);
-
-      // printf("drawing buffer pixels\n");
-      for (uint8_t i = 0; i < tNodeLength; i++)
-          for (uint8_t j = 0; j < 2; j++)
-          {
-              SDL_FRect pxl = {(float)tBuff[i][j].x,
-  (float)tBuff[i][j].y, 1.0f, 1.0f}; pixelData trainPxl = tBuff[i][j].pxlData;
-
-              SDL_SetRenderDrawColor(renderer, trainPxl.r, trainPxl.g,
-  trainPxl.b, SDL_ALPHA_OPAQUE); SDL_RenderRect(renderer, &pxl);
-          }
-  } */
 
   if (tdata.len > 0) {
     for (size_t i = 0; i < tdata.len; i++) {
@@ -285,6 +237,24 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
       SDL_RenderRect(renderer, &pxlbtm);
     }
   }
+
+  size_t i = 0;
+  for (uint32_t fps = (uint32_t)(1.0f / delta); fps != 0 && i < sizeof(sfps);
+       fps /= 10) {
+    sfps[i++] = (fps % 10) + '0';
+  }
+
+  for (size_t j = 0; j < i; j++) {
+    char hold = sfps[j];
+    sfps[j] = sfps[i-(j+1)];
+    sfps[i-(j+1)] = hold;
+  }
+  sfps[i] = '\0';
+
+  SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderScale(renderer, 0.5f, 0.5f);
+  assert(SDL_RenderDebugText(renderer, 210, 56, sfps));
+  SDL_SetRenderScale(renderer, 1.0f, 1.0f);
 
   // printf("presenting pixels\n");
   SDL_RenderPresent(renderer);

@@ -98,6 +98,12 @@ typedef struct train_object {
   uint8_t dataCollected;
 
   /**
+   * The amount of missed data collections this train has when parsing the incoming train data.
+   * A train is allowed 1 miss
+   */
+  uint8_t dataMisses;
+
+  /**
    * The X position of the train on the actual LED screen
    */
   float x;

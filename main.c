@@ -1,6 +1,6 @@
 #include "t_renderer.h"
 
-#define REQUEST_TIME 30000
+#define REQUEST_TIME 15000
 
 int main(void) {
   t_data tdata = {0, NULL};
@@ -42,6 +42,22 @@ int main(void) {
     } else if (requestcomplete) {
       parseTrains(&tdata);
 
+      printf("\n=============================\n");
+      // print details about incoming train data - mostly for debugging purposes
+      for (size_t i = 0; i < tdata.len; i++) {
+        printf(
+            "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
+            " next station: %s\n alter station: %u\n status: %u\n"
+            " data collected: %s\n data misses: %u\n"
+            " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
+            tdata.data[i].id, getstationliteral(tdata.data[i].stationName),
+            tdata.data[i].direction, tdata.data[i].timeToStation,
+            getstationliteral(tdata.data[i].nextStation),
+            tdata.data[i].alterStation, tdata.data[i].status,
+            tdata.data[i].dataCollected ? "yes" : "no", tdata.data[i].dataMisses,
+            tdata.data[i].x, tdata.data[i].speed, delta, tdata.data[i].speed * delta);
+      }
+
       uint8_t zero = 0;
       fwrite(&zero, 1, 1, requeststatus);
       fseek(requeststatus, 0, SEEK_SET);
@@ -49,8 +65,8 @@ int main(void) {
 
     updateTrainPosition(&tdata, delta);
 
-    status =
-        t_rend_event() && t_rend_drawPixels(&imgData, renderer, tdata, tBuffer, delta);
+    status = t_rend_event() &&
+             t_rend_drawPixels(&imgData, renderer, tdata, tBuffer, delta);
     // printf("finished a cycle\n");
     // status = false;
   }

@@ -1,18 +1,44 @@
 /**
- * This collects train request data from the tfl servers, places it inside a .txt file
- * and once the request is finised, it will notify the binary file "request_finished"
- * by changing the first byte to 1
+ * This collects train request data from the tfl servers, places it inside a
+ * .txt file and once the request is finised, it will notify the binary file
+ * "request_finished" by changing the first byte to 1
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#define REQUEST_INTERVAL 30000
 
 int main(void) {
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt &");
-
-  FILE* text = fopen("requestcomplete.bin", "wb");
+  FILE* text = fopen("requestcomplete.bin", "rb");
   char val = 1;
-  fwrite(&val, 1, 1, text);
+
+  clock_t time = 0;
+  clock_t previous = clock();
+  clock_t delta = 0;
+
+  while (1) {
+    time = clock();
+    delta += time - previous;
+
+    if (delta >= REQUEST_INTERVAL) {
+      delta = delta % REQUEST_INTERVAL;
+      fgets(&val, 2, text);
+      fseek(text, 0, SEEK_SET);
+      printf("value: %u\n", val);
+      if (val == 2) {
+        break;
+      } else {
+        val = 1;
+      }
+
+      system(
+          "curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+      fwrite(&val, 1, 1, text);
+    }
+  }
+
   fclose(text);
 
   return 0;

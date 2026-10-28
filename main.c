@@ -14,15 +14,16 @@ int main(void) {
   bool status = t_rend_init(&window, &renderer, &imgData, &tBuffer);
 
   // Collect initial data
-  system("t_request");
+  system("start t_request");
+  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
   parseTrains(&tdata);
-  // updateTrainNode(tNodes, tData, &tNodeLen, tDataLen);
 
   FILE* requeststatus = fopen("requestcomplete.bin", "r+");
   uint8_t requestcomplete = 0;
 
   uint64_t previousTick = 0;
   uint64_t requestRefreshTime = 0;
+
   while (status) {
     uint64_t currentTick = SDL_GetTicks();
     float delta = (float)(currentTick - previousTick) /
@@ -36,10 +37,11 @@ int main(void) {
     assert(requestcomplete == 0 || requestcomplete == 1);
 
     // request data from tfl server and then parse it once recieved
-    if (!requestcomplete && requestRefreshTime >= REQUEST_TIME) {
-      system("start t_request");
-      requestRefreshTime = requestRefreshTime % REQUEST_TIME;
-    } else if (requestcomplete) {
+    /*  if (!requestcomplete && requestRefreshTime >= REQUEST_TIME) {
+       system("start t_request");
+       requestRefreshTime = requestRefreshTime % REQUEST_TIME;
+     } else  */
+    if (requestcomplete) {
       parseTrains(&tdata);
 
       printf("\n=============================\n");
@@ -54,8 +56,9 @@ int main(void) {
             tdata.data[i].direction, tdata.data[i].timeToStation,
             getstationliteral(tdata.data[i].nextStation),
             tdata.data[i].alterStation, tdata.data[i].status,
-            tdata.data[i].dataCollected ? "yes" : "no", tdata.data[i].dataMisses,
-            tdata.data[i].x, tdata.data[i].speed, delta, tdata.data[i].speed * delta);
+            tdata.data[i].dataCollected ? "yes" : "no",
+            tdata.data[i].dataMisses, tdata.data[i].x, tdata.data[i].speed,
+            delta, tdata.data[i].speed * delta);
       }
 
       uint8_t zero = 0;
@@ -70,6 +73,11 @@ int main(void) {
     // printf("finished a cycle\n");
     // status = false;
   }
+
+  // Singalling to the requst executable that the program is finished
+  char two = 2;
+  fwrite(&two, 1, 1, requeststatus);
+  fclose(requeststatus);
 
   t_data_quit(&tdata);
   // t_nodes_quit(tNodes);

@@ -353,15 +353,16 @@ void parseTrains(t_data* tdata) {
   for (size_t i = 0; i < tdata->len; i++) {
     if (!tdata->data[i].dataCollected) {
       printf("removing train\n");
-      tdata->data[i].dataMisses += 1;
+      tdata->data[i].dataMisses++;
+
       if (tdata->data[i].dataMisses > 1) {
         printf("train %u has been removed\n", tdata->data[i].id);
         tdata->data[i] = tdata->data[--tdata->len];
         traintotal--;
         continue;
-      } else {
-        tdata->data[i].dataMisses = 0;
       }
+    } else {
+      tdata->data[i].dataMisses = 0;
     }
 
     train_object train = tdata->data[i];
@@ -372,7 +373,7 @@ void parseTrains(t_data* tdata) {
         // train.x = (float)tStops_pos[train.nextStation - 1];
         train.speed = MAX_SPEED * train.direction;
       } else {
-        train.speed = getSpeedf(train);
+        train.speed = (getSpeedf(train) + train.speed) / 2.0f;
       }
     } else if (!train.status) {
       size_t dir = (train.direction + 1) / 2;
@@ -551,9 +552,9 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
     float xDelta = deltaTime * train.speed;
     assert(xDelta * train.direction >= 0.0f);
     train.x += xDelta;
-    if (xDelta > 1.0f) {
-      printf("\n------------ delta x: %f -----------\n", xDelta);
-    }
+    /*     if (xDelta > 1.0f) {
+          printf("\n------------ delta x: %f -----------\n", xDelta);
+        } */
 
     /**
      * This will correct the x positon of the train if it has gone past it's

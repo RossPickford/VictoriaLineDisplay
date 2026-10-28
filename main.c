@@ -13,13 +13,21 @@ int main(void) {
   t_data_init(&tdata);
   bool status = t_rend_init(&window, &renderer, &imgData, &tBuffer);
 
-  // Collect initial data
-  system("start t_request");
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
-  parseTrains(&tdata);
-
-  FILE* requeststatus = fopen("requestcomplete.bin", "r+");
+  /**
+   * This file holds the status of the t_request - 1 for it has completed the
+   * request and the trains file is ready to be parsed, 0 is for the data has been
+   * parsed, and 2 tells t_request that the program has been closed.
+   */
+  FILE* requeststatus = fopen("requestcomplete.bin", "w+");
   uint8_t requestcomplete = 0;
+
+  fwrite(&requestcomplete, 1, 1, requeststatus);
+  fseek(requeststatus, 0, SEEK_SET);
+
+  // Collect initial data
+  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+  system("start t_request");
+  parseTrains(&tdata);
 
   uint64_t previousTick = 0;
   uint64_t requestRefreshTime = 0;
@@ -34,14 +42,15 @@ int main(void) {
     // collect the value from requestcomplete.bin and reset file stream
     fgets(&requestcomplete, 2, requeststatus);
     fseek(requeststatus, 0, SEEK_SET);
-    assert(requestcomplete == 0 || requestcomplete == 1);
+    assert(requestcomplete == 0 || requestcomplete == 1 ||
+           requestcomplete == 2);
 
     // request data from tfl server and then parse it once recieved
     /*  if (!requestcomplete && requestRefreshTime >= REQUEST_TIME) {
        system("start t_request");
        requestRefreshTime = requestRefreshTime % REQUEST_TIME;
      } else  */
-    if (requestcomplete) {
+    if (requestcomplete == 1) {
       parseTrains(&tdata);
 
       printf("\n=============================\n");

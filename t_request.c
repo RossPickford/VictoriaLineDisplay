@@ -11,7 +11,7 @@
 #define REQUEST_INTERVAL 30000
 
 int main(void) {
-  FILE* text = fopen("requestcomplete.bin", "rb");
+  FILE* text = fopen("requestcomplete.bin", "r+");
   char val = 1;
 
   clock_t time = 0;
@@ -21,17 +21,18 @@ int main(void) {
   while (1) {
     time = clock();
     delta += time - previous;
+    previous = time;
+
+    fgets(&val, 2, text);
+    fseek(text, 0, SEEK_SET);
+    if (val == 2) {
+      break;
+    } else {
+      val = 1;
+    }
 
     if (delta >= REQUEST_INTERVAL) {
       delta = delta % REQUEST_INTERVAL;
-      fgets(&val, 2, text);
-      fseek(text, 0, SEEK_SET);
-      printf("value: %u\n", val);
-      if (val == 2) {
-        break;
-      } else {
-        val = 1;
-      }
 
       system(
           "curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");

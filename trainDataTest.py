@@ -26,9 +26,9 @@ station_index = {
 import time
 totalTime_init = time.time()
 
-from sys import path
+""" from sys import path
 import link
-path.append(link.getRequestsAddress())
+path.append(link.getRequestsAddress()) """
 
 from requests import get, Timeout
 import nextStation
@@ -137,7 +137,7 @@ def requestTrainData():
 
 
         if station != station_name and state != 0 and "At" not in location:
-            print(f" {id} station: {station} | current station: {station_name}")
+            # print(f" {id} station: {station} | current station: {station_name}")
             continue
 
         if state == 1:

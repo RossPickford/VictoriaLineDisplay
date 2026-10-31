@@ -35,7 +35,7 @@ int main(void) {
       delta = delta % REQUEST_INTERVAL;
 
       system(
-          "curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+          "curl https://api.tfl.gov.uk/Line/victoria/Arrivals?app_key=580efc09100e43b6976feaefb4e33f12 -o trains.txt ");
       fwrite(&val, 1, 1, text);
     }
   }

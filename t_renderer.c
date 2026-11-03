@@ -56,7 +56,10 @@ bool extractPixelDataFromFile(imageData* imgData) {
     return APP_END;
   }
 
-  // Has to be a multiple of 4 bytes, hence padding
+  /**
+   * The row length is repesented in bytes - it must be a mutliple of 4 bytes
+   * This utilises the floor function 
+   */
   uint32_t pixelRowLength = (((bitsPerPixel * imgData->width) + 31) / 32) * 4;
   uint32_t pixelDataSize = pixelRowLength * imgData->height;
 
@@ -83,14 +86,14 @@ bool extractPixelDataFromFile(imageData* imgData) {
     *(imgData->pixelData + i) =
         (pixelData*)malloc(imgData->width * sizeof(pixelData));
 
-  for (size_t i = 0, c = 0, r = 1; i < pixelDataSize; i += 3) {
-    if ((r * pixelRowLength) - i < 3 && pixelRowLength > 0) {
+  for (size_t i = 0, col = 0, row = 1; i < pixelDataSize; i += 3) {
+    if ((row * pixelRowLength) - i < 3 && pixelRowLength > 0) {
       i += padding;
-      r++;
-      c = 0;
+      row++;
+      col = 0;
     }
 
-    pixelData pData = *(*(imgData->pixelData + (imgData->height - r)) + c++) =
+    pixelData pData = *(*(imgData->pixelData + (imgData->height - row)) + col++) =
         *(pixelData*)(rawPixelData + i);
     // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
   }
@@ -238,7 +241,9 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
     }
   }
 
-  size_t i = 0;
+  // ===============================================
+  // Drawing the fps
+/*   size_t i = 0;
   for (uint32_t fps = (uint32_t)(1.0f / delta); fps != 0 && i < sizeof(sfps);
        fps /= 10) {
     sfps[i++] = (fps % 10) + '0';
@@ -254,7 +259,9 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
   SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
   SDL_SetRenderScale(renderer, 0.5f, 0.5f);
   assert(SDL_RenderDebugText(renderer, 210, 56, sfps));
-  SDL_SetRenderScale(renderer, 1.0f, 1.0f);
+  SDL_SetRenderScale(renderer, 1.0f, 1.0f); */
+
+  //===================================================
 
   // printf("presenting pixels\n");
   SDL_RenderPresent(renderer);

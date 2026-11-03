@@ -169,11 +169,11 @@ void parseTrains(t_data* tdata) {
 
             switch (vstr.data[0]) {
               case 'B':  // Brixton
-                tempdata.direction = 1;
+                tempdata.direction = SOUTHBOUND;
                 break;
               case 'W':  // Walthamstow Central
               case 'S':  // Seven Sisters
-                tempdata.direction = -1;
+                tempdata.direction = NORTHBOUND;
                 break;
               case 'C':  // Check Front of Train - i.e. ignore this data
                 tempdata.direction = 0;

@@ -58,7 +58,10 @@ bool extractPixelDataFromFile(imageData* imgData) {
 
   /**
    * The row length is repesented in bytes - it must be a mutliple of 4 bytes
-   * This utilises the floor function 
+   * This utilises the floor function - you add on the highest fraction below 1
+   * that is a multiple of 1/32 (i.e 31/32) to the row length (measured in 4 bytes).
+   * The floor function thus ensures the result is a multiple of 4 bytes above the remainder.
+   * The final multiplication of 4 converts it back to bytes.
    */
   uint32_t pixelRowLength = (((bitsPerPixel * imgData->width) + 31) / 32) * 4;
   uint32_t pixelDataSize = pixelRowLength * imgData->height;

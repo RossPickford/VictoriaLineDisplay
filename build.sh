@@ -1,5 +1,5 @@
 #!/bin/bash
-cc t_request.c -o t_request.exe
+cc t_request.c -o t_request
 cc -c t_dataCol_simple.c -o datacol.o
 cc -I ./include -Wall -O3 -march=native -mtune=native -flto=2 -g -Wextra -Wno-unused-parameter -c -o renderer.o t_renderer.c
 cc -I ./include -Wall -O3 -march=native -mtune=native -flto=2 -g -Wextra -Wno-unused-parameter -c -o main.o main.c

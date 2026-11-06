@@ -42,7 +42,7 @@ int main(void) {
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
   // start the request program - collects train data every 30 seconds and then
   // informs the program
-  system("start t_request");
+  system("t_request &&");
   parseTrains(&tdata);
 
   clock_t previousTick = 0;

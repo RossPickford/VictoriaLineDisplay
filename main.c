@@ -56,7 +56,7 @@ int main(void) {
     previousTick = currentTick;
 
     // collect the value from requestcomplete.bin and reset file stream
-    fgets(&requestcomplete, 2, requeststatus);
+    fgets(&requestcomplete, 1, requeststatus);
     fseek(requeststatus, 0, SEEK_SET);
     assert(requestcomplete == 0 || requestcomplete == 1 ||
            requestcomplete == 2);

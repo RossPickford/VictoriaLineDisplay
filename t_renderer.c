@@ -3,6 +3,8 @@
 #define APP_END false
 #define APP_CONTINUE true
 
+#define BYTE_SIZE 8
+
 #define NORTHBOUND_Y 15
 #define SOUTHBOUND_Y 17
 
@@ -66,7 +68,11 @@ bool extractPixelDataFromFile(imageData* imgData) {
   uint32_t pixelRowLength = (((bitsPerPixel * imgData->width) + 31) / 32) * 4;
   uint32_t pixelDataSize = pixelRowLength * imgData->height;
 
-  uint8_t padding = pixelRowLength % (bitsPerPixel * 8);
+  /**
+   * The padding is how many bytes need to be added on at the end of each row
+   * as a row must contain a full pixel dataset (3 bytes in this case)
+   *  */ 
+  uint8_t padding = pixelRowLength % (bitsPerPixel / BYTE_SIZE);
 
   printf("Row size in bytes: %u | pixel data size: %u\n", pixelRowLength,
          pixelDataSize);

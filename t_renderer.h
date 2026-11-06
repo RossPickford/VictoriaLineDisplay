@@ -1,5 +1,5 @@
-#include "t_dataCollection.h"
 #include "led-matrix-c.h"
+#include "t_dataCollection.h"
 
 #pragma once
 
@@ -16,8 +16,8 @@ typedef struct imageData {
 } imageData;
 
 typedef struct display {
-    RGBLedMatrix *matrix;
-    LedCanvas *canvas;
+    struct RGBLedMatrix *matrix;
+    struct LedCanvas *canvas;
     int width;
     int height;
 } display;

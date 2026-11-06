@@ -1,5 +1,5 @@
-gcc t_request.c -o t_request.exe
-gcc -c t_dataCol_simple.c -o datacol.o
-gcc -c t_renderer.c -o renderer.o -I "C:\ExternalLibraries\SDL\include"
-gcc -c main.c -o main.o -I "C:\ExternalLibraries\SDL\include"
-gcc datacol.o renderer.o main.o -o vld_software.exe -L "c:\ExternalLibraries\SDL\lib" -lsdl3
+cc t_request.c -o t_request.exe
+cc -c t_dataCol_simple.c -o datacol.o
+cc -I ./include -Wall -O3 -march=native -mtune=native -flto=2 -g -Wextra -Wno-unused-parameter -c -o render_test.o render_test.c
+cc -I ./include -Wall -O3 -march=native -mtune=native -flto=2 -g -Wextra -Wno-unused-parameter -c -o main.o main.c
+cc datacol.o renderer.o main.o -o vl_render_test -march=native -mtune=native -flto=2 -L ./lib -lrgbmatrix -lrt -lm -lpthread -lstdc++

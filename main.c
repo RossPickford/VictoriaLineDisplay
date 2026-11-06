@@ -1,3 +1,6 @@
+#include <string.h>
+#include <time.h>
+
 #include "t_renderer.h"
 
 #define REQUEST_TIME 15000
@@ -5,18 +8,29 @@
 int main(void) {
   t_data tdata = {0, NULL};
   imageData imgData;
-  SDL_Window* window = NULL;
-  SDL_Renderer* renderer = NULL;
 
-  pixelDataExtended** tBuffer = NULL;
+  display disp = {NULL, NULL, 0, 0};
+  struct RGBLedMatrixOptions options;
+
+  memset(&options, 0, sizeof(options));
+  options.rows = 32;
+  options.cols = 64;
+  options.chain_length = 2;
+
+  /* This supports all the led commandline options. Try --led-help */
+  disp.matrix = led_matrix_create_from_options(&options, NULL, NULL);
+  if (disp.matrix == NULL) return 1;
+
+  disp.canvas = led_matrix_create_offscreen_canvas(disp.matrix);
+  led_canvas_get_size(disp.canvas, &disp.width, &disp.height);
 
   t_data_init(&tdata);
-  bool status = t_rend_init(&window, &renderer, &imgData, &tBuffer);
+  bool status = t_rend_init(&imgData);
 
   /**
    * This file holds the status of the t_request - 1 for it has completed the
-   * request and the trains file is ready to be parsed, 0 is for the data has been
-   * parsed, and 2 tells t_request that the program has been closed.
+   * request and the trains file is ready to be parsed, 0 is for the data has
+   * been parsed, and 2 tells t_request that the program has been closed.
    */
   FILE* requeststatus = fopen("requestcomplete.bin", "w+");
   uint8_t requestcomplete = 0;
@@ -26,10 +40,12 @@ int main(void) {
 
   // Collect initial data
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+  // start the request program - collects train data every 30 seconds and then
+  // informs the program
   system("start t_request");
   parseTrains(&tdata);
 
-  uint64_t previousTick = 0;
+  clock_t previousTick = 0;
   uint64_t requestRefreshTime = 0;
 
   while (status) {
@@ -45,11 +61,8 @@ int main(void) {
     assert(requestcomplete == 0 || requestcomplete == 1 ||
            requestcomplete == 2);
 
-    // request data from tfl server and then parse it once recieved
-    /*  if (!requestcomplete && requestRefreshTime >= REQUEST_TIME) {
-       system("start t_request");
-       requestRefreshTime = requestRefreshTime % REQUEST_TIME;
-     } else  */
+    // if t_request has the most up to date train data (which hasn't been read)
+    // - update the train nodes
     if (requestcomplete == 1) {
       parseTrains(&tdata);
 
@@ -77,10 +90,7 @@ int main(void) {
 
     updateTrainPosition(&tdata, delta);
 
-    status = t_rend_event() &&
-             t_rend_drawPixels(&imgData, renderer, tdata, tBuffer, delta);
-    // printf("finished a cycle\n");
-    // status = false;
+    status = t_rend_drawPixels(&imgData, &disp, tdata, delta);
   }
 
   // Singalling to the requst executable that the program is finished
@@ -89,7 +99,9 @@ int main(void) {
   fclose(requeststatus);
 
   t_data_quit(&tdata);
-  // t_nodes_quit(tNodes);
-  t_rend_quit(window, renderer, &imgData, &tBuffer);
+  t_rend_quit(&imgData);
+
+  led_matrix_delete(disp.matrix);
+
   return 0;
 }

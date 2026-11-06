@@ -20,13 +20,6 @@ typedef struct imageData
     int32_t height;
 } imageData;
 
-typedef struct pixelDataExtended
-{
-    uint8_t x;
-    uint8_t y;
-    pixelData pxlData;
-} pixelDataExtended;
-
 #define APP_END 0
 #define APP_CONTINUE 1
 
@@ -126,7 +119,7 @@ int extractPixelDataFromFile(imageData *imgData)
     return APP_CONTINUE;
 }
 
-void t_rend_quit(imageData *imgData, pixelDataExtended ***tBuffer)
+void t_rend_quit(imageData *imgData)
 {
     for (size_t i = 0; i < imgData->height; i++)
         free((imgData->pixelData + i));

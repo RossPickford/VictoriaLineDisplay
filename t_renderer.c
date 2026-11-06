@@ -1,7 +1,7 @@
 #include "t_renderer.h"
 
-#define APP_END false
-#define APP_CONTINUE true
+#define APP_END 0
+#define APP_CONTINUE 1
 
 #define BYTE_SIZE 8
 
@@ -110,7 +110,8 @@ bool extractPixelDataFromFile(imageData* imgData) {
     // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
   } */
 
-  for (size_t i = 0, col = imgData->width - 1, row = 0; i < pixelDataSize; i += 3) {
+  for (size_t i = 0, col = imgData->width - 1, row = 0; i < pixelDataSize;
+       i += 3) {
     if (((row + 1) * pixelRowLength) - i < 3 && pixelRowLength > 0) {
       i += padding;
       row++;
@@ -127,108 +128,35 @@ bool extractPixelDataFromFile(imageData* imgData) {
   return APP_CONTINUE;
 }
 
-bool t_rend_init(SDL_Window** window, SDL_Renderer** renderer,
-                 imageData* imgData, pixelDataExtended*** tBuffer) {
-  if (!SDL_Init(SDL_INIT_VIDEO)) {
-    SDL_Log("Failed to initialise video: %s", SDL_GetError());
-    return APP_END;
-  }
-
+bool t_rend_init(imageData* imgData) {
   if (!extractPixelDataFromFile(imgData)) {
     printf("couldn't load bitmap image\n");
     return APP_END;
   }
 
-  if (!SDL_CreateWindowAndRenderer("VL Display", 10 * imgData->width,
-                                   10 * imgData->height, SDL_WINDOW_RESIZABLE,
-                                   window, renderer)) {
-    SDL_Log("Failed to create window and renderer: %s", SDL_GetError());
-    return APP_END;
-  }
-
-  SDL_SetRenderLogicalPresentation(*renderer, imgData->width, imgData->height,
-                                   SDL_LOGICAL_PRESENTATION_LETTERBOX);
-
-  *tBuffer =
-      (pixelDataExtended**)malloc(sizeof(pixelDataExtended*) * ARENA_MAX);
-  assert(*tBuffer);
-
-  for (size_t i = 0; i < ARENA_MAX; i++) {
-    *(*tBuffer + i) =
-        (pixelDataExtended*)malloc(sizeof(pixelDataExtended) * NODE_PIXELS_MAX);
-    assert(*(*tBuffer + i));
-  }
-
   return APP_CONTINUE;
 }
 
-bool t_rend_event() {
-  // printf("event\n");
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
-    if (event.type == SDL_EVENT_KEY_DOWN &&
-        event.key.scancode == SDL_SCANCODE_ESCAPE)
-      return APP_END;
-
-    if (event.type == SDL_EVENT_QUIT) return APP_END;
-  }
-
-  return APP_CONTINUE;
-}
-
-void t_rend_quit(SDL_Window* window, SDL_Renderer* renderer, imageData* imgData,
-                 pixelDataExtended*** tBuffer) {
+void t_rend_quit(imageData* imgData) {
   for (size_t i = 0; i < imgData->height; i++) free((imgData->pixelData + i));
-
-  // printf("freeing buffer\n");
-  for (size_t i = 0; i < ARENA_MAX; i++) free(*(*tBuffer + i));
-
-  free(*tBuffer);
   free(imgData->pixelData);
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  SDL_QuitSubSystem(SDL_INIT_VIDEO);
-  SDL_Quit();
 }
 
-uint8_t ulerp(uint8_t minVal, uint8_t maxVal, float t) {
-  assert(t <= 1.0f && t >= 0.0f);
-  uint8_t diff = maxVal - minVal;
-  float change = (float)diff * t;
-  return minVal + (uint8_t)change;
-}
-
-uint8_t uinvslerp(uint8_t minVal, uint8_t maxVal, float t) {
-  // float newT = sqrtf((2 * t) - (t * t));
-  assert(t <= 1.0f && t >= 0.0f);
-  float newT = 1.0f - sqrtf(1.0f - (t * t));
-  uint8_t diff = maxVal - minVal;
-  float change = (float)diff * newT;
-  return minVal + (uint8_t)change;
-}
-
-bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
-                       pixelDataExtended** tBuff, float delta) {
+bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
+                       float delta) {
   // printf("rendering\n");
 
-  if (!imgData | !renderer) {
+  if (!imgData) {
     printf("A pointer variables inserted is/are null\n");
     return APP_END;
   }
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   // printf("drawing background\n");
   for (size_t y = 0; y < imgData->height; y++)
     for (size_t x = 0; x < imgData->width; x++) {
-      pixelData pData = *(*(imgData->pixelData + y) + x);
-      // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
+      pixelData pdata = *(*(imgData->pixelData + y) + x);
 
-      SDL_FRect pixel = {x, y, 1.0f, 1.0f};
-      SDL_SetRenderDrawColor(renderer, pData.r, pData.g, pData.b,
-                             SDL_ALPHA_OPAQUE);
-      SDL_RenderFillRect(renderer, &pixel);
+      led_canvas_set_pixel(disp->canvas, x, y, pdata.r, pdata.g, pdata.b);
     }
 
   if (tdata.len > 0) {
@@ -243,7 +171,7 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
       assert(!isnan(train.x));
 
       uint64_t xInt = (uint64_t)train.x;
-      float y = train.direction == NORTHBOUND ? NORTHBOUND_Y : SOUTHBOUND_Y;
+      int y = train.direction == NORTHBOUND ? NORTHBOUND_Y : SOUTHBOUND_Y;
 
       float fract = train.x - (float)xInt;
       /**
@@ -256,12 +184,8 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
       }
 
       // Draw the pixel to screen
-      SDL_FRect pxltop = {(float)xInt, y, 1.0f, 1.0f};
-      SDL_FRect pxlbtm = {(float)xInt, y + 1, 1.0f, 1.0f};
-
-      SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-      SDL_RenderRect(renderer, &pxltop);
-      SDL_RenderRect(renderer, &pxlbtm);
+      led_canvas_set_pixel(disp->canvas, xInt, y, 255, 0, 0);
+      led_canvas_set_pixel(disp->canvas, xInt, y + 1, 255, 0, 0);
     }
   }
 
@@ -288,7 +212,7 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
   //===================================================
 
   // printf("presenting pixels\n");
-  SDL_RenderPresent(renderer);
+  disp->canvas = led_matrix_swap_on_vsync(disp->matrix, disp->canvas);
 
   return APP_CONTINUE;
 }

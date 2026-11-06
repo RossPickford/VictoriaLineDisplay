@@ -147,8 +147,8 @@ int main(void)
     int x, y, i;
 
     memset(&options, 0, sizeof(options));
-    options.rows = imgData.height;
-    options.cols = imgData.width;
+    options.rows = 32;
+    options.cols = 64;
     options.chain_length = 2;
 
     /* This supports all the led commandline options. Try --led-help */

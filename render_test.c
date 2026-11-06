@@ -109,18 +109,17 @@ int extractPixelDataFromFile(imageData *imgData)
     for (size_t i = 0; i < imgData->height; i++)
         *(imgData->pixelData + i) = (pixelData *)malloc(imgData->width * sizeof(pixelData));
 
-    for (size_t i = 0, c = 0, r = 1; i < pixelDataSize; i += 3)
-    {
-        if ((r * pixelRowLength) - i < 3 && pixelRowLength > 0)
-        {
-            i += padding;
-            r++;
-            c = 0;
-        }
-
-        pixelData pData = *(*(imgData->pixelData + (imgData->height - r)) + c++) = *(pixelData *)(rawPixelData + i);
-        // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
+  for (size_t i = 0, col = imgData->width - 1, row = 0; i < pixelDataSize; i += 3) {
+    if (((row + 1) * pixelRowLength) - i < 3 && pixelRowLength > 0) {
+      i += padding;
+      row++;
+      col = imgData->width - 1;
     }
+
+    pixelData pData = *(*(imgData->pixelData + row) + col--) =
+        *(pixelData*)(rawPixelData + i);
+    // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
+  }
 
     free(rawPixelData);
     fclose(image);

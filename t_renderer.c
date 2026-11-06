@@ -61,9 +61,10 @@ bool extractPixelDataFromFile(imageData* imgData) {
   /**
    * The row length is repesented in bytes - it must be a mutliple of 4 bytes
    * This utilises the floor function - you add on the highest fraction below 1
-   * that is a multiple of 1/32 (i.e 31/32) to the row length (measured in 4 bytes).
-   * The floor function thus ensures the result is a multiple of 4 bytes above the remainder.
-   * The final multiplication of 4 converts it back to bytes.
+   * that is a multiple of 1/32 (i.e 31/32) to the row length (measured in 4
+   * bytes). The floor function thus ensures the result is a multiple of 4 bytes
+   * above the remainder. The final multiplication of 4 converts it back to
+   * bytes.
    */
   uint32_t pixelRowLength = (((bitsPerPixel * imgData->width) + 31) / 32) * 4;
   uint32_t pixelDataSize = pixelRowLength * imgData->height;
@@ -71,7 +72,7 @@ bool extractPixelDataFromFile(imageData* imgData) {
   /**
    * The padding is how many bytes need to be added on at the end of each row
    * as a row must contain a full pixel dataset (3 bytes in this case)
-   *  */ 
+   *  */
   uint8_t padding = pixelRowLength % (bitsPerPixel / BYTE_SIZE);
 
   printf("Row size in bytes: %u | pixel data size: %u\n", pixelRowLength,
@@ -95,14 +96,28 @@ bool extractPixelDataFromFile(imageData* imgData) {
     *(imgData->pixelData + i) =
         (pixelData*)malloc(imgData->width * sizeof(pixelData));
 
-  for (size_t i = 0, col = 0, row = 1; i < pixelDataSize; i += 3) {
+  // original pixel assignment.
+  /* for (size_t i = 0, col = 0, row = 1; i < pixelDataSize; i += 3) {
     if ((row * pixelRowLength) - i < 3 && pixelRowLength > 0) {
       i += padding;
       row++;
       col = 0;
     }
 
-    pixelData pData = *(*(imgData->pixelData + (imgData->height - row)) + col++) =
+    pixelData pData = *(*(imgData->pixelData + (imgData->height - row)) + col++)
+  =
+        *(pixelData*)(rawPixelData + i);
+    // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
+  } */
+
+  for (size_t i = 0, col = imgData->width - 1, row = 0; i < pixelDataSize; i += 3) {
+    if (((row + 1) * pixelRowLength) - i < 3 && pixelRowLength > 0) {
+      i += padding;
+      row++;
+      col = imgData->width - 1;
+    }
+
+    pixelData pData = *(*(imgData->pixelData + row) + col--) =
         *(pixelData*)(rawPixelData + i);
     // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
   }
@@ -252,23 +267,23 @@ bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
 
   // ===============================================
   // Drawing the fps
-/*   size_t i = 0;
-  for (uint32_t fps = (uint32_t)(1.0f / delta); fps != 0 && i < sizeof(sfps);
-       fps /= 10) {
-    sfps[i++] = (fps % 10) + '0';
-  }
+  /*   size_t i = 0;
+    for (uint32_t fps = (uint32_t)(1.0f / delta); fps != 0 && i < sizeof(sfps);
+         fps /= 10) {
+      sfps[i++] = (fps % 10) + '0';
+    }
 
-  for (size_t j = 0; j < i; j++) {
-    char hold = sfps[j];
-    sfps[j] = sfps[i-(j+1)];
-    sfps[i-(j+1)] = hold;
-  }
-  sfps[i] = '\0';
+    for (size_t j = 0; j < i; j++) {
+      char hold = sfps[j];
+      sfps[j] = sfps[i-(j+1)];
+      sfps[i-(j+1)] = hold;
+    }
+    sfps[i] = '\0';
 
-  SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
-  SDL_SetRenderScale(renderer, 0.5f, 0.5f);
-  assert(SDL_RenderDebugText(renderer, 210, 56, sfps));
-  SDL_SetRenderScale(renderer, 1.0f, 1.0f); */
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderScale(renderer, 0.5f, 0.5f);
+    assert(SDL_RenderDebugText(renderer, 210, 56, sfps));
+    SDL_SetRenderScale(renderer, 1.0f, 1.0f); */
 
   //===================================================
 

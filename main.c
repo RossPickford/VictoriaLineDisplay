@@ -46,10 +46,10 @@ int main(void) {
   parseTrains(&tdata);
 
   clock_t previousTick = 0;
-  uint64_t requestRefreshTime = 0;
+  clock_t requestRefreshTime = 0;
 
   while (status) {
-    uint64_t currentTick = SDL_GetTicks();
+    clock_t currentTick = clock();
     float delta = (float)(currentTick - previousTick) /
                   1000.0f;  // convert from ms to seconds
     requestRefreshTime += currentTick - previousTick;

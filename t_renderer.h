@@ -16,10 +16,10 @@ typedef struct imageData {
 } imageData;
 
 typedef struct display {
-    struct RGBLedMatrix *matrix;
-    struct LedCanvas *canvas;
-    int width;
-    int height;
+  struct RGBLedMatrix* matrix;
+  struct LedCanvas* canvas;
+  int width;
+  int height;
 } display;
 
 bool t_rend_init(imageData* imgData);

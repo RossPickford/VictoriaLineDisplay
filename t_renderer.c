@@ -1,5 +1,7 @@
 #include "t_renderer.h"
 
+#include <math.h>
+
 #define APP_END 0
 #define APP_CONTINUE 1
 

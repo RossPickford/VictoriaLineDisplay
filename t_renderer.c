@@ -152,12 +152,12 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
   }
 
   // printf("drawing background\n");
-  /* for (size_t y = 0; y < imgData->height; y++)
+  for (size_t y = 0; y < imgData->height; y++)
     for (size_t x = 0; x < imgData->width; x++) {
       pixelData pdata = *(*(imgData->pixelData + y) + x);
 
       led_canvas_set_pixel(disp->canvas, x, y, pdata.r, pdata.g, pdata.b);
-    } */
+    }
 
   if (tdata.len > 0) {
     for (size_t i = 0; i < tdata.len; i++) {

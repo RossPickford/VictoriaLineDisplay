@@ -114,7 +114,7 @@ void parseTrains(t_data* tdata) {
           break;
         case 't':
           char* timeto_literal = "timeToS";
-          String timeto = {sizeof(timeto_literal) - 1, timeto_literal};
+          String timeto = {7, timeto_literal};
           if (k_str.data[1] == 'o')
             k_type = KT_TOWARDS;
           else if (strComp(k_str, timeto, timeto.len))

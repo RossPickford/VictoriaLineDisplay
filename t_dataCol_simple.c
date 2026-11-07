@@ -3,6 +3,7 @@
 #include "t_dataCollection.h"
 #include "t_parse.h"
 #include "t_stopData.h"
+#include <math.h>
 
 #define DATA_ARENA_SIZE 50
 #define KEY_VALUE_BUFF_SIZE 64
@@ -384,6 +385,7 @@ void parseTrains(t_data* tdata) {
     } else if (!train.status) {
       size_t dir = (train.direction + 1) / 2;
       train.x = (float)tStops_pos[train.nextStation - 1];
+      assert(!isnan(train.x));
       train.x = train.timeToStation == 0
                     ? train.x
                     : (((float)train.timeToStation /

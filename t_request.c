@@ -7,11 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 
 #define REQUEST_INTERVAL 30
 
 int main(void) {
   FILE* text = fopen("requestcomplete.txt", "r+");
+  assert(text);
   char val = 1;
 
   int time = 0;

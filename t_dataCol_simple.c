@@ -20,7 +20,6 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 static uint8_t traintotal = 0;
 
 void parseTrains(t_data* tdata) {
-
   printf("parsing trains... \n\n");
 
   /**
@@ -188,10 +187,10 @@ void parseTrains(t_data* tdata) {
             }
 
             // change the next station to the correct one based on direction
-            tempdata.nextStation += tempdata.direction * tempdata.alterStation;
+            tempdata.nextStation +=
+                (SOUTHBOUND * tempdata.direction * tempdata.alterStation);
 
-            if (tempdata.nextStation < 1 ||
-                tempdata.nextStation > 16) {
+            if (tempdata.nextStation < 1 || tempdata.nextStation > 16) {
               fprintf(stderr, "train: %u - invalid station value - %u\n",
                       tempdata.id, tempdata.nextStation);
               tempdata.direction = 0;
@@ -201,7 +200,8 @@ void parseTrains(t_data* tdata) {
           case KT_TIMETOSTATION:
             if (*streampos < 0x30 || *streampos > 0x39) {
               fprintf(stderr,
-                      "expected value to be a number, instead recieved %c - key = %s",
+                      "expected value to be a number, instead recieved %c - "
+                      "key = %s",
                       *streampos, k_str.data);
               return;
             }

@@ -536,7 +536,7 @@ char* getstationliteral(station_name station) {
 }
 
 float getSpeedf(train_object train) {
-  float speed = ((float)tStops_pos[train.nextStation + NORTHBOUND] - train.x) /
+  float speed = ((float)tStops_pos[train.nextStation - NORTHBOUND] - train.x) /
                 train.timeToStation;
 
   // check if direction of speed matches the train's direction.
@@ -564,7 +564,7 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
      * This will correct the x positon of the train if it has gone past it's
      * listed next station
      */
-    float nextstationpos = (float)tStops_pos[train.nextStation + NORTHBOUND];
+    float nextstationpos = (float)tStops_pos[train.nextStation - NORTHBOUND];
     if (train.direction == NORTHBOUND && train.x < nextstationpos) {
       train.x = nextstationpos;
       train.speed = 0.0f;

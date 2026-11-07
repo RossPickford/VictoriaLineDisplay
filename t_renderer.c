@@ -120,9 +120,7 @@ bool extractPixelDataFromFile(imageData* imgData) {
       col = imgData->width - 1;
     }
 
-    pixelData pData = *(*(imgData->pixelData + row) + col--) =
-        *(pixelData*)(rawPixelData + i);
-    // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
+    *(*(imgData->pixelData + row) + col--) = *(pixelData*)(rawPixelData + i);
   }
 
   free(rawPixelData);

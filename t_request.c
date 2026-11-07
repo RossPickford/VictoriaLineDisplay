@@ -14,7 +14,8 @@
 int main(void) {
   FILE* text = fopen("requestcomplete.txt", "r+");
   assert(text);
-  char val = 1;
+  size_t val = 0x0001;
+  printf("size_t size = %u\n", val);
 
   int time = 0;
   int previous = clock() / CLOCKS_PER_SEC;
@@ -25,12 +26,12 @@ int main(void) {
     delta += time - previous;
     previous = time;
 
-    fgets(&val, 2, text);
+    fgets(&val, 4, text);
     fseek(text, 0, SEEK_SET);
-    if (val == 2) {
+    if (val == 0x0002) {
       break;
     } else {
-      val = 1;
+      val = 0x0001;
     }
 
     if (delta >= REQUEST_INTERVAL) {

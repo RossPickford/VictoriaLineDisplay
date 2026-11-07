@@ -187,8 +187,10 @@ void parseTrains(t_data* tdata) {
             }
 
             // change the next station to the correct one based on direction
+            // southbound has to be +1 and northbound has to be -1
             tempdata.nextStation +=
-                (SOUTHBOUND * tempdata.direction * tempdata.alterStation);
+                (tempdata.direction == NORTHBOUND ? -1
+                                                  : 1 * tempdata.alterStation);
 
             if (tempdata.nextStation < 1 || tempdata.nextStation > 16) {
               fprintf(stderr, "train: %u - invalid station value - %u\n",

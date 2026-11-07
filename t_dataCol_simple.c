@@ -361,7 +361,7 @@ void parseTrains(t_data* tdata) {
       printf("removing train\n");
       tdata->data[i].dataMisses++;
 
-      if (tdata->data[i].dataMisses > 1) {
+      if (tdata->data[i].dataMisses > 1 || tdata->data[i].nextStation == V_NONE) {
         printf("train %u has been removed\n", tdata->data[i].id);
         tdata->data[i] = tdata->data[--tdata->len];
         traintotal--;

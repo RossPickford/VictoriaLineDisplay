@@ -32,7 +32,7 @@ int main(void) {
    * request and the trains file is ready to be parsed, 0 is for the data has
    * been parsed, and 2 tells t_request that the program has been closed.
    */
-  FILE* requeststatus = fopen("requestcomplete.txt", "w+");
+  FILE* requeststatus = fopen("requestcomplete.txt", "a");
   assert(requeststatus);
   printf("file opened\n\n");
   uint8_t requestcomplete = 0;

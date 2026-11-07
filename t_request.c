@@ -23,7 +23,7 @@ int main(void) {
     delta += time - previous;
     previous = time;
 
-    fgets(&val, 1, text);
+    fgets(&val, 2, text);
     fseek(text, 0, SEEK_SET);
     if (val == 2) {
       break;

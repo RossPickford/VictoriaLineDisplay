@@ -176,6 +176,7 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
        * ensure the x value is within the confines of the display
        * and that it is not nan.
        */
+      printf("train x = %f\n\n", train.x);
       assert(train.x >= 0.0f && train.x <= 128.0f);
       assert(!isnan(train.x));
 

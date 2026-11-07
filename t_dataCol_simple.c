@@ -200,8 +200,8 @@ void parseTrains(t_data* tdata) {
           case KT_TIMETOSTATION:
             if (*streampos < 0x30 || *streampos > 0x39) {
               fprintf(stderr,
-                      "expected value to be a number, instead recieved %c",
-                      *streampos);
+                      "expected value to be a number, instead recieved %c %c %c",
+                      *streampos, *(streampos + 1), *(streampos + 2));
               return;
             }
 

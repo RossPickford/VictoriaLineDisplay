@@ -35,15 +35,16 @@ int main(void) {
    * request and the trains file is ready to be parsed, 0 is for the data has
    * been parsed, and 2 tells t_request that the program has been closed.
    */
-  /* FILE* requeststatus = fopen("requestcomplete.txt", "w+");
+  FILE* requeststatus = fopen("requestcomplete.txt", "w+");
   assert(requeststatus);
   printf("file opened\n\n");
-  uint8_t requestcomplete = 0; */
+  uint8_t requestcomplete[4];
+  memset(requestcomplete, 0, 4);
 
-/*   fwrite(&requestcomplete, 1, 1, requeststatus);
-  fseek(requeststatus, 0, SEEK_SET); */
+  fwrite(&requestcomplete, 1, 1, requeststatus);
+  fseek(requeststatus, 0, SEEK_SET);
 
-  // printf("data written onto file\n\n");
+  printf("data written onto file\n\n");
 
   // Collect initial data
   system(
@@ -53,8 +54,8 @@ int main(void) {
 
   // start the request program - collects train data every 30 seconds and then
   // informs the program
-/*   system("sudo ./t_request &");
-  printf("launching request program...\n\n"); */
+  system("sudo ./t_request &");
+  printf("launching request program...\n\n");
   
   t_data_init(&tdata);
   bool status = t_rend_init(&imgData);
@@ -72,14 +73,14 @@ int main(void) {
     timeelapsed += delta;
 
     // collect the value from requestcomplete.bin and reset file stream
-    /* fgets(&requestcomplete, 2, requeststatus);
+    fgets(requestcomplete, 4, requeststatus);
     fseek(requeststatus, 0, SEEK_SET);
-    assert(requestcomplete == 0 || requestcomplete == 1 ||
-           requestcomplete == 2); */
+    assert(*requestcomplete == 0 || *requestcomplete == 1 ||
+           *requestcomplete == 2);
 
     // if t_request has the most up to date train data (which hasn't been read)
     // - update the train nodes
-    if (timeelapsed >= REQUEST_TIME) {
+    if (*requestcomplete == 1) {
       timeelapsed = (float)((int)timeelapsed % REQUEST_TIME);
       parseTrains(&tdata);
 
@@ -100,9 +101,9 @@ int main(void) {
             delta, tdata.data[i].speed * delta);
       }
 
-/*       uint8_t zero = 0;
-      fwrite(&zero, 1, 1, requeststatus);
-      fseek(requeststatus, 0, SEEK_SET); */
+      *requestcomplete = 0;
+      fwrite(requestcomplete, 1, 1, requeststatus);
+      fseek(requeststatus, 0, SEEK_SET);
     }
 
     updateTrainPosition(&tdata, delta);
@@ -111,9 +112,9 @@ int main(void) {
   }
 
   // Singalling to the requst executable that the program is finished
-/*   char two = 2;
+  char two = 2;
   fwrite(&two, 1, 1, requeststatus);
-  fclose(requeststatus); */
+  fclose(requeststatus);
 
   t_data_quit(&tdata);
   t_rend_quit(&imgData);

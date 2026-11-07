@@ -26,7 +26,7 @@ int main(void) {
     delta += time - previous;
     previous = time;
 
-    fgets(&val, 4, text);
+    fgets(val, 4, text);
     fseek(text, 0, SEEK_SET);
     if (val[0] == 2) {
       break;

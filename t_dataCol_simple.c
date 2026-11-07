@@ -20,6 +20,9 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 static uint8_t traintotal = 0;
 
 void parseTrains(t_data* tdata) {
+
+  printf("parsing trains... \n\n");
+
   /**
    * This resets the dataCollected variable for the current train pool,
    * as well as labelling them as existing before processing the incoming

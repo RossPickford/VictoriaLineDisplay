@@ -149,7 +149,7 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
   // printf("rendering\n");
 
   if (!imgData) {
-    printf("A pointer variables inserted is/are null\n");
+    printf("Img data is null\n");
     return APP_END;
   }
 

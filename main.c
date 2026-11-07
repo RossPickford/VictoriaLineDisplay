@@ -54,12 +54,14 @@ int main(void) {
   // informs the program
   system("sudo ./t_request &");
   printf("launching request program...\n\n");
-  parseTrains(&tdata);
-
+  
   t_data_init(&tdata);
   bool status = t_rend_init(&imgData);
+  
+  parseTrains(&tdata);
+  
   float previousTick = 0.0f;
-
+  
   while (status) {
     float currentTick = (float)clock() / (float)CLOCKS_PER_SEC;
     float delta =

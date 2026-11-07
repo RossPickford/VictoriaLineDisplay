@@ -90,9 +90,10 @@ void parseTrains(t_data* tdata) {
        * storing current key into a buffer
        */
       while (*streampos != '"') {
-        assert(k_str.len < KEY_VALUE_BUFF_SIZE);
+        assert(k_str.len <= KEY_VALUE_BUFF_SIZE);
         k_str.data[k_str.len++] = *streampos++;
       }
+      k_str.data[k_str.len] = '\0';
 
       /**
        * Switch determines if key is one of specific keys with the necessary
@@ -200,8 +201,8 @@ void parseTrains(t_data* tdata) {
           case KT_TIMETOSTATION:
             if (*streampos < 0x30 || *streampos > 0x39) {
               fprintf(stderr,
-                      "expected value to be a number, instead recieved %c %c %c",
-                      *streampos, *(streampos + 1), *(streampos + 2));
+                      "expected value to be a number, instead recieved %c - key = %s",
+                      *streampos, k_str.data);
               return;
             }
 

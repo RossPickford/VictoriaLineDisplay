@@ -34,7 +34,7 @@ int main(void) {
    */
   FILE* requeststatus = fopen("requestcomplete.txt", "w+");
   assert(requeststatus);
-  print("file opened\n\n");
+  printf("file opened\n\n");
   uint8_t requestcomplete = 0;
 
   fwrite(&requestcomplete, 1, 1, requeststatus);

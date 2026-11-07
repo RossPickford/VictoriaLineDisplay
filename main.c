@@ -9,6 +9,26 @@ int main(void) {
   t_data tdata = {0, NULL};
   imageData imgData;
 
+  display disp = {NULL, NULL, 0, 0};
+  struct RGBLedMatrixOptions options;
+  struct RGBLedRuntimeOptions runtimeoptions;
+
+  memset(&options, 0, sizeof(options));
+  options.rows = 32;
+  options.cols = 64;
+  options.chain_length = 2;
+
+  memset(&runtimeoptions, 0, sizeof(runtimeoptions));
+  runtimeoptions.drop_privileges = -1;
+
+  /* This supports all the led commandline options. Try --led-help */
+  disp.matrix =
+      led_matrix_create_from_options_and_rt_options(&options, &runtimeoptions);
+  if (disp.matrix == NULL) return 1;
+
+  disp.canvas = led_matrix_create_offscreen_canvas(disp.matrix);
+  led_canvas_get_size(disp.canvas, &disp.width, &disp.height);
+
   /**
    * This file holds the status of the t_request - 1 for it has completed the
    * request and the trains file is ready to be parsed, 0 is for the data has
@@ -24,24 +44,6 @@ int main(void) {
 
   printf("data written onto file\n\n");
 
-  display disp = {NULL, NULL, 0, 0};
-  struct RGBLedMatrixOptions options;
-
-  memset(&options, 0, sizeof(options));
-  options.rows = 32;
-  options.cols = 64;
-  options.chain_length = 2;
-
-  /* This supports all the led commandline options. Try --led-help */
-  disp.matrix = led_matrix_create_from_options(&options, NULL, NULL);
-  if (disp.matrix == NULL) return 1;
-
-  disp.canvas = led_matrix_create_offscreen_canvas(disp.matrix);
-  led_canvas_get_size(disp.canvas, &disp.width, &disp.height);
-
-  t_data_init(&tdata);
-  bool status = t_rend_init(&imgData);
-
   // Collect initial data
   system(
       "sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o "
@@ -53,6 +55,8 @@ int main(void) {
   printf("launching request program...\n\n");
   parseTrains(&tdata);
 
+  t_data_init(&tdata);
+  bool status = t_rend_init(&imgData);
   float previousTick = 0.0f;
 
   while (status) {

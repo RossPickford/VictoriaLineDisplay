@@ -33,16 +33,22 @@ int main(void) {
    * been parsed, and 2 tells t_request that the program has been closed.
    */
   FILE* requeststatus = fopen("requestcomplete.txt", "w+");
+  assert(requeststatus);
+  print("file opened\n\n");
   uint8_t requestcomplete = 0;
 
   fwrite(&requestcomplete, 1, 1, requeststatus);
   fseek(requeststatus, 0, SEEK_SET);
 
+  printf("data written onto file\n\n");
+
   // Collect initial data
   system("sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+  printf("getting initial trains...\n\n");
   // start the request program - collects train data every 30 seconds and then
   // informs the program
   system("t_request &");
+  printf("launching request program...\n\n");
   parseTrains(&tdata);
 
   float previousTick = 0.0f;

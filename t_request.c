@@ -14,8 +14,8 @@
 int main(void) {
   FILE* text = fopen("requestcomplete.txt", "r+");
   assert(text);
-  size_t val = 0x0001;
-  printf("size_t size = %u\n", val);
+  char val[4] = "1000";
+  printf("size_t size = %u\n", sizeof(size_t));
 
   int time = 0;
   int previous = clock() / CLOCKS_PER_SEC;
@@ -28,10 +28,10 @@ int main(void) {
 
     fgets(&val, 4, text);
     fseek(text, 0, SEEK_SET);
-    if (val == 0x0002) {
+    if (val[0] == 2) {
       break;
     } else {
-      val = 0x0001;
+    val[0] = 1;
     }
 
     if (delta >= REQUEST_INTERVAL) {
@@ -39,7 +39,7 @@ int main(void) {
 
       system(
           "curl https://api.tfl.gov.uk/Line/victoria/Arrivals?app_key=580efc09100e43b6976feaefb4e33f12 -o trains.txt ");
-      fwrite(&val, 1, 1, text);
+      fwrite(&val, 1, 4, text);
     }
   }
 

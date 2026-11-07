@@ -3,7 +3,7 @@
 
 #include "t_renderer.h"
 
-#define REQUEST_TIME 15000
+#define REQUEST_TIME 30
 
 int main(void) {
   t_data tdata = {0, NULL};
@@ -35,32 +35,33 @@ int main(void) {
    * request and the trains file is ready to be parsed, 0 is for the data has
    * been parsed, and 2 tells t_request that the program has been closed.
    */
-  FILE* requeststatus = fopen("requestcomplete.txt", "w+");
+  /* FILE* requeststatus = fopen("requestcomplete.txt", "w+");
   assert(requeststatus);
   printf("file opened\n\n");
-  uint8_t requestcomplete = 0;
+  uint8_t requestcomplete = 0; */
 
-  fwrite(&requestcomplete, 1, 1, requeststatus);
-  fseek(requeststatus, 0, SEEK_SET);
+/*   fwrite(&requestcomplete, 1, 1, requeststatus);
+  fseek(requeststatus, 0, SEEK_SET); */
 
-  printf("data written onto file\n\n");
+  // printf("data written onto file\n\n");
 
   // Collect initial data
   system(
       "sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o "
       "trains.txt ");
   printf("getting initial trains...\n\n");
+
   // start the request program - collects train data every 30 seconds and then
   // informs the program
-  system("sudo ./t_request &");
-  printf("launching request program...\n\n");
+/*   system("sudo ./t_request &");
+  printf("launching request program...\n\n"); */
   
   t_data_init(&tdata);
   bool status = t_rend_init(&imgData);
   
   parseTrains(&tdata);
-  
-  float previousTick = 0.0f;
+
+  float previousTick = 0.0f, timeelapsed = 0.0f;
   
   while (status) {
     float currentTick = (float)clock() / (float)CLOCKS_PER_SEC;
@@ -68,15 +69,18 @@ int main(void) {
         (float)(currentTick - previousTick);  // convert from ms to seconds
     previousTick = currentTick;
 
+    timeelapsed += delta;
+
     // collect the value from requestcomplete.bin and reset file stream
-    fgets(&requestcomplete, 2, requeststatus);
+    /* fgets(&requestcomplete, 2, requeststatus);
     fseek(requeststatus, 0, SEEK_SET);
     assert(requestcomplete == 0 || requestcomplete == 1 ||
-           requestcomplete == 2);
+           requestcomplete == 2); */
 
     // if t_request has the most up to date train data (which hasn't been read)
     // - update the train nodes
-    if (requestcomplete == 1) {
+    if (timeelapsed >= REQUEST_TIME) {
+      timeelapsed = (float)((int)timeelapsed % REQUEST_TIME);
       parseTrains(&tdata);
 
       printf("\n=============================\n");
@@ -96,9 +100,9 @@ int main(void) {
             delta, tdata.data[i].speed * delta);
       }
 
-      uint8_t zero = 0;
+/*       uint8_t zero = 0;
       fwrite(&zero, 1, 1, requeststatus);
-      fseek(requeststatus, 0, SEEK_SET);
+      fseek(requeststatus, 0, SEEK_SET); */
     }
 
     updateTrainPosition(&tdata, delta);
@@ -107,9 +111,9 @@ int main(void) {
   }
 
   // Singalling to the requst executable that the program is finished
-  char two = 2;
+/*   char two = 2;
   fwrite(&two, 1, 1, requeststatus);
-  fclose(requeststatus);
+  fclose(requeststatus); */
 
   t_data_quit(&tdata);
   t_rend_quit(&imgData);

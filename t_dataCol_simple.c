@@ -541,6 +541,10 @@ float getSpeedf(train_object train) {
   float speed = ((float)tStops_pos[train.nextStation - 1] - train.x) /
                 train.timeToStation;
 
+  if (speed < -MAX_SPEED || speed > MAX_SPEED) {
+    speed = MAX_SPEED;
+  }
+
   // check if direction of speed matches the train's direction.
   if ((speed < 0 && train.direction > 0) ||
       ((speed > 0 && train.direction < 0)))

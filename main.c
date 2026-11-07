@@ -49,7 +49,7 @@ int main(void) {
   printf("getting initial trains...\n\n");
   // start the request program - collects train data every 30 seconds and then
   // informs the program
-  system("t_request &");
+  system("sudo ./t_request &");
   printf("launching request program...\n\n");
   parseTrains(&tdata);
 

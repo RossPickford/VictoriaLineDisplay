@@ -8,18 +8,18 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define REQUEST_INTERVAL 30000
+#define REQUEST_INTERVAL 30
 
 int main(void) {
-  FILE* text = fopen("requestcomplete.bin", "r+");
+  FILE* text = fopen("requestcomplete.txt", "r+");
   char val = 1;
 
-  clock_t time = 0;
-  clock_t previous = clock();
-  clock_t delta = 0;
+  int time = 0;
+  int previous = clock() / CLOCKS_PER_SEC;
+  int delta = 0;
 
   while (1) {
-    time = clock();
+    time = clock() / CLOCKS_PER_SEC;
     delta += time - previous;
     previous = time;
 

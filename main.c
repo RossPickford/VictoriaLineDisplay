@@ -39,24 +39,21 @@ int main(void) {
   fseek(requeststatus, 0, SEEK_SET);
 
   // Collect initial data
-  system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+  system("sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
   // start the request program - collects train data every 30 seconds and then
   // informs the program
-  system("t_request &&");
+  system("t_request &");
   parseTrains(&tdata);
 
-  clock_t previousTick = 0;
-  clock_t requestRefreshTime = 0;
+  float previousTick = 0.0f;
 
   while (status) {
-    clock_t currentTick = clock();
-    float delta = (float)(currentTick - previousTick) /
-                  1000.0f;  // convert from ms to seconds
-    requestRefreshTime += currentTick - previousTick;
+    float currentTick = (float)clock() / (float)CLOCKS_PER_SEC;
+    float delta = (float)(currentTick - previousTick);  // convert from ms to seconds
     previousTick = currentTick;
 
     // collect the value from requestcomplete.bin and reset file stream
-    fgets(&requestcomplete, 1, requeststatus);
+    fgets(&requestcomplete, 2, requeststatus);
     fseek(requeststatus, 0, SEEK_SET);
     assert(requestcomplete == 0 || requestcomplete == 1 ||
            requestcomplete == 2);
@@ -66,7 +63,7 @@ int main(void) {
     if (requestcomplete == 1) {
       parseTrains(&tdata);
 
-      printf("\n=============================\n");
+/*       printf("\n=============================\n");
       // print details about incoming train data - mostly for debugging purposes
       for (size_t i = 0; i < tdata.len; i++) {
         printf(
@@ -81,7 +78,7 @@ int main(void) {
             tdata.data[i].dataCollected ? "yes" : "no",
             tdata.data[i].dataMisses, tdata.data[i].x, tdata.data[i].speed,
             delta, tdata.data[i].speed * delta);
-      }
+      } */
 
       uint8_t zero = 0;
       fwrite(&zero, 1, 1, requeststatus);

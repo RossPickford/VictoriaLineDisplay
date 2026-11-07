@@ -190,8 +190,8 @@ void parseTrains(t_data* tdata) {
             // change the next station to the correct one based on direction
             tempdata.nextStation += tempdata.direction * tempdata.alterStation;
 
-            if (tempdata.nextStation < V_WALTHAMSTOW ||
-                tempdata.nextStation > V_BRIXTON) {
+            if (tempdata.nextStation < 1 ||
+                tempdata.nextStation > 16) {
               fprintf(stderr, "train: %u - invalid station value - %u\n",
                       tempdata.id, tempdata.nextStation);
               tempdata.direction = 0;

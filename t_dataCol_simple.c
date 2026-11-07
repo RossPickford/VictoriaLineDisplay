@@ -566,6 +566,7 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
      * This will correct the x positon of the train if it has gone past it's
      * listed next station
      */
+    assert(train.nextStation > 0 && train.nextStation <= 16);
     float nextstationpos = (float)tStops_pos[train.nextStation - 1];
     if (train.direction == 1 && train.x >= nextstationpos) {
       train.x = nextstationpos;

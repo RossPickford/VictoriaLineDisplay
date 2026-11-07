@@ -564,7 +564,7 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
      * This will correct the x positon of the train if it has gone past it's
      * listed next station
      */
-    float nextstationpos = (float)tStops_pos[train.nextStation - 1];
+    float nextstationpos = (float)tStops_pos[train.nextStation + NORTHBOUND];
     if (train.direction == NORTHBOUND && train.x < nextstationpos) {
       train.x = nextstationpos;
       train.speed = 0.0f;

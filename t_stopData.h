@@ -5,7 +5,7 @@
 
 /**** MUST DEFINE NORTHBOUND AND SOUTHBOUND BEFORE INCLUDING THIS HEADER ****/
 
-#if NORTHBOUND == 1
+#if NORTHBOUND == -1
 
 static const uint8_t tStops_pos[16] = {
     // Single Lane Stops //

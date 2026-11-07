@@ -35,14 +35,14 @@ int main(void) {
       "sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o "
       "trains.txt ");
   printf("getting initial trains...\n\n");
-  
+
   t_data_init(&tdata);
   bool status = t_rend_init(&imgData);
-  
+
   parseTrains(&tdata);
 
   float previousTick = 0.0f, timeelapsed = 0.0f;
-  
+
   while (status) {
     float currentTick = (float)clock() / (float)CLOCKS_PER_SEC;
     float delta =
@@ -55,6 +55,10 @@ int main(void) {
     // - update the train nodes
     if (timeelapsed >= REQUEST_TIME) {
       timeelapsed = (float)((int)timeelapsed % REQUEST_TIME);
+
+      system(
+          "sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o "
+          "trains.txt ");
       parseTrains(&tdata);
 
       printf("\n=============================\n");

@@ -9,6 +9,21 @@ int main(void) {
   t_data tdata = {0, NULL};
   imageData imgData;
 
+  /**
+   * This file holds the status of the t_request - 1 for it has completed the
+   * request and the trains file is ready to be parsed, 0 is for the data has
+   * been parsed, and 2 tells t_request that the program has been closed.
+   */
+  FILE* requeststatus = fopen("requestcomplete.txt", "w+");
+  assert(requeststatus);
+  printf("file opened\n\n");
+  uint8_t requestcomplete = 0;
+
+  fwrite(&requestcomplete, 1, 1, requeststatus);
+  fseek(requeststatus, 0, SEEK_SET);
+
+  printf("data written onto file\n\n");
+
   display disp = {NULL, NULL, 0, 0};
   struct RGBLedMatrixOptions options;
 
@@ -26,25 +41,6 @@ int main(void) {
 
   t_data_init(&tdata);
   bool status = t_rend_init(&imgData);
-
-  /**
-   * This file holds the status of the t_request - 1 for it has completed the
-   * request and the trains file is ready to be parsed, 0 is for the data has
-   * been parsed, and 2 tells t_request that the program has been closed.
-   */
-  FILE* requeststatus = fopen("requestcomplete.txt", "r+");
-  assert(requeststatus);
-  printf("file opened\n\n");
-  uint8_t requestcomplete = 0;
-
-  int val = 0;
-  fgets(&val, 2, requeststatus);
-  fseek(requeststatus, 0, SEEK_SET);
-
-  fwrite(&requestcomplete, 1, 1, requeststatus);
-  fseek(requeststatus, 0, SEEK_SET);
-
-  printf("data written onto file\n\n");
 
   // Collect initial data
   system(

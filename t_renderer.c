@@ -178,19 +178,16 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
        */
       printf("train x = %f\n\n", train.x);
       printf(
-            "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
-            " next station: %s\n alter station: %u\n status: %u\n"
-            " data collected: %s\n data misses: %u\n"
-            " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
-            train.id, getstationliteral(train.stationName),
-            train.direction, train.timeToStation,
-            getstationliteral(train.nextStation),
-            train.alterStation, train.status,
-            train.dataCollected ? "yes" : "no",
-            train.dataMisses, train.x, train.speed,
-            delta, train.speed * delta);
-      assert(train.x >= 0.0f && train.x <= 128.0f);
+          "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
+          " next station: %s\n alter station: %u\n status: %u\n"
+          " data collected: %s\n data misses: %u\n"
+          " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
+          train.id, getstationliteral(train.stationName), train.direction,
+          train.timeToStation, getstationliteral(train.nextStation),
+          train.alterStation, train.status, train.dataCollected ? "yes" : "no",
+          train.dataMisses, train.x, train.speed, delta, train.speed * delta);
       assert(!isnan(train.x));
+      assert(train.x >= 0.0f && train.x <= 128.0f);
 
       uint64_t xInt = (uint64_t)train.x;
       int y = train.direction == NORTHBOUND ? NORTHBOUND_Y : SOUTHBOUND_Y;

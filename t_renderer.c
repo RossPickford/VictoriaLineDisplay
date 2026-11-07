@@ -187,7 +187,7 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
        * Invert the x value and fractional for Northbound trains.
        * The x coords decrease for Northbound trains.
        */
-      if (fract > 0.0f && train.direction == NORTHBOUND) {
+      if (fract > 0.0f && train.direction == -1) {
         xInt++;
         fract = 1.0f - fract;
       }

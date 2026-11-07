@@ -5,8 +5,8 @@
 
 #pragma once
 
-#define NORTHBOUND -1
-#define SOUTHBOUND 1
+#define NORTHBOUND 1
+#define SOUTHBOUND -1
 
 #define TRAIN_NEW 0
 #define TRAIN_EXISTS 1
@@ -98,8 +98,8 @@ typedef struct train_object {
   uint8_t dataCollected;
 
   /**
-   * The amount of missed data collections this train has when parsing the incoming train data.
-   * A train is allowed 1 miss
+   * The amount of missed data collections this train has when parsing the
+   * incoming train data. A train is allowed 1 miss
    */
   uint8_t dataMisses;
 

@@ -7,8 +7,17 @@
 
 #define BYTE_SIZE 8
 
+#if NORTHBOUND == -1
+
 #define NORTHBOUND_Y 15
 #define SOUTHBOUND_Y 17
+
+#else
+
+#define NORTHBOUND_Y 15
+#define SOUTHBOUND_Y 13
+
+#endif
 
 #define ARENA_MAX 50
 #define NODE_PIXELS_MAX 6

@@ -536,7 +536,7 @@ char* getstationliteral(station_name station) {
 }
 
 float getSpeedf(train_object train) {
-  float speed = ((float)tStops_pos[train.nextStation - 1] - train.x) /
+  float speed = ((float)tStops_pos[train.nextStation + NORTHBOUND] - train.x) /
                 train.timeToStation;
 
   // check if direction of speed matches the train's direction.

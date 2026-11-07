@@ -11,6 +11,7 @@
 #define TRAIN_NEW 0
 #define TRAIN_EXISTS 1
 
+#if NORHTBOUND == -1
 typedef enum station_name {
   V_NONE = 0,
   V_WALTHAMSTOW = 1,
@@ -30,6 +31,27 @@ typedef enum station_name {
   V_STOCKWELL = 15,
   V_BRIXTON = 16
 } station_name;
+#else
+typedef enum station_name {
+  V_NONE = 0,
+  V_WALTHAMSTOW = 16,
+  V_BLACKHORSE = 15,
+  V_TOTTENHAM = 14,
+  V_SEVENSISTERS = 13,
+  V_FINSBURYPARK = 12,
+  V_HIGHBURY = 11,
+  V_KINGSCROSS = 10,
+  V_EUSTON = 9,
+  V_WARRENSTREET = 8,
+  V_OXFORDCIRCUS = 7,
+  V_GREENPARK = 6,
+  V_VICTORIA = 5,
+  V_PIMLICO = 4,
+  V_VAUXHALL = 3,
+  V_STOCKWELL = 2,
+  V_BRIXTON = 1
+} station_name;
+#endif
 
 typedef struct train_object {
   /**

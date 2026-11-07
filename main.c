@@ -37,13 +37,19 @@ int main(void) {
   printf("file opened\n\n");
   uint8_t requestcomplete = 0;
 
+  int val = 0;
+  fgets(&val, 2, requeststatus);
+  fseek(requeststatus, 0, SEEK_SET);
+
   fwrite(&requestcomplete, 1, 1, requeststatus);
   fseek(requeststatus, 0, SEEK_SET);
 
   printf("data written onto file\n\n");
 
   // Collect initial data
-  system("sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+  system(
+      "sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o "
+      "trains.txt ");
   printf("getting initial trains...\n\n");
   // start the request program - collects train data every 30 seconds and then
   // informs the program
@@ -55,7 +61,8 @@ int main(void) {
 
   while (status) {
     float currentTick = (float)clock() / (float)CLOCKS_PER_SEC;
-    float delta = (float)(currentTick - previousTick);  // convert from ms to seconds
+    float delta =
+        (float)(currentTick - previousTick);  // convert from ms to seconds
     previousTick = currentTick;
 
     // collect the value from requestcomplete.bin and reset file stream
@@ -69,22 +76,21 @@ int main(void) {
     if (requestcomplete == 1) {
       parseTrains(&tdata);
 
-/*       printf("\n=============================\n");
-      // print details about incoming train data - mostly for debugging purposes
-      for (size_t i = 0; i < tdata.len; i++) {
-        printf(
-            "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
-            " next station: %s\n alter station: %u\n status: %u\n"
-            " data collected: %s\n data misses: %u\n"
-            " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
-            tdata.data[i].id, getstationliteral(tdata.data[i].stationName),
-            tdata.data[i].direction, tdata.data[i].timeToStation,
-            getstationliteral(tdata.data[i].nextStation),
-            tdata.data[i].alterStation, tdata.data[i].status,
-            tdata.data[i].dataCollected ? "yes" : "no",
-            tdata.data[i].dataMisses, tdata.data[i].x, tdata.data[i].speed,
-            delta, tdata.data[i].speed * delta);
-      } */
+      /*       printf("\n=============================\n");
+            // print details about incoming train data - mostly for debugging
+         purposes for (size_t i = 0; i < tdata.len; i++) { printf( "id: %u\n
+         station name: %s\n direction: %d\n time to station: %u\n" " next
+         station: %s\n alter station: %u\n status: %u\n" " data collected: %s\n
+         data misses: %u\n" " x pos: %f, speed %f delta time: %f delta x:
+         %f\n\n", tdata.data[i].id,
+         getstationliteral(tdata.data[i].stationName), tdata.data[i].direction,
+         tdata.data[i].timeToStation,
+                  getstationliteral(tdata.data[i].nextStation),
+                  tdata.data[i].alterStation, tdata.data[i].status,
+                  tdata.data[i].dataCollected ? "yes" : "no",
+                  tdata.data[i].dataMisses, tdata.data[i].x,
+         tdata.data[i].speed, delta, tdata.data[i].speed * delta);
+            } */
 
       uint8_t zero = 0;
       fwrite(&zero, 1, 1, requeststatus);

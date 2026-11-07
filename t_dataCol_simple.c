@@ -567,10 +567,10 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
      * listed next station
      */
     float nextstationpos = (float)tStops_pos[train.nextStation - 1];
-    if (train.direction && train.x >= nextstationpos) {
+    if (train.direction == 1 && train.x >= nextstationpos) {
       train.x = nextstationpos;
       train.speed = 0.0f;
-    } else if (!train.direction && train.x <= nextstationpos) {
+    } else if (train.direction == -1 && train.x <= nextstationpos) {
       train.x = nextstationpos;
       train.speed = 0.0f;
     }

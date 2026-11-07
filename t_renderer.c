@@ -176,7 +176,7 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
        * ensure the x value is within the confines of the display
        * and that it is not nan.
        */
-      printf("train x = %f\n\n", train.x);
+/*       printf("train x = %f\n\n", train.x);
       printf(
           "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
           " next station: %s\n alter station: %u\n status: %u\n"
@@ -185,7 +185,7 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
           train.id, getstationliteral(train.stationName), train.direction,
           train.timeToStation, getstationliteral(train.nextStation),
           train.alterStation, train.status, train.dataCollected ? "yes" : "no",
-          train.dataMisses, train.x, train.speed, delta, train.speed * delta);
+          train.dataMisses, train.x, train.speed, delta, train.speed * delta); */
       assert(!isnan(train.x));
       assert(train.x >= 0.0f && train.x <= 128.0f);
 

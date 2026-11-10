@@ -54,6 +54,7 @@ int main(void) {
     // if t_request has the most up to date train data (which hasn't been read)
     // - update the train nodes
     if (timeelapsed >= REQUEST_TIME) {
+      printf("\ntime elapsed\n");
       timeelapsed = (float)((int)timeelapsed % REQUEST_TIME);
 
       system(

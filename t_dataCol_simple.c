@@ -50,7 +50,7 @@ void parseTrains(t_data* tdata) {
   }
 
   printf("stream start: %c\n", stream[0]);
-  assert(depth < 1);
+  assert(depth <= 1);
 
   char* streampos = stream;
 

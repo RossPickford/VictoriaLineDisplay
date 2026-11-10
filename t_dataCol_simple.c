@@ -316,17 +316,16 @@ void parseTrains(t_data* tdata) {
     // move to beginning of next train object or the end of the array
     while (*streampos != '{' && *streampos != ']') ++streampos;
 
+    // temp data cannot have a status of 1 before assessment
+    assert(!tempdata.status);
+
     // Adding the train information to the main arena of train data
     size_t itrain = 0;
-
     for (size_t i = 0; i < tdata->len; i++)
       if (tdata->data[i].id == tempdata.id) {
         tempdata.status = 1;
         itrain = i;
       }
-
-    // temp data cannot have a status of 1 before assessment
-    assert(!tempdata.status);
 
     /**
      * This will either change the timeTo variable if the train exists
@@ -337,7 +336,8 @@ void parseTrains(t_data* tdata) {
      * Otherwise, if the train does not exist in the current pool, add it
      */
     if (tempdata.direction == 0) {  // ignore the data if direction is 0
-    } else if (tempdata.nextStation == tdata->data[itrain].nextStation) {
+    } else if (tempdata.status &&
+               tempdata.nextStation == tdata->data[itrain].nextStation) {
       tdata->data[itrain].dataCollected = 1;
 
       if (tempdata.timeToStation < tdata->data[itrain].timeToStation) {

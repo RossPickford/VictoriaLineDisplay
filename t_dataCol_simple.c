@@ -45,6 +45,7 @@ void parseTrains(t_data* tdata) {
   }
   size_t depth = 0;
   while (fgets(stream, sizeof(stream), trains) != EOF) depth++;
+    printf("depth: %llu\n", depth);
 
   assert(depth < 1);
 

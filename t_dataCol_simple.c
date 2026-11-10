@@ -574,9 +574,6 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
     float xDelta = deltaTime * train.speed;
     assert(xDelta * train.direction >= 0.0f);
     train.x += xDelta;
-    /*     if (xDelta > 1.0f) {
-          printf("\n------------ delta x: %f -----------\n", xDelta);
-        } */
 
     /**
      * This will correct the x positon of the train if it has gone past it's
@@ -612,6 +609,9 @@ int main(void) {
     if (deltatime < 10.0f) continue;
 
     deltatime -= 10.0f;
+    system(
+        "sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o "
+        "trains.txt ");
     parseTrains(&tdata);
     updateTrainPosition(&tdata, 0.01f);
 

@@ -601,7 +601,7 @@ int main(void) {
   t_data_init(&tdata);
   float deltatime = 0.0f;
   float previoustime = 0.0f;
-  while (true) {
+  while (1) {
     float curtime = ((float)clock() / (float)CLOCKS_PER_SEC);
     deltatime += curtime - previoustime;
     previoustime = curtime;

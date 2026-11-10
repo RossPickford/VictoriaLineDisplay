@@ -1,9 +1,9 @@
+#include <math.h>
 #include <time.h>
 
 #include "t_dataCollection.h"
 #include "t_parse.h"
 #include "t_stopData.h"
-#include <math.h>
 
 #define DATA_ARENA_SIZE 50
 #define KEY_VALUE_BUFF_SIZE 64
@@ -43,9 +43,10 @@ void parseTrains(t_data* tdata) {
     printf("failed to open files");
     return;
   }
+  size_t depth = 0;
+  while (fgets(stream, sizeof(stream), trains)) depth++;
 
-  for (size_t depth = 0; fgets(stream, sizeof(stream), trains); depth++)
-    if (depth > 1) printf("stream buffer reached capacity before completion\n");
+  assert(depth < 1);
 
   char* streampos = stream;
 
@@ -320,7 +321,7 @@ void parseTrains(t_data* tdata) {
         itrain = i;
       }
 
-
+    // temp data cannot have a status of 1 before assessment
     assert(!tempdata.status);
 
     /**
@@ -332,8 +333,7 @@ void parseTrains(t_data* tdata) {
      * Otherwise, if the train does not exist in the current pool, add it
      */
     if (tempdata.direction == 0) {  // ignore the data if direction is 0
-    } else if (tempdata.status &&
-               tempdata.nextStation == tdata->data[itrain].nextStation) {
+    } else if (tempdata.nextStation == tdata->data[itrain].nextStation) {
       tdata->data[itrain].dataCollected = 1;
 
       if (tempdata.timeToStation < tdata->data[itrain].timeToStation) {
@@ -362,12 +362,14 @@ void parseTrains(t_data* tdata) {
    * and remove any tallied misses to trains that had misses but recieved data.
    */
   for (size_t i = 0; i < tdata->len; i++) {
-    printf("%u data is %s collected\n", tdata->data[i].id, tdata->data[i].dataCollected ? "is" : "is not");
+    printf("%u data is %s collected\n", tdata->data[i].id,
+           tdata->data[i].dataCollected ? "is" : "is not");
     if (!tdata->data[i].dataCollected) {
       printf("removing train\n");
       tdata->data[i].dataMisses++;
 
-      if (tdata->data[i].dataMisses > 1 || tdata->data[i].nextStation == V_NONE) {
+      if (tdata->data[i].dataMisses > 1 ||
+          tdata->data[i].nextStation == V_NONE) {
         printf("train %u has been removed\n", tdata->data[i].id);
         tdata->data[i] = tdata->data[--tdata->len];
         traintotal--;
@@ -593,28 +595,38 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
 /**
  * main function ========================================
  */
-/* int main(void)
-{
+int main(void) {
   t_data tdata;
   tdata.len = 0;
   t_data_init(&tdata);
   float deltatime = 0.0f;
   float previoustime = 0.0f;
-  while (true)
-  {
+  while (true) {
     float curtime = ((float)clock() / (float)CLOCKS_PER_SEC);
-    deltatime +=  curtime - previoustime;
+    deltatime += curtime - previoustime;
     previoustime = curtime;
-    if (deltatime < 10.0f)
-      continue;
+    if (deltatime < 10.0f) continue;
 
     deltatime -= 10.0f;
-    requestTrains(&tdata);
+    parseTrains(&tdata);
     updateTrainPosition(&tdata, 0.01f);
+
+    for (size_t i = 0; i < tdata.len; i++) {
+      printf(
+          "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
+          " next station: %s\n alter station: %u\n status: %u\n"
+          " data collected: %s\n data misses: %u\n"
+          " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
+          tdata.data[i].id, getstationliteral(tdata.data[i].stationName),
+          tdata.data[i].direction, tdata.data[i].timeToStation,
+          getstationliteral(tdata.data[i].nextStation),
+          tdata.data[i].alterStation, tdata.data[i].status,
+          tdata.data[i].dataCollected ? "yes" : "no", tdata.data[i].dataMisses,
+          tdata.data[i].x, tdata.data[i].speed, deltatime,
+          tdata.data[i].speed * deltatime);
+    }
   }
-  t_data_quit(&tdata);
-  return 0;
-} */
+}
 
 void t_data_init(t_data* tdata) {
   tdata->data = (train_object*)malloc(sizeof(train_object) * DATA_ARENA_SIZE);

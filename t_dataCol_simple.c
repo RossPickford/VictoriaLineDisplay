@@ -282,7 +282,7 @@ void parseTrains(t_data* tdata) {
                 } else if (vstr.data[1] != 'e') {
                   fprintf(stderr, "unexpected value for current location: %c\n",
                           vstr.data[1]);
-                  return;
+                  break;
                 }
 
                 tempdata.nextStation =
@@ -291,7 +291,7 @@ void parseTrains(t_data* tdata) {
                 break;
               default:
                 fprintf(stderr, "unknown current location: %s\n", vstr.data);
-                return;
+                break;
             }
             break;
           default:
@@ -596,7 +596,7 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
 /**
  * main function ========================================
  */
-int main(void) {
+/* int main(void) {
   t_data tdata;
   tdata.len = 0;
   t_data_init(&tdata);
@@ -630,7 +630,7 @@ int main(void) {
           tdata.data[i].speed * deltatime);
     }
   }
-}
+} */
 
 void t_data_init(t_data* tdata) {
   tdata->data = (train_object*)malloc(sizeof(train_object) * DATA_ARENA_SIZE);

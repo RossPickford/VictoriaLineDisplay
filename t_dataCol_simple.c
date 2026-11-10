@@ -320,6 +320,9 @@ void parseTrains(t_data* tdata) {
         itrain = i;
       }
 
+
+    assert(!tempdata.status);
+
     /**
      * This will either change the timeTo variable if the train exists
      * in the current train pool and the incoming data and the existing
@@ -338,6 +341,7 @@ void parseTrains(t_data* tdata) {
       }
 
     } else if (tempdata.stationName == tempdata.nextStation) {
+      printf("data collected");
       tempdata.dataCollected = 1;
 
       if (tempdata.status) {
@@ -358,6 +362,7 @@ void parseTrains(t_data* tdata) {
    * and remove any tallied misses to trains that had misses but recieved data.
    */
   for (size_t i = 0; i < tdata->len; i++) {
+    printf("%u data is %s collected\n", tdata->data[i].id, tdata->data[i].dataCollected ? "is" : "is not");
     if (!tdata->data[i].dataCollected) {
       printf("removing train\n");
       tdata->data[i].dataMisses++;

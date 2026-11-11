@@ -1,2 +1,2 @@
 sleep 20
-sudo ./vl_final
+sudo ~/VictoriaLineDisplay/vl_final

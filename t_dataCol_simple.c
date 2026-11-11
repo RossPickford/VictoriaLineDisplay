@@ -344,7 +344,7 @@ void parseTrains(t_data* tdata) {
         tdata->data[itrain].timeToStation = tempdata.timeToStation;
       }
 
-    } else if (tempdata.stationName == tempdata.nextStation) {
+    } else if (tempdata.stationName == tempdata.nextStation && tempdata.stationName != V_NONE) {
       printf("data collected");
       tempdata.dataCollected = 1;
 
@@ -413,17 +413,6 @@ void parseTrains(t_data* tdata) {
 
     tdata->data[i] = train;
   }
-
-  // tdata->len = 1;
-
-  /*   // print details about incoming train data - mostly for debugging
-    purposes for (size_t i = 0; i < tdata->len; i++) { printf( "id: %u\n station
-    name: %s\n direction: %d\n next station: %s\n time " "to station: %u\n x
-    pos: %f, speed %f\n\n", tdata->data[i].id,
-    getstationliteral(tdata->data[i].stationName), tdata->data[i].direction,
-    getstationliteral(tdata->data[i].nextStation), tdata->data[i].timeToStation,
-    tdata->data[i].x, tdata->data[i].speed);
-    } */
 
   printf("number of unique trains: %u\n", tdata->len);
   printf("total number of trains by ID: %u\n", traintotal);
@@ -572,6 +561,22 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
   for (size_t i = 0; i < tdata->len; i++) {
     train_object train = *(tdata->data + i);
     float xDelta = deltaTime * train.speed;
+
+    if (xDelta * train.direction < 0.0f) {
+      printf(
+          "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
+          " next station: %s\n alter station: %u\n status: %u\n"
+          " data collected: %s\n data misses: %u\n"
+          " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
+          train.id, getstationliteral(train.stationName),
+          train.direction, train.timeToStation,
+          getstationliteral(train.nextStation),
+          train.alterStation, train.status,
+          train.dataCollected ? "yes" : "no", train.dataMisses,
+          train.x, train.speed, deltaTime,
+          train.speed * deltaTime);
+    }
+
     assert(xDelta * train.direction >= 0.0f);
     train.x += xDelta;
 

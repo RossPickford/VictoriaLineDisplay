@@ -39,6 +39,8 @@ int main(void) {
   t_data_init(&tdata);
   bool status = t_rend_init(&imgData);
 
+  assert(status);
+
   parseTrains(&tdata);
 
   float previousTick = 0.0f, timeelapsed = 0.0f;

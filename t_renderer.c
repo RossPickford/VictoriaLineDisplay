@@ -155,10 +155,7 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
                        float delta) {
   // printf("rendering\n");
 
-  if (!imgData) {
-    printf("Img data is null\n");
-    return APP_END;
-  }
+  assert(imgData);
 
   // printf("drawing background\n");
   for (size_t y = 0; y < imgData->height; y++)

@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <string.h>
 #include "led-matrix-c.h"
 
 int main(void) {

@@ -373,7 +373,7 @@ void parseTrains(t_data* tdata) {
       tdata->data[i].dataMisses++;
 
       if (tdata->data[i].dataMisses > 1 ||
-          tdata->data[i].nextStation == V_NONE) {
+          tdata->data[i].nextStation == V_NONE || tdata->data[i].x == 0.0f) {
         printf("train %u has been removed\n", tdata->data[i].id);
         tdata->data[i] = tdata->data[--tdata->len];
         traintotal--;
@@ -556,7 +556,7 @@ float getSpeedf(train_object train) {
 
 void updateTrainPosition(t_data* tdata, float deltaTime) {
   // printf("updating Pos\n");
-  if (tdata->len == 0 || deltaTime == 0.0f || !tdata->data) return;
+  if (tdata->len == 0 || deltaTime <= 0.0f || !tdata->data) return;
 
   for (size_t i = 0; i < tdata->len; i++) {
     train_object train = *(tdata->data + i);

@@ -8,9 +8,8 @@ int main(void) {
 
   while (1) {
     clock_t tick = clock();
-    float currentTick = (float)tick / (float)CLOCKS_PER_SEC;
-    float delta =
-        (float)(currentTick - previousTick);  // convert from ms to seconds
+    float currentTick = (float)tick / (float)CLOCKS_PER_SEC; // convert from ms to seconds
+    float delta = currentTick - previousTick;  
     previousTick = currentTick;
 
     timeelapsed += delta;

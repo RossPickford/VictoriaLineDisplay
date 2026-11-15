@@ -43,12 +43,13 @@ int main(void) {
 
   parseTrains(&tdata);
 
-  float previousTick = 0.0f, timeelapsed = 0.0f;
+  clock_t previousTick = 0;
+  float timeelapsed = 0.0f;
 
   while (status) {
-    float currentTick = (float)clock() / (float)CLOCKS_PER_SEC;
+    clock_t currentTick = clock();
     float delta =
-        (float)(currentTick - previousTick);  // convert from ms to seconds
+        (float)(currentTick - previousTick) / (float)CLOCKS_PER_SEC;  // convert from ms to seconds
     previousTick = currentTick;
 
     timeelapsed += delta;

@@ -1,4 +1,4 @@
-#include "led-matrix-c.h"
+#include <SDL3/SDL.h>
 #include "t_dataCollection.h"
 
 #pragma once
@@ -16,13 +16,13 @@ typedef struct imageData {
 } imageData;
 
 typedef struct display {
-  struct RGBLedMatrix* matrix;
-  struct LedCanvas* canvas;
+  SDL_Window* window;
+  SDL_Renderer* rendere;
   int width;
   int height;
 } display;
 
-bool t_rend_init(imageData* imgData);
+bool t_rend_init(imageData* imgData, display* disp);
 bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
                        float delta);
 void t_rend_quit(imageData* imgData);

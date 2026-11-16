@@ -25,7 +25,8 @@
 char sfps[10];
 
 bool extractPixelDataFromFile(imageData* imgData) {
-  FILE* image = fopen("/VictoriaLineDisplay/media/background_128x32_single.bmp", "rb");
+  FILE* image =
+      fopen("/VictoriaLineDisplay/media/background_128x32_single.bmp", "rb");
   uint8_t header[14];
   uint8_t DIBHeader[40];
 
@@ -90,25 +91,22 @@ bool extractPixelDataFromFile(imageData* imgData) {
          pixelDataSize);
 
   uint8_t* rawPixelData = (uint8_t*)malloc(pixelDataSize);
-  if (!rawPixelData) {
-    printf("failed to allocate memory for pixel data\n");
-    return APP_END;
-  }
-
-  if (!fread(rawPixelData, 1, pixelDataSize, image)) {
-    fprintf(stderr, "ERROR: cannot read file pixel data\n");
-    return APP_END;
-  }
+  assert(rawPixelData);
+  assert(fread(rawPixelData, 1, pixelDataSize, image));
 
   imgData->pixelData =
       (pixelData**)malloc(imgData->height * sizeof(pixelData*));
 
-  for (size_t i = 0; i < imgData->height; i++)
+  assert(imgData->pixelData);
+
+  for (size_t i = 0; i < imgData->height; i++) {
     *(imgData->pixelData + i) =
-        (pixelData*)malloc(imgData->width * sizeof(pixelData));
+    (pixelData*)malloc(imgData->width * sizeof(pixelData));
+    assert(*(imgData->pixelData + i));
+  }
 
   // original pixel assignment.
-  /* for (size_t i = 0, col = 0, row = 1; i < pixelDataSize; i += 3) {
+  for (size_t i = 0, col = 0, row = 1; i < pixelDataSize; i += 3) {
     if ((row * pixelRowLength) - i < 3 && pixelRowLength > 0) {
       i += padding;
       row++;
@@ -119,9 +117,10 @@ bool extractPixelDataFromFile(imageData* imgData) {
   =
         *(pixelData*)(rawPixelData + i);
     // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
-  } */
+  }
 
-  for (size_t i = 0, col = imgData->width - 1, row = 0; i < pixelDataSize;
+  //flipped for LED matrix
+  /* for (size_t i = 0, col = imgData->width - 1, row = 0; i < pixelDataSize;
        i += 3) {
     if (((row + 1) * pixelRowLength) - i < 3 && pixelRowLength > 0) {
       i += padding;
@@ -130,7 +129,7 @@ bool extractPixelDataFromFile(imageData* imgData) {
     }
 
     *(*(imgData->pixelData + row) + col--) = *(pixelData*)(rawPixelData + i);
-  }
+  } */
 
   free(rawPixelData);
   fclose(image);
@@ -173,16 +172,16 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
        * ensure the x value is within the confines of the display
        * and that it is not nan.
        */
-/*       printf("train x = %f\n\n", train.x);
-      printf(
-          "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
-          " next station: %s\n alter station: %u\n status: %u\n"
-          " data collected: %s\n data misses: %u\n"
-          " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
-          train.id, getstationliteral(train.stationName), train.direction,
-          train.timeToStation, getstationliteral(train.nextStation),
-          train.alterStation, train.status, train.dataCollected ? "yes" : "no",
-          train.dataMisses, train.x, train.speed, delta, train.speed * delta); */
+      /*       printf("train x = %f\n\n", train.x);
+            printf(
+                "id: %u\n station name: %s\n direction: %d\n time to station:
+         %u\n" " next station: %s\n alter station: %u\n status: %u\n" " data
+         collected: %s\n data misses: %u\n" " x pos: %f, speed %f delta time: %f
+         delta x: %f\n\n", train.id, getstationliteral(train.stationName),
+         train.direction, train.timeToStation,
+         getstationliteral(train.nextStation), train.alterStation, train.status,
+         train.dataCollected ? "yes" : "no", train.dataMisses, train.x,
+         train.speed, delta, train.speed * delta); */
       assert(!isnan(train.x));
       assert(train.x >= 0.0f && train.x <= 128.0f);
 

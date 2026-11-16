@@ -8,8 +8,6 @@ int main(void) {
   SDL_Window* window = NULL;
   SDL_Renderer* renderer = NULL;
 
-  pixelDataExtended** tBuffer = NULL;
-
   t_data_init(&tdata);
   bool status = t_rend_init(&window, &renderer, &imgData, &tBuffer);
 

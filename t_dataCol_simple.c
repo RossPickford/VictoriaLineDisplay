@@ -1,3 +1,4 @@
+#include <math.h>
 #include <time.h>
 
 #include "t_dataCollection.h"
@@ -20,6 +21,8 @@ static char v_buff[KEY_VALUE_BUFF_SIZE];
 static uint8_t traintotal = 0;
 
 void parseTrains(t_data* tdata) {
+  printf("parsing trains... \n\n");
+
   /**
    * This resets the dataCollected variable for the current train pool,
    * as well as labelling them as existing before processing the incoming
@@ -40,9 +43,14 @@ void parseTrains(t_data* tdata) {
     printf("failed to open files");
     return;
   }
+  size_t depth = 0;
+  while (fgets(stream, sizeof(stream), trains) != NULL) {
+    depth++;
+    printf("depth: %u and stream start: %c\n", depth, stream[0]);
+  }
 
-  for (size_t depth = 0; fgets(stream, sizeof(stream), trains); depth++)
-    if (depth > 1) printf("stream buffer reached capacity before completion\n");
+  printf("stream start: %c\n", stream[0]);
+  assert(depth <= 1);
 
   char* streampos = stream;
 
@@ -87,9 +95,10 @@ void parseTrains(t_data* tdata) {
        * storing current key into a buffer
        */
       while (*streampos != '"') {
-        assert(k_str.len < KEY_VALUE_BUFF_SIZE);
+        assert(k_str.len <= KEY_VALUE_BUFF_SIZE);
         k_str.data[k_str.len++] = *streampos++;
       }
+      k_str.data[k_str.len] = '\0';
 
       /**
        * Switch determines if key is one of specific keys with the necessary
@@ -110,7 +119,7 @@ void parseTrains(t_data* tdata) {
           break;
         case 't':
           char* timeto_literal = "timeToS";
-          String timeto = {sizeof(timeto_literal) - 1, timeto_literal};
+          String timeto = {7, timeto_literal};
           if (k_str.data[1] == 'o')
             k_type = KT_TOWARDS;
           else if (strComp(k_str, timeto, timeto.len))
@@ -184,10 +193,12 @@ void parseTrains(t_data* tdata) {
             }
 
             // change the next station to the correct one based on direction
-            tempdata.nextStation += tempdata.direction * tempdata.alterStation;
+            // southbound has to be +1 and northbound has to be -1
+            tempdata.nextStation +=
+                (tempdata.direction == NORTHBOUND ? -1
+                                                  : 1 * tempdata.alterStation);
 
-            if (tempdata.nextStation < V_WALTHAMSTOW ||
-                tempdata.nextStation > V_BRIXTON) {
+            if (tempdata.nextStation < 1 || tempdata.nextStation > 16) {
               fprintf(stderr, "train: %u - invalid station value - %u\n",
                       tempdata.id, tempdata.nextStation);
               tempdata.direction = 0;
@@ -197,8 +208,9 @@ void parseTrains(t_data* tdata) {
           case KT_TIMETOSTATION:
             if (*streampos < 0x30 || *streampos > 0x39) {
               fprintf(stderr,
-                      "expected value to be a number, instead recieved %c",
-                      *streampos);
+                      "expected value to be a number, instead recieved %c - "
+                      "key = %s",
+                      *streampos, k_str.data);
               return;
             }
 
@@ -270,7 +282,7 @@ void parseTrains(t_data* tdata) {
                 } else if (vstr.data[1] != 'e') {
                   fprintf(stderr, "unexpected value for current location: %c\n",
                           vstr.data[1]);
-                  return;
+                  break;
                 }
 
                 tempdata.nextStation =
@@ -279,7 +291,7 @@ void parseTrains(t_data* tdata) {
                 break;
               default:
                 fprintf(stderr, "unknown current location: %s\n", vstr.data);
-                return;
+                break;
             }
             break;
           default:
@@ -304,9 +316,11 @@ void parseTrains(t_data* tdata) {
     // move to beginning of next train object or the end of the array
     while (*streampos != '{' && *streampos != ']') ++streampos;
 
+    // temp data cannot have a status of 1 before assessment
+    assert(!tempdata.status);
+
     // Adding the train information to the main arena of train data
     size_t itrain = 0;
-
     for (size_t i = 0; i < tdata->len; i++)
       if (tdata->data[i].id == tempdata.id) {
         tempdata.status = 1;
@@ -330,7 +344,8 @@ void parseTrains(t_data* tdata) {
         tdata->data[itrain].timeToStation = tempdata.timeToStation;
       }
 
-    } else if (tempdata.stationName == tempdata.nextStation) {
+    } else if (tempdata.stationName == tempdata.nextStation && tempdata.stationName != V_NONE) {
+      printf("data collected");
       tempdata.dataCollected = 1;
 
       if (tempdata.status) {
@@ -351,11 +366,14 @@ void parseTrains(t_data* tdata) {
    * and remove any tallied misses to trains that had misses but recieved data.
    */
   for (size_t i = 0; i < tdata->len; i++) {
+    printf("%u data is %s collected\n", tdata->data[i].id,
+           tdata->data[i].dataCollected ? "is" : "is not");
     if (!tdata->data[i].dataCollected) {
       printf("removing train\n");
       tdata->data[i].dataMisses++;
 
-      if (tdata->data[i].dataMisses > 1) {
+      if (tdata->data[i].dataMisses > 1 ||
+          tdata->data[i].nextStation == V_NONE || tdata->data[i].x == 0.0f) {
         printf("train %u has been removed\n", tdata->data[i].id);
         tdata->data[i] = tdata->data[--tdata->len];
         traintotal--;
@@ -395,17 +413,6 @@ void parseTrains(t_data* tdata) {
 
     tdata->data[i] = train;
   }
-
-  // tdata->len = 1;
-
-  /*   // print details about incoming train data - mostly for debugging
-    purposes for (size_t i = 0; i < tdata->len; i++) { printf( "id: %u\n station
-    name: %s\n direction: %d\n next station: %s\n time " "to station: %u\n x
-    pos: %f, speed %f\n\n", tdata->data[i].id,
-    getstationliteral(tdata->data[i].stationName), tdata->data[i].direction,
-    getstationliteral(tdata->data[i].nextStation), tdata->data[i].timeToStation,
-    tdata->data[i].x, tdata->data[i].speed);
-    } */
 
   printf("number of unique trains: %u\n", tdata->len);
   printf("total number of trains by ID: %u\n", traintotal);
@@ -535,6 +542,10 @@ float getSpeedf(train_object train) {
   float speed = ((float)tStops_pos[train.nextStation - 1] - train.x) /
                 train.timeToStation;
 
+  if (speed < -MAX_SPEED || speed > MAX_SPEED) {
+    speed = MAX_SPEED;
+  }
+
   // check if direction of speed matches the train's direction.
   if ((speed < 0 && train.direction > 0) ||
       ((speed > 0 && train.direction < 0)))
@@ -545,27 +556,43 @@ float getSpeedf(train_object train) {
 
 void updateTrainPosition(t_data* tdata, float deltaTime) {
   // printf("updating Pos\n");
-  if (tdata->len == 0 || deltaTime == 0.0f || !tdata->data) return;
+  if (tdata->len == 0 || deltaTime <= 0.0f || !tdata->data) return;
 
   for (size_t i = 0; i < tdata->len; i++) {
     train_object train = *(tdata->data + i);
     float xDelta = deltaTime * train.speed;
+
+    if (xDelta * train.direction < 0.0f) {
+      printf(
+          "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
+          " next station: %s\n alter station: %u\n status: %u\n"
+          " data collected: %s\n data misses: %u\n"
+          " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
+          train.id, getstationliteral(train.stationName),
+          train.direction, train.timeToStation,
+          getstationliteral(train.nextStation),
+          train.alterStation, train.status,
+          train.dataCollected ? "yes" : "no", train.dataMisses,
+          train.x, train.speed, deltaTime,
+          train.speed * deltaTime);
+    }
+
     assert(xDelta * train.direction >= 0.0f);
     train.x += xDelta;
-    /*     if (xDelta > 1.0f) {
-          printf("\n------------ delta x: %f -----------\n", xDelta);
-        } */
 
     /**
      * This will correct the x positon of the train if it has gone past it's
      * listed next station
      */
+    assert(train.nextStation > 0 && train.nextStation <= 16);
     float nextstationpos = (float)tStops_pos[train.nextStation - 1];
-    if (train.direction == NORTHBOUND && train.x < nextstationpos) {
+    if (train.direction == 1 && train.x >= nextstationpos) {
       train.x = nextstationpos;
       train.speed = 0.0f;
-    } else if (train.direction == SOUTHBOUND && train.x > nextstationpos)
+    } else if (train.direction == -1 && train.x <= nextstationpos) {
       train.x = nextstationpos;
+      train.speed = 0.0f;
+    }
 
     *(tdata->data + i) = train;
   }
@@ -574,27 +601,40 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
 /**
  * main function ========================================
  */
-/* int main(void)
-{
+/* int main(void) {
   t_data tdata;
   tdata.len = 0;
   t_data_init(&tdata);
   float deltatime = 0.0f;
   float previoustime = 0.0f;
-  while (true)
-  {
+  while (1) {
     float curtime = ((float)clock() / (float)CLOCKS_PER_SEC);
-    deltatime +=  curtime - previoustime;
+    deltatime += curtime - previoustime;
     previoustime = curtime;
-    if (deltatime < 10.0f)
-      continue;
+    if (deltatime < 10.0f) continue;
 
     deltatime -= 10.0f;
-    requestTrains(&tdata);
+    system(
+        "sudo curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o "
+        "trains.txt ");
+    parseTrains(&tdata);
     updateTrainPosition(&tdata, 0.01f);
+
+    for (size_t i = 0; i < tdata.len; i++) {
+      printf(
+          "id: %u\n station name: %s\n direction: %d\n time to station: %u\n"
+          " next station: %s\n alter station: %u\n status: %u\n"
+          " data collected: %s\n data misses: %u\n"
+          " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
+          tdata.data[i].id, getstationliteral(tdata.data[i].stationName),
+          tdata.data[i].direction, tdata.data[i].timeToStation,
+          getstationliteral(tdata.data[i].nextStation),
+          tdata.data[i].alterStation, tdata.data[i].status,
+          tdata.data[i].dataCollected ? "yes" : "no", tdata.data[i].dataMisses,
+          tdata.data[i].x, tdata.data[i].speed, deltatime,
+          tdata.data[i].speed * deltatime);
+    }
   }
-  t_data_quit(&tdata);
-  return 0;
 } */
 
 void t_data_init(t_data* tdata) {

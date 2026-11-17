@@ -101,7 +101,7 @@ bool extractPixelDataFromFile(imageData* imgData) {
 
   for (size_t i = 0; i < imgData->height; i++) {
     *(imgData->pixelData + i) =
-    (pixelData*)malloc(imgData->width * sizeof(pixelData));
+        (pixelData*)malloc(imgData->width * sizeof(pixelData));
     assert(*(imgData->pixelData + i));
   }
 
@@ -113,13 +113,13 @@ bool extractPixelDataFromFile(imageData* imgData) {
       col = 0;
     }
 
-    pixelData pData = *(*(imgData->pixelData + (imgData->height - row)) + col++)
-  =
-        *(pixelData*)(rawPixelData + i);
+    pixelData pData =
+        *(*(imgData->pixelData + (imgData->height - row)) + col++) =
+            *(pixelData*)(rawPixelData + i);
     // printf("r: %u, g: %u, b: %u\n", pData.r, pData.g, pData.b);
   }
 
-  //flipped for LED matrix
+  // flipped for LED matrix
   /* for (size_t i = 0, col = imgData->width - 1, row = 0; i < pixelDataSize;
        i += 3) {
     if (((row + 1) * pixelRowLength) - i < 3 && pixelRowLength > 0) {
@@ -136,32 +136,60 @@ bool extractPixelDataFromFile(imageData* imgData) {
   return APP_CONTINUE;
 }
 
-bool t_rend_init(imageData* imgData) {
-  if (!extractPixelDataFromFile(imgData)) {
-    printf("couldn't load bitmap image\n");
-    return APP_END;
+void t_rend_init(imageData* imgData, display* disp) {
+  assert(extractPixelDataFromFile(imgData));
+  assert(SDL_Init(SDL_INIT_VIDEO));
+  assert(SDL_CreateWindowAndRenderer("VL Display", 10 * imgData->width,
+                                     10 * imgData->height, SDL_WINDOW_RESIZABLE,
+                                     &disp->window, &disp->renderer));
+
+  assert(SDL_SetRenderLogicalPresentation(disp->renderer, imgData->width,
+                                          imgData->height,
+                                          SDL_LOGICAL_PRESENTATION_LETTERBOX));
+}
+
+bool t_rend_event()
+{
+    // printf("event\n");
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_ESCAPE)
+            return APP_END;
+
+        if (event.type == SDL_EVENT_QUIT)
+            return APP_END;
+    }
+
+    return APP_CONTINUE;
+}
+
+void t_rend_quit(imageData* imgData, display* disp) {
+  for (size_t i = 0; i < imgData->height; i++) {
+    free((imgData->pixelData + i));
   }
 
-  return APP_CONTINUE;
-}
-
-void t_rend_quit(imageData* imgData) {
-  for (size_t i = 0; i < imgData->height; i++) free((imgData->pixelData + i));
   free(imgData->pixelData);
+  SDL_DestroyRenderer(disp->renderer);
+  SDL_DestroyWindow(disp->window);
+  SDL_QuitSubSystem(SDL_INIT_VIDEO);
+  SDL_Quit();
 }
 
-bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
+bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
                        float delta) {
-  // printf("rendering\n");
-
   assert(imgData);
+
+  SDL_RenderClear(renderer);
 
   // printf("drawing background\n");
   for (size_t y = 0; y < imgData->height; y++)
     for (size_t x = 0; x < imgData->width; x++) {
       pixelData pdata = *(*(imgData->pixelData + y) + x);
 
-      led_canvas_set_pixel(disp->canvas, x, y, pdata.r, pdata.g, pdata.b);
+      SDL_FRect rect = {x, y, 1.0f, 1.0f};
+      SDL_SetRenderDrawColor(renderer, pdata.r, pdata.g, pdata.b, SDL_ALPHA_OPAQUE);
+      SDL_RenderRect(renderer, &rect);
     }
 
   if (tdata.len > 0) {
@@ -198,9 +226,12 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
         fract = 1.0f - fract;
       }
 
-      // Draw the pixel to screen
-      led_canvas_set_pixel(disp->canvas, xInt, y, 255, 0, 0);
-      led_canvas_set_pixel(disp->canvas, xInt, y + 1, 255, 0, 0);
+      SDL_FRect top = {(float)xInt, (float)y, 1.0f, 1.0f};
+      SDL_FRect bottom = {(float)xInt, (float)y + 1.0f, 1.0f, 1.0f};
+
+      SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+      SDL_RenderRect(renderer, &top);
+      SDL_RenderRect(renderer, &bottom);
     }
   }
 
@@ -226,8 +257,6 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
 
   //===================================================
 
-  // printf("presenting pixels\n");
-  disp->canvas = led_matrix_swap_on_vsync(disp->matrix, disp->canvas);
-
+  SDL_RenderPresent(renderer);
   return APP_CONTINUE;
 }

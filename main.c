@@ -1,26 +1,15 @@
 #include "t_renderer.h"
 
-#define REQUEST_TIME 15000
+#define REQUEST_TIME 30000
 
 int main(void) {
   t_data tdata = {0, NULL};
   imageData imgData;
-  SDL_Window* window = NULL;
-  SDL_Renderer* renderer = NULL;
+  display disp = {NULL, NULL, 0, 0};
 
   t_data_init(&tdata);
-  bool status = t_rend_init(&window, &renderer, &imgData, &tBuffer);
-
-  /**
-   * This file holds the status of the t_request - 1 for it has completed the
-   * request and the trains file is ready to be parsed, 0 is for the data has been
-   * parsed, and 2 tells t_request that the program has been closed.
-   */
-  FILE* requeststatus = fopen("requestcomplete.bin", "w+");
-  uint8_t requestcomplete = 0;
-
-  fwrite(&requestcomplete, 1, 1, requeststatus);
-  fseek(requeststatus, 0, SEEK_SET);
+  bool status = 1; 
+  t_rend_init(&imgData, &disp);
 
   // Collect initial data
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
@@ -37,18 +26,8 @@ int main(void) {
     requestRefreshTime += currentTick - previousTick;
     previousTick = currentTick;
 
-    // collect the value from requestcomplete.bin and reset file stream
-    fgets(&requestcomplete, 2, requeststatus);
-    fseek(requeststatus, 0, SEEK_SET);
-    assert(requestcomplete == 0 || requestcomplete == 1 ||
-           requestcomplete == 2);
-
-    // request data from tfl server and then parse it once recieved
-    /*  if (!requestcomplete && requestRefreshTime >= REQUEST_TIME) {
-       system("start t_request");
-       requestRefreshTime = requestRefreshTime % REQUEST_TIME;
-     } else  */
-    if (requestcomplete == 1) {
+    if (requestRefreshTime >= REQUEST_TIME) {
+      requestRefreshTime = requestRefreshTime % REQUEST_TIME;
       parseTrains(&tdata);
 
       printf("\n=============================\n");
@@ -67,27 +46,17 @@ int main(void) {
             tdata.data[i].dataMisses, tdata.data[i].x, tdata.data[i].speed,
             delta, tdata.data[i].speed * delta);
       }
-
-      uint8_t zero = 0;
-      fwrite(&zero, 1, 1, requeststatus);
-      fseek(requeststatus, 0, SEEK_SET);
     }
 
     updateTrainPosition(&tdata, delta);
 
-    status = t_rend_event() &&
-             t_rend_drawPixels(&imgData, renderer, tdata, tBuffer, delta);
+    t_rend_drawPixels(&imgData, disp.renderer, tdata, delta);
+    status = t_rend_event();
     // printf("finished a cycle\n");
     // status = false;
   }
 
-  // Singalling to the requst executable that the program is finished
-  char two = 2;
-  fwrite(&two, 1, 1, requeststatus);
-  fclose(requeststatus);
-
   t_data_quit(&tdata);
-  // t_nodes_quit(tNodes);
-  t_rend_quit(window, renderer, &imgData, &tBuffer);
+  t_rend_quit(&imgData, &disp);
   return 0;
 }

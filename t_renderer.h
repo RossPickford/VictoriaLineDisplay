@@ -17,12 +17,12 @@ typedef struct imageData {
 
 typedef struct display {
   SDL_Window* window;
-  SDL_Renderer* rendere;
+  SDL_Renderer* renderer;
   int width;
   int height;
 } display;
 
-bool t_rend_init(imageData* imgData, display* disp);
-bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
+void t_rend_init(imageData* imgData, display* disp);
+bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
                        float delta);
-void t_rend_quit(imageData* imgData);
+void t_rend_quit(imageData* imgData, display* disp);

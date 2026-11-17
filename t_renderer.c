@@ -103,7 +103,7 @@ bool extractPixelDataFromFile(imageData* imgData) {
   imgData->pixelData =
       (pixelData**)malloc(imgData->height * sizeof(pixelData*));
 
-  for (size_t i = 0; i < imgData->height; i++)
+  for (size_t i = 0; i < (size_t)imgData->height; i++)
     *(imgData->pixelData + i) =
         (pixelData*)malloc(imgData->width * sizeof(pixelData));
 
@@ -147,7 +147,7 @@ bool t_rend_init(imageData* imgData) {
 }
 
 void t_rend_quit(imageData* imgData) {
-  for (size_t i = 0; i < imgData->height; i++) free((imgData->pixelData + i));
+  for (size_t i = 0; i < (size_t)imgData->height; i++) free((imgData->pixelData + i));
   free(imgData->pixelData);
 }
 
@@ -158,8 +158,8 @@ bool t_rend_drawPixels(imageData* imgData, display* disp, t_data tdata,
   assert(imgData);
 
   // printf("drawing background\n");
-  for (size_t y = 0; y < imgData->height; y++)
-    for (size_t x = 0; x < imgData->width; x++) {
+  for (size_t y = 0; y < (size_t)imgData->height; y++)
+    for (size_t x = 0; x < (size_t)imgData->width; x++) {
       pixelData pdata = *(*(imgData->pixelData + y) + x);
 
       led_canvas_set_pixel(disp->canvas, x, y, pdata.r, pdata.g, pdata.b);

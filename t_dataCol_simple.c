@@ -55,8 +55,7 @@ void parseTrains(t_data* tdata) {
   char* streampos = stream;
 
   if (*streampos++ != '[') {
-    fprintf(stderr, "expected to begin with array, instead recieved %c\n",
-            stream[0]);
+    fprintf(stderr, "expected to begin with array, instead recieved %c\n", stream[0]);
     return;
   }
 
@@ -65,8 +64,7 @@ void parseTrains(t_data* tdata) {
    */
   while (*streampos != ']') {
     if (*streampos != '{') {
-      fprintf(stderr, "expected object type, instead recieved %c\n",
-              *streampos);
+      fprintf(stderr, "expected object type, instead recieved %c\n", *streampos);
       return;
     }
 
@@ -80,8 +78,7 @@ void parseTrains(t_data* tdata) {
      */
     while (*streampos != '}') {
       if (*streampos != '"') {
-        fprintf(stderr, "expected string type, instead recieved %c\n",
-                *streampos);
+        fprintf(stderr, "expected string type, instead recieved %c\n", *streampos);
         return;
       }
 
@@ -154,9 +151,7 @@ void parseTrains(t_data* tdata) {
             getstringvalue(&streampos, &vstr);
 
             if (vstr.data[0] < 0x30 || vstr.data[0] > 0x39) {
-              fprintf(stderr,
-                      "expected valid number for ID, instead recieved %c",
-                      vstr.data[0]);
+              fprintf(stderr, "expected valid number for ID, instead recieved %c", vstr.data[0]);
               return;
             }
 
@@ -195,12 +190,11 @@ void parseTrains(t_data* tdata) {
             // change the next station to the correct one based on direction
             // southbound has to be +1 and northbound has to be -1
             tempdata.nextStation +=
-                (tempdata.direction == NORTHBOUND ? -1
-                                                  : 1 * tempdata.alterStation);
+                (tempdata.direction == NORTHBOUND ? -1 : 1 * tempdata.alterStation);
 
             if (tempdata.nextStation < 1 || tempdata.nextStation > 16) {
-              fprintf(stderr, "train: %u - invalid station value - %u\n",
-                      tempdata.id, tempdata.nextStation);
+              fprintf(stderr, "train: %u - invalid station value - %u\n", tempdata.id,
+                      tempdata.nextStation);
               tempdata.direction = 0;
             }
 
@@ -221,8 +215,7 @@ void parseTrains(t_data* tdata) {
             }
 
             for (size_t i = 0; i < vstr.len; i++) {
-              tempdata.timeToStation =
-                  (tempdata.timeToStation * 10u) + (vstr.data[i] - 48u);
+              tempdata.timeToStation = (tempdata.timeToStation * 10u) + (vstr.data[i] - 48u);
             }
 
             break;
@@ -240,8 +233,7 @@ void parseTrains(t_data* tdata) {
                 // if the 9th byte in the value is ' ' then the first word must
                 // be 'Departed'
                 index = vstr.data[8] == ' ' ? 9 : 10;
-                tempdata.nextStation =
-                    (station_name)getstationfromstring(vstr, index);
+                tempdata.nextStation = (station_name)getstationfromstring(vstr, index);
 
                 tempdata.alterStation = 1;
                 break;
@@ -260,8 +252,7 @@ void parseTrains(t_data* tdata) {
 
                 index = vstr.data[1] == 't' ? 3 : 12;
                 tempdata.nextStation = getstationfromstring(vstr, index);
-                if (tempdata.nextStation == V_PIMLICO &&
-                    vstr.data[index + 1] == 'l')
+                if (tempdata.nextStation == V_PIMLICO && vstr.data[index + 1] == 'l')
                   tempdata.nextStation = tempdata.stationName;
 
                 if (index == 3) {  // if the current locatain is 'At', then the
@@ -280,13 +271,11 @@ void parseTrains(t_data* tdata) {
                   tempdata.nextStation == V_BRIXTON;
                   break;
                 } else if (vstr.data[1] != 'e') {
-                  fprintf(stderr, "unexpected value for current location: %c\n",
-                          vstr.data[1]);
+                  fprintf(stderr, "unexpected value for current location: %c\n", vstr.data[1]);
                   break;
                 }
 
-                tempdata.nextStation =
-                    (station_name)getstationfromstring(vstr, 8);
+                tempdata.nextStation = (station_name)getstationfromstring(vstr, 8);
                 tempdata.alterStation = 1;
                 break;
               default:
@@ -305,8 +294,7 @@ void parseTrains(t_data* tdata) {
       }
 
       if (*streampos != ',' && *streampos != '}') {
-        fprintf(stderr, "expected end of key-value pair, instead recieved %c\n",
-                *streampos);
+        fprintf(stderr, "expected end of key-value pair, instead recieved %c\n", *streampos);
         return;
       } else if (*streampos == ',')
         ++streampos;
@@ -336,8 +324,7 @@ void parseTrains(t_data* tdata) {
      * Otherwise, if the train does not exist in the current pool, add it
      */
     if (tempdata.direction == 0) {  // ignore the data if direction is 0
-    } else if (tempdata.status &&
-               tempdata.nextStation == tdata->data[itrain].nextStation) {
+    } else if (tempdata.status && tempdata.nextStation == tdata->data[itrain].nextStation) {
       tdata->data[itrain].dataCollected = 1;
 
       if (tempdata.timeToStation < tdata->data[itrain].timeToStation) {
@@ -372,8 +359,8 @@ void parseTrains(t_data* tdata) {
       printf("removing train\n");
       tdata->data[i].dataMisses++;
 
-      if (tdata->data[i].dataMisses > 1 ||
-          tdata->data[i].nextStation == V_NONE || tdata->data[i].x == 0.0f) {
+      if (tdata->data[i].dataMisses > 1 || tdata->data[i].nextStation == V_NONE ||
+          tdata->data[i].x == 0.0f) {
         printf("train %u has been removed\n", tdata->data[i].id);
         tdata->data[i] = tdata->data[--tdata->len];
         traintotal--;
@@ -396,15 +383,14 @@ void parseTrains(t_data* tdata) {
     } else if (!train.status) {
       size_t dir = (train.direction + 1) / 2;
       train.x = (float)tStops_pos[train.nextStation - 1];
-      train.x = train.timeToStation == 0
-                    ? train.x
-                    : (((float)train.timeToStation /
-                        (float)tStops_times[dir][train.nextStation - 1]) *
-                       STATION_GAP * (float)train.direction * -1.0f) +
-                          train.x;
+      train.x =
+          train.timeToStation == 0
+              ? train.x
+              : (((float)train.timeToStation / (float)tStops_times[dir][train.nextStation - 1]) *
+                 STATION_GAP * (float)train.direction * -1.0f) +
+                    train.x;
 
-      train.speed = train.timeToStation == 0 ? (MAX_SPEED * train.direction)
-                                             : getSpeedf(train);
+      train.speed = train.timeToStation == 0 ? (MAX_SPEED * train.direction) : getSpeedf(train);
     }
 
     if (train.x == 0.0f) {
@@ -463,13 +449,11 @@ int8_t getstationfromstring(String str, size_t startpos) {
     case 'P':
       return (int8_t)V_PIMLICO;
     case 'W':
-      return (int8_t)(str.data[startpos + 2] == 'l' ? V_WALTHAMSTOW
-                                                    : V_WARRENSTREET);
+      return (int8_t)(str.data[startpos + 2] == 'l' ? V_WALTHAMSTOW : V_WARRENSTREET);
     case 'B':
       return (int8_t)(str.data[startpos + 1] == 'l' ? V_BLACKHORSE : V_BRIXTON);
     case 'S':
-      return (int8_t)(str.data[startpos + 1] == 'e' ? V_SEVENSISTERS
-                                                    : V_STOCKWELL);
+      return (int8_t)(str.data[startpos + 1] == 'e' ? V_SEVENSISTERS : V_STOCKWELL);
     case 'V':
       return (int8_t)(str.data[startpos + 1] == 'i' ? V_VICTORIA : V_VAUXHALL);
     default:
@@ -495,8 +479,8 @@ uint8_t strComp(String str1, String str2, size_t len) {
  * check if train object has no variables set
  */
 int isobjectempty(train_object data) {
-  return data.id == 0 && data.direction == 0 && data.nextStation == 0 &&
-         data.status == 0 && data.stationName == 0 && data.timeToStation == 0;
+  return data.id == 0 && data.direction == 0 && data.nextStation == 0 && data.status == 0 &&
+         data.stationName == 0 && data.timeToStation == 0;
 }
 
 char* getstationliteral(station_name station) {
@@ -539,17 +523,14 @@ char* getstationliteral(station_name station) {
 }
 
 float getSpeedf(train_object train) {
-  float speed = ((float)tStops_pos[train.nextStation - 1] - train.x) /
-                train.timeToStation;
+  float speed = ((float)tStops_pos[train.nextStation - 1] - train.x) / train.timeToStation;
 
   if (speed < -MAX_SPEED || speed > MAX_SPEED) {
     speed = MAX_SPEED;
   }
 
   // check if direction of speed matches the train's direction.
-  if ((speed < 0 && train.direction > 0) ||
-      ((speed > 0 && train.direction < 0)))
-    speed *= -1.0f;
+  if ((speed < 0 && train.direction > 0) || ((speed > 0 && train.direction < 0))) speed *= -1.0f;
 
   return speed;
 }
@@ -568,12 +549,9 @@ void updateTrainPosition(t_data* tdata, float deltaTime) {
           " next station: %s\n alter station: %u\n status: %u\n"
           " data collected: %s\n data misses: %u\n"
           " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
-          train.id, getstationliteral(train.stationName),
-          train.direction, train.timeToStation,
-          getstationliteral(train.nextStation),
-          train.alterStation, train.status,
-          train.dataCollected ? "yes" : "no", train.dataMisses,
-          train.x, train.speed, deltaTime,
+          train.id, getstationliteral(train.stationName), train.direction, train.timeToStation,
+          getstationliteral(train.nextStation), train.alterStation, train.status,
+          train.dataCollected ? "yes" : "no", train.dataMisses, train.x, train.speed, deltaTime,
           train.speed * deltaTime);
     }
 

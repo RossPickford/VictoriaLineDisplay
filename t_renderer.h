@@ -25,4 +25,5 @@ typedef struct display {
 void t_rend_init(imageData* imgData, display* disp);
 bool t_rend_drawPixels(imageData* imgData, SDL_Renderer* renderer, t_data tdata,
                        float delta);
+bool t_rend_event();
 void t_rend_quit(imageData* imgData, display* disp);

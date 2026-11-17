@@ -26,32 +26,14 @@ char sfps[10];
 
 bool extractPixelDataFromFile(imageData* imgData) {
   FILE* image =
-      fopen("/VictoriaLineDisplay/media/background_128x32_single.bmp", "rb");
+      fopen("./media/background_128x32_single.bmp", "rb");
   uint8_t header[14];
   uint8_t DIBHeader[40];
 
-  if (image == NULL) {
-    printf("Unable to load image file");
-    return APP_END;
-  }
-
-  if (fread(header, 1, 14, image) != 14) {
-    fprintf(stderr, "ERROR: Cannot read file header\n");
-    fclose(image);
-    return APP_END;
-  }
-
-  if (header[0] != 'B' && header[1] != 'M') {
-    printf("\nthis is not a bmp file");
-    fclose(image);
-    return APP_END;
-  }
-
-  if (fread(DIBHeader, 1, 40, image) != 40) {
-    fprintf(stderr, "ERROR: Cannot read file DIB header\n");
-    fclose(image);
-    return APP_END;
-  }
+  assert(image);
+  assert(fread(header, 1, 14, image) == 14);
+  assert(header[0] == 'B' && header[1] == 'M');
+  assert(fread(DIBHeader, 1, 40, image) == 40);
 
   // all of these key address points were on the wiki for bmp files
   uint32_t headerSize = *(uint32_t*)&DIBHeader[0];
@@ -65,10 +47,7 @@ bool extractPixelDataFromFile(imageData* imgData) {
   printf("width: %d, height: %d\n", imgData->width, imgData->height);
   printf("Bits per pixel: %u\n", bitsPerPixel);
 
-  if (bitsPerPixel != 24) {
-    printf("BPP is not 24, please re-format");
-    return APP_END;
-  }
+  assert(bitsPerPixel == 24);
 
   /**
    * The row length is repesented in bytes - it must be a mutliple of 4 bytes

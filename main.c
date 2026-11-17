@@ -8,12 +8,11 @@ int main(void) {
   display disp = {NULL, NULL, 0, 0};
 
   t_data_init(&tdata);
-  bool status = 1; 
+  bool status = 1;
   t_rend_init(&imgData, &disp);
 
   // Collect initial data
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
-  system("start t_request");
   parseTrains(&tdata);
 
   uint64_t previousTick = 0;
@@ -21,13 +20,14 @@ int main(void) {
 
   while (status) {
     uint64_t currentTick = SDL_GetTicks();
-    float delta = (float)(currentTick - previousTick) /
-                  1000.0f;  // convert from ms to seconds
+    float delta = (float)(currentTick - previousTick) / 1000.0f;  // convert from ms to seconds
     requestRefreshTime += currentTick - previousTick;
     previousTick = currentTick;
 
     if (requestRefreshTime >= REQUEST_TIME) {
       requestRefreshTime = requestRefreshTime % REQUEST_TIME;
+      system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+      system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.json ");
       parseTrains(&tdata);
 
       printf("\n=============================\n");
@@ -38,13 +38,11 @@ int main(void) {
             " next station: %s\n alter station: %u\n status: %u\n"
             " data collected: %s\n data misses: %u\n"
             " x pos: %f, speed %f delta time: %f delta x: %f\n\n",
-            tdata.data[i].id, getstationliteral(tdata.data[i].stationName),
-            tdata.data[i].direction, tdata.data[i].timeToStation,
-            getstationliteral(tdata.data[i].nextStation),
+            tdata.data[i].id, getstationliteral(tdata.data[i].stationName), tdata.data[i].direction,
+            tdata.data[i].timeToStation, getstationliteral(tdata.data[i].nextStation),
             tdata.data[i].alterStation, tdata.data[i].status,
-            tdata.data[i].dataCollected ? "yes" : "no",
-            tdata.data[i].dataMisses, tdata.data[i].x, tdata.data[i].speed,
-            delta, tdata.data[i].speed * delta);
+            tdata.data[i].dataCollected ? "yes" : "no", tdata.data[i].dataMisses, tdata.data[i].x,
+            tdata.data[i].speed, delta, tdata.data[i].speed * delta);
       }
     }
 

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#define NORTHBOUND 1
-#define SOUTHBOUND -1
+#define NORTHBOUND -1
+#define SOUTHBOUND 1
 
 #define TRAIN_NEW 0
 #define TRAIN_EXISTS 1

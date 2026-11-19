@@ -13,6 +13,7 @@ int main(void) {
 
   // Collect initial data
   system("curl https://api.tfl.gov.uk/Line/victoria/Arrivals/ -o trains.txt ");
+  // system("curl https://api.tfl.gov.uk/TrackerNet/PredictionDetailed/V/KXX?app_key=1af1e69a0f734e779134a71357b06073 -o test.xml ");
   parseTrains(&tdata);
 
   uint64_t previousTick = 0;

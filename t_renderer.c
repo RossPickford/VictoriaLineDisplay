@@ -25,12 +25,12 @@
 char sfps[10];
 
 bool extractPixelDataFromFile(imageData* imgData) {
-  FILE* image = fopen("/usr/VictoriaLineDisplay/media/background_128x32_single.bmp", "rb");
+  FILE* image = fopen("/home/ross/VictoriaLineDisplay/media/background_128x32_single.bmp", "rb");
   uint8_t header[14];
   uint8_t DIBHeader[40];
 
   if (image == NULL) {
-    printf("Unable to load image file");
+    printf("Unable to load image file\n");
     return APP_END;
   }
 

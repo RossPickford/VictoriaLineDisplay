@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ROOT xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://trackernet.lul.co.uk">
+  <Disclaimer>This system is an INFORMATION ONLY system, relying entirely on 
+				information received from the relevant Operational Railway Control System(s). It is NOT 
+				considered a safety related system in the Railway Engineering sense. However, 
+				the information reported may trigger user intervention by staff regarding possible 
+				incidents on the railway, and confirmation of the situation observed should be obtained prior 
+				to any corrective action being taken.</Disclaimer>
+  <WhenCreated>22 Nov 2026 1:05:22</WhenCreated>
+  <Line>V</Line>
+  <LineName>Victoria Line</LineName>
+  <S Code="SVS" Mess="" N="Seven Sisters." CurTime="1:05:22">
+    <P N="Northbound - Platform 3" Num="3" TrackCode="TV6214" NextTrain="false">
+      <T TrainId="1061120" LCID="2166" SetNo="255" TripNo="8" SecondsTo="164" TimeTo="3:00" Location="Between Finsbury Park and Seven Sisters" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="164" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6262" LN="V" LeadingCarNo="11044" />
+      <T TrainId="1060950" LCID="2145" SetNo="216" TripNo="35" SecondsTo="360" TimeTo="6:00" Location="At Highbury &amp; Islington" Destination="Seven Sisters" InputDest="1021" DestCode="341" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="360" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6324" LN="V" LeadingCarNo="11022" />
+      <T TrainId="1061040" LCID="2155" SetNo="257" TripNo="8" SecondsTo="577" TimeTo="10:00" Location="At Euston" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="577" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6424" LN="V" LeadingCarNo="11004" />
+      <T TrainId="1060210" LCID="6787" SetNo="253" TripNo="24" SecondsTo="723" TimeTo="12:00" Location="Between Oxford Circus and Warren Street" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="723" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6520" LN="V" LeadingCarNo="11014" />
+      <T TrainId="1061030" LCID="2156" SetNo="250" TripNo="26" SecondsTo="1474" TimeTo="25:00" Location="At Brixton Platform 1" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:03:57" DepartInterval="1474" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6824" LN="V" LeadingCarNo="11067" />
+      <T TrainId="1061050" LCID="2160" SetNo="256" TripNo="8" SecondsTo="1524" TimeTo="25:00" Location="At Brixton Platform 2" Destination="Walthamstow Central" InputDest="11" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:14" DepartInterval="1524" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6825" LN="V" LeadingCarNo="11033" />
+    </P>
+    <P N="Northbound - Platform 4" Num="4" TrackCode="TV6178" NextTrain="false">
+      <T TrainId="1061110" LCID="2191" SetNo="237" TripNo="31" SecondsTo="0" TimeTo="-" Location="At Platform" Destination="Seven Sisters" InputDest="1021" DestCode="341" Order="0" ArrivalTime="" DepartTime="1:03:14" DepartInterval="0" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6178" LN="V" LeadingCarNo="11015" />
+      <T TrainId="1061120" LCID="2166" SetNo="255" TripNo="8" SecondsTo="128" TimeTo="2:30" Location="Between Finsbury Park and Seven Sisters" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="128" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6262" LN="V" LeadingCarNo="11044" />
+      <T TrainId="1060950" LCID="2145" SetNo="216" TripNo="35" SecondsTo="324" TimeTo="5:00" Location="At Highbury &amp; Islington" Destination="Seven Sisters" InputDest="1021" DestCode="341" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="324" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6324" LN="V" LeadingCarNo="11022" />
+      <T TrainId="1061040" LCID="2155" SetNo="257" TripNo="8" SecondsTo="541" TimeTo="9:00" Location="At Euston" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="541" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6424" LN="V" LeadingCarNo="11004" />
+      <T TrainId="1060210" LCID="6787" SetNo="253" TripNo="24" SecondsTo="687" TimeTo="11:00" Location="Between Oxford Circus and Warren Street" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:20" DepartInterval="687" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6520" LN="V" LeadingCarNo="11014" />
+      <T TrainId="1061030" LCID="2156" SetNo="250" TripNo="26" SecondsTo="1438" TimeTo="24:00" Location="At Brixton Platform 1" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:03:57" DepartInterval="1438" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6824" LN="V" LeadingCarNo="11067" />
+      <T TrainId="1061050" LCID="2160" SetNo="256" TripNo="8" SecondsTo="1488" TimeTo="25:00" Location="At Brixton Platform 2" Destination="Walthamstow Central" InputDest="11" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:05:14" DepartInterval="1488" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6825" LN="V" LeadingCarNo="11033" />
+    </P>
+    <P N="Southbound - Platform 5" Num="5" TrackCode="TV6225" NextTrain="false">
+      <T TrainId="1060640" LCID="5564" SetNo="251" TripNo="25" SecondsTo="0" TimeTo="-" Location="At Platform" Destination="Brixton" InputDest="80" DestCode="88" Order="0" ArrivalTime="" DepartTime="1:05:12" DepartInterval="0" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6223" LN="V" LeadingCarNo="11046" />
+    </P>
+  </S>
+</ROOT>

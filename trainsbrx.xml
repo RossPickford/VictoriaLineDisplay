@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ROOT xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://trackernet.lul.co.uk">
+  <Disclaimer>This system is an INFORMATION ONLY system, relying entirely on 
+				information received from the relevant Operational Railway Control System(s). It is NOT 
+				considered a safety related system in the Railway Engineering sense. However, 
+				the information reported may trigger user intervention by staff regarding possible 
+				incidents on the railway, and confirmation of the situation observed should be obtained prior 
+				to any corrective action being taken.</Disclaimer>
+  <WhenCreated>22 Nov 2026 1:05:28</WhenCreated>
+  <Line>V</Line>
+  <LineName>Victoria Line</LineName>
+  <S Code="BRX" Mess="" N="Brixton." CurTime="1:05:28">
+    <P N="Northbound - Platform 1" Num="1" TrackCode="TV6824" NextTrain="false">
+      <T TrainId="1061030" LCID="2156" SetNo="250" TripNo="26" SecondsTo="0" TimeTo="-" Location="At Platform" Destination="Walthamstow Central" InputDest="1011" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:02:44" DepartInterval="0" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6824" LN="V" LeadingCarNo="11067" />
+      <T TrainId="1061020" LCID="2151" SetNo="252" TripNo="23" SecondsTo="523" TimeTo="9:00" Location="At Victoria" Destination="Brixton" InputDest="80" DestCode="88" Order="0" ArrivalTime="" DepartTime="1:05:26" DepartInterval="523" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6617" LN="V" LeadingCarNo="11039" />
+      <T TrainId="1061220" LCID="2192" SetNo="254" TripNo="9" SecondsTo="1076" TimeTo="18:00" Location="Departed Kings Cross St. Pancras" Destination="Brixton" InputDest="80" DestCode="88" Order="0" ArrivalTime="" DepartTime="1:05:26" DepartInterval="1076" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6377" LN="V" LeadingCarNo="11012" />
+      <T TrainId="1060640" LCID="5564" SetNo="251" TripNo="25" SecondsTo="1614" TimeTo="27:00" Location="At Seven Sisters Platform 5" Destination="Brixton" InputDest="80" DestCode="88" Order="0" ArrivalTime="" DepartTime="1:05:24" DepartInterval="1614" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6225" LN="V" LeadingCarNo="11046" />
+    </P>
+    <P N="Northbound - Platform 2" Num="2" TrackCode="TV6825" NextTrain="false">
+      <T TrainId="1061050" LCID="2160" SetNo="256" TripNo="8" SecondsTo="0" TimeTo="-" Location="At Platform" Destination="Walthamstow Central" InputDest="11" DestCode="457" Order="0" ArrivalTime="" DepartTime="1:04:28" DepartInterval="0" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6825" LN="V" LeadingCarNo="11033" />
+      <T TrainId="1061020" LCID="2151" SetNo="252" TripNo="23" SecondsTo="502" TimeTo="8:00" Location="At Victoria" Destination="Brixton" InputDest="80" DestCode="88" Order="0" ArrivalTime="" DepartTime="1:05:26" DepartInterval="502" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6617" LN="V" LeadingCarNo="11039" />
+      <T TrainId="1061220" LCID="2192" SetNo="254" TripNo="9" SecondsTo="1055" TimeTo="18:00" Location="Departed Kings Cross St. Pancras" Destination="Brixton" InputDest="80" DestCode="88" Order="0" ArrivalTime="" DepartTime="1:05:26" DepartInterval="1055" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6377" LN="V" LeadingCarNo="11012" />
+      <T TrainId="1060640" LCID="5564" SetNo="251" TripNo="25" SecondsTo="1593" TimeTo="27:00" Location="At Seven Sisters Platform 5" Destination="Brixton" InputDest="80" DestCode="88" Order="0" ArrivalTime="" DepartTime="1:05:24" DepartInterval="1593" Departed="0" Direction="0" IsStalled="0" TrackCode="TV6225" LN="V" LeadingCarNo="11046" />
+    </P>
+  </S>
+</ROOT>
